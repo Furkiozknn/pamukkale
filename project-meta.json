@@ -1,0 +1,82 @@
+{
+  "schema_version": "1.0.0",
+  "id": "pamukkale",
+  "owner": "Furkiozknn",
+  "repository": "https://github.com/Furkiozknn/pamukkale",
+  "homepage": "https://furkiozknn.github.io/pamukkale/",
+  "releases": null,
+  "status": "active",
+  "category": "game",
+  "platform": [
+    "web"
+  ],
+  "primary_language": "JavaScript",
+  "technologies": [
+    "Three.js r170",
+    "Canvas 2D",
+    "Web Audio API"
+  ],
+  "version": null,
+  "license": "MIT",
+  "topics": [
+    "browser-game",
+    "threejs",
+    "puzzle-game",
+    "water-simulation",
+    "pamukkale",
+    "claude-code",
+    "claude-game-arena"
+  ],
+  "summary": "Calm 3D water-flow puzzle on the travertine terraces of Pamukkale, built by Claude Haiku 5.5 · Pamukkale travertenlerinde sakin 3D su akışı bulmacası, Claude Haiku 5.5 yaptı",
+  "key_features": [
+    "Guide spring water into target pools with a limited set of stones, dams and splitters",
+    "Still water builds calcium, so the terraces rise and change while the water runs",
+    "20 levels in 4 areas with three stars each: all pools full, no water spilled, tool saving",
+    "Every level checked offline against the same simulation code (tools/solve-levels.mjs)",
+    "The ?auto bot cleared 20/20 levels with 46/60 stars; one index.html, everything generated in code"
+  ],
+  "media": {
+    "hero": "docs/02-gameplay-level9.png",
+    "screenshots": [
+      "docs/card.jpg",
+      "docs/02-gameplay-level9.png",
+      "docs/01-title.png",
+      "docs/03-gameplay-level1.png",
+      "docs/04-ending.png",
+      "docs/05-phone-500x900.png"
+    ],
+    "gifs": [
+      "docs/gameplay.gif"
+    ],
+    "videos": [
+      "docs/gameplay.mp4"
+    ]
+  },
+  "tests": null,
+  "ci": {
+    "workflows": [],
+    "badge": null
+  },
+  "docs": {
+    "readme": "README.md",
+    "changelog": null,
+    "version_history": null,
+    "roadmap": null,
+    "security": null,
+    "contributing": null,
+    "license_file": "LICENSE"
+  },
+  "social": {
+    "headline": "Guide warm spring water into the white travertine pools · Ilık kaynak suyunu beyaz traverten havuzlarına yönlendir",
+    "hashtags": [
+      "claudecode",
+      "indiegame"
+    ],
+    "primary_link": "https://furkiozknn.github.io/pamukkale/"
+  },
+  "provenance": {
+    "generated_at": "2026-10-27",
+    "generator": "hand-written",
+    "rule": "mechanical fields read from the repository; editorial fields hand-written from the README and index.html; no field is generated from a guess"
+  }
+}
