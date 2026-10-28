@@ -18,6 +18,10 @@
 
 <p align="center"><b>Play online: <a href="https://furkiozknn.github.io/pamukkale/">https://furkiozknn.github.io/pamukkale/</a></b> (desktop and phone, no install)</p>
 
+<!-- portals:start -->
+<p align="center">Also on: <a href="https://furkiozknn.itch.io/pamukkale">itch.io</a></p>
+<!-- portals:end -->
+
 ## Highlights
 
 - **Three tools, limited.** A stone raises a cell by one step so the water turns around it, a dam raises it by two
@@ -151,3 +155,5 @@ oynanır. Claude Haiku 5.5 tarafından Claude Code ile tek bir prompt'tan yapıl
 ## License
 
 MIT, see [LICENSE](LICENSE).
+
+Like the game? You can support new rounds on [Buy Me a Coffee](https://buymeacoffee.com/furkiozkann). The game stays free.
