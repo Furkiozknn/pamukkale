@@ -767,12 +767,12 @@ let board = null;        // { n, terrainGeo, waterGeo, terrain, water, perim, V,
 const TOOL_KINDS = ['stone', 'dam', 'split'];
 const toolGeo = {
   stone: new THREE.IcosahedronGeometry(0.32, 2).scale(1, 0.55, 1),
-  dam: new THREE.CapsuleGeometry(0.13, 0.55, 4, 10).rotateZ(Math.PI / 2),
+  dam: new THREE.CapsuleGeometry(0.14, 0.55, 6, 14).rotateZ(Math.PI / 2),
   split: new THREE.ConeGeometry(0.28, 0.42, 16)
 };
 const toolMat = {
-  stone: new THREE.MeshLambertMaterial({ color: 0xFFFFFF }),
-  dam: new THREE.MeshLambertMaterial({ color: 0xFFF8EA }),
+  stone: new THREE.MeshLambertMaterial({ color: 0xCDB89A }),
+  dam: new THREE.MeshLambertMaterial({ color: 0xCDB89A }),
   split: new THREE.MeshLambertMaterial({ color: 0x2EC4C9 })
 };
 const toolMesh = {};
@@ -957,10 +957,11 @@ function refreshTerrain() {
     const band = 0.012 * Math.sin(u * 2.3 + v * 1.7) + 0.01 * Math.cos(u * 5.1 - v * 3.3);
     // steep parts of a shelf sit a little darker, so every rounded lip reads
     const sl = Math.min(1, Math.abs(samp(hArr, n, u + 0.3, v) - samp(hArr, n, u - 0.3, v)) + Math.abs(samp(hArr, n, u, v + 0.3) - samp(hArr, n, u, v - 0.3)));
-    const shade = 1 - 0.16 * sl;
-    col.setXYZ(k, (CREAM[0] + (WHITE[0] - CREAM[0]) * rim + band) * shade, (CREAM[1] + (WHITE[1] - CREAM[1]) * rim + band) * shade, (CREAM[2] + (WHITE[2] - CREAM[2]) * rim + band) * shade);
+    // the steepest edges catch the light: their top brightens towards #FBF8F2
+    const shade = 1 - 0.1 * sl, hi = Math.min(1, sl * 1.5) * 0.5;
+    const cr = (CREAM[0] + (WHITE[0] - CREAM[0]) * rim + band) * shade, cg = (CREAM[1] + (WHITE[1] - CREAM[1]) * rim + band) * shade, cb = (CREAM[2] + (WHITE[2] - CREAM[2]) * rim + band) * shade;
+    col.setXYZ(k, cr + (0.984 - cr) * hi, cg + (0.973 - cg) * hi, cb + (0.949 - cb) * hi);
   }
-  refreshLips(hArr);
   for (let p = 0; p < board.P; p++) {
     const src = board.perim[p], dst = V + p;
     // the apron's foot hangs in uneven drips and carries faint vertical flowstone streaks
@@ -1015,36 +1016,6 @@ function shimmer(time) {
 const cellX = (i, n) => (i % n) + 0.5 - n / 2;
 const cellZ = (i, n) => Math.floor(i / n) + 0.5 - n / 2;
 
-// rounded lips: a capsule lies along every edge where the shelf steps by 1.5 units or more (stones stay ramps)
-const LIP_MAX = 400;   // 2 * 10 * 10 edges at most: the largest level is 10 cells wide
-const lipMesh = new THREE.InstancedMesh(new THREE.CapsuleGeometry(0.085, 0.8, 4, 10), new THREE.MeshLambertMaterial({ color: 0xffffff }), LIP_MAX);
-lipMesh.count = 0;
-lipMesh.castShadow = quality !== 'low';
-scene.add(lipMesh);
-const AXIS_Y = new THREE.Vector3(0, 1, 0), AXIS_X = new THREE.Vector3(1, 0, 0), AXIS_Z = new THREE.Vector3(0, 0, 1);
-function refreshLips(hArr) {
-  const n = board.n;
-  let c = 0;
-  for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) {
-    const a = j * n + i;
-    for (const [di, dj] of [[1, 0], [0, 1]]) {
-      const ni = i + di, nj = j + dj;
-      if (ni >= n || nj >= n || c >= LIP_MAX) continue;
-      const b = nj * n + ni, ha = hArr[a], hb = hArr[b];
-      if (Math.abs(ha - hb) < 1.5) continue;
-      // the capsule runs along the edge, so it turns across the step direction
-      tmpQ.setFromUnitVectors(AXIS_Y, di ? AXIS_Z : AXIS_X);
-      tmpM.compose(tmpP.set((cellX(a, n) + cellX(b, n)) / 2, Math.max(ha, hb) * HU + 0.02, (cellZ(a, n) + cellZ(b, n)) / 2), tmpQ, tmpS.set(1, 1, 1));
-      lipMesh.setMatrixAt(c, tmpM);
-      lipMesh.setColorAt(c, tmpC.setRGB(0.97, 0.94, 0.88));
-      c++;
-    }
-  }
-  lipMesh.count = c;
-  lipMesh.instanceMatrix.needsUpdate = true;
-  if (lipMesh.instanceColor) lipMesh.instanceColor.needsUpdate = true;
-}
-
 function refreshTools() {
   if (!board || !G.st) return;
   const st = G.st, n = board.n;
@@ -1059,7 +1030,7 @@ function refreshTools() {
     tmpQ.setFromEuler(tmpE);
     tmpM.compose(tmpP.set(cellX(i, n), h + yOff, cellZ(i, n)), tmpQ, tmpS.set(1, 1, 1));
     toolMesh[kind].setMatrixAt(k, tmpM);
-    tmpC.setHSL(0.11 + ((i * 37) % 10) * 0.002, 0.14, 0.88 - ((i * 13) % 7) * 0.012);
+    tmpC.setHSL(0.11 + ((i * 37) % 10) * 0.002, 0.14, 0.94 - ((i * 13) % 7) * 0.012);
     if (kind === 'stone') toolMesh.stone.setColorAt(k, tmpC);
   }
   for (const kind of TOOL_KINDS) {
