@@ -21,27 +21,29 @@
 <style>
 :root{
   /* palette: travertine #F5F3EE, turquoise #2EC4C9, sunset peach #FFC9A9, ruin stone #CDB89A, sky #BFE6FF */
-  --ink:#1D3F49; --ink-soft:#5C7A80; --paper:#FFFFFF; --cream:#F5F3EE;
+  /* --ink-soft darkened to #3E5C63 (>6.3:1 on cream/glass) so subtitle, result and footer text pass WCAG AA 4.5:1 */
+  --ink:#1D3F49; --ink-soft:#3E5C63; --paper:#FFFFFF; --cream:#F5F3EE;
   --accent:#2EC4C9; --accent-deep:#0F8B91; --gold:#E9A53C; --danger:#D9644F;
-  --glass:rgba(255,255,255,.94); --glass-line:rgba(29,63,73,.1);
+  --glass:rgba(255,255,255,.94); --glass-line:rgba(29,63,73,.1); --overlay-bg:rgba(245,243,238,.5);
   --shadow:0 10px 28px rgba(29,63,73,.12); --focus:#0F8B91;
   --sky-top:#BFE6FF; --sky-bottom:#FFE3D0; --star-off:rgba(23,59,68,.22);
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --ink:#EAF6F6; --ink-soft:#A7C3C6; --paper:#132D35; --cream:#1A3840;
-    --glass:rgba(19,45,53,.92); --glass-line:rgba(234,246,246,.14);
-    --shadow:0 10px 28px rgba(0,0,0,.45); --sky-top:#23485A; --sky-bottom:#5A4A4F; --star-off:#A7C3C6;
+    /* --ink-soft lightened to #B8D4D7 (>7.8:1 on dark paper/glass) and dark overlay backdrop for WCAG AA 4.5:1 */
+    --ink:#EAF6F6; --ink-soft:#B8D4D7; --paper:#132D35; --cream:#1A3840;
+    --glass:rgba(19,45,53,.92); --glass-line:rgba(234,246,246,.14); --overlay-bg:rgba(19,45,53,.6);
+    --shadow:0 10px 28px rgba(0,0,0,.45); --sky-top:#23485A; --sky-bottom:#5A4A4F; --star-off:#B8D4D7;
   }
 }
 :root[data-theme="dark"]{
-  --ink:#EAF6F6; --ink-soft:#A7C3C6; --paper:#132D35; --cream:#1A3840;
-  --glass:rgba(19,45,53,.92); --glass-line:rgba(234,246,246,.14);
-  --shadow:0 10px 28px rgba(0,0,0,.45); --sky-top:#23485A; --sky-bottom:#5A4A4F; --star-off:#A7C3C6;
+  --ink:#EAF6F6; --ink-soft:#B8D4D7; --paper:#132D35; --cream:#1A3840;
+  --glass:rgba(19,45,53,.92); --glass-line:rgba(234,246,246,.14); --overlay-bg:rgba(19,45,53,.6);
+  --shadow:0 10px 28px rgba(0,0,0,.45); --sky-top:#23485A; --sky-bottom:#5A4A4F; --star-off:#B8D4D7;
 }
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;overflow:hidden}
-body{background:#F5F3EE;color:var(--ink);font-family:Nunito,system-ui,sans-serif;-webkit-user-select:none;user-select:none;touch-action:none}
+body{background:var(--cream);color:var(--ink);font-family:Nunito,system-ui,sans-serif;-webkit-user-select:none;user-select:none;touch-action:none}
 #stage{position:fixed;inset:0;background:linear-gradient(180deg,var(--sky-top) 0%,var(--sky-bottom) 70%)}
 #c{position:absolute;inset:0;width:100%;height:100%;display:block}
 button{font:inherit;color:inherit;cursor:pointer;min-height:44px;min-width:44px}
@@ -50,7 +52,8 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--focus);outline-
 .glass{background:var(--glass);border:1px solid var(--glass-line);border-radius:24px;box-shadow:var(--shadow);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
 .hidden{display:none !important}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 20px;border-radius:999px;border:1px solid var(--glass-line);background:#FFFFFF;color:var(--ink);font-weight:800;font-size:16px;transition:transform .12s,background .12s}
-:root[data-theme="dark"] .btn:not(.primary):not(.run),:root:not([data-theme="light"]) .btn:not(.primary):not(.run){background:rgba(255,255,255,.08)}
+:root[data-theme="dark"] .btn:not(.primary):not(.run){background:rgba(255,255,255,.08)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn:not(.primary):not(.run){background:rgba(255,255,255,.08)}}
 .btn:hover{transform:translateY(-1px)}
 .btn:disabled{opacity:.42;cursor:not-allowed;transform:none}
 .btn.primary{background:var(--accent);border-color:var(--accent-deep);color:#073A3D;box-shadow:0 6px 18px rgba(46,196,201,.38)}
@@ -61,7 +64,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--focus);outline-
 .ico{width:22px;height:22px;fill:currentColor;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .ico.f{stroke:none}
 .ico.s{fill:none}
-.overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(245,243,238,.5);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);z-index:20}
+.overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;background:var(--overlay-bg);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);z-index:20}
 .card{width:min(460px,100%);max-height:100%;overflow:auto;padding:28px 26px;text-align:center}
 .wide{width:min(820px,100%)}
 h1,h2{font-family:Nunito,system-ui,sans-serif;margin:0;letter-spacing:-.2px}
@@ -72,7 +75,8 @@ h2{font-size:30px;font-weight:700}
 .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px}
 .logo{width:92px;height:92px;margin:0 auto 4px;display:block}
 .best{margin-top:14px;font-size:14px;color:var(--ink-soft)}
-.footer{position:fixed;left:0;right:0;bottom:8px;text-align:center;font-size:13px;color:var(--ink-soft);z-index:5;pointer-events:auto}
+/* opaque pill backing so footer/credits text keeps >7:1 contrast over the 3D stage in light and dark schemes */
+.footer{position:fixed;left:0;right:0;bottom:8px;width:max-content;max-width:calc(100% - 16px);margin:0 auto;padding:4px 14px;border-radius:999px;background:var(--paper);border:1px solid var(--glass-line);box-shadow:var(--shadow);text-align:center;font-size:13px;color:var(--ink-soft);z-index:5;pointer-events:auto}
 .footer a{color:inherit;font-weight:800}
 .lang-seg,.quality-seg{display:flex;gap:6px;justify-content:center}
 .lang-seg button,.quality-seg button{min-width:72px;background:rgba(255,255,255,.55);border:1px solid var(--glass-line);border-radius:12px;padding:0 12px;font-weight:800;color:var(--ink)}
