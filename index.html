@@ -17,19 +17,19 @@
   --accent:#2EC4C9; --accent-deep:#0F8B91; --gold:#E9A53C; --danger:#D9644F;
   --glass:rgba(255,255,255,.94); --glass-line:rgba(29,63,73,.1);
   --shadow:0 10px 28px rgba(29,63,73,.12); --focus:#0F8B91;
-  --sky-top:#BFE6FF; --sky-bottom:#FFE3D0;
+  --sky-top:#BFE6FF; --sky-bottom:#FFE3D0; --star-off:rgba(23,59,68,.22);
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --ink:#EAF6F6; --ink-soft:#A7C3C6; --paper:#132D35; --cream:#1A3840;
     --glass:rgba(19,45,53,.92); --glass-line:rgba(234,246,246,.14);
-    --shadow:0 10px 28px rgba(0,0,0,.45); --sky-top:#23485A; --sky-bottom:#5A4A4F;
+    --shadow:0 10px 28px rgba(0,0,0,.45); --sky-top:#23485A; --sky-bottom:#5A4A4F; --star-off:#A7C3C6;
   }
 }
 :root[data-theme="dark"]{
   --ink:#EAF6F6; --ink-soft:#A7C3C6; --paper:#132D35; --cream:#1A3840;
   --glass:rgba(19,45,53,.92); --glass-line:rgba(234,246,246,.14);
-  --shadow:0 10px 28px rgba(0,0,0,.45); --sky-top:#23485A; --sky-bottom:#5A4A4F;
+  --shadow:0 10px 28px rgba(0,0,0,.45); --sky-top:#23485A; --sky-bottom:#5A4A4F; --star-off:#A7C3C6;
 }
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;overflow:hidden}
@@ -89,13 +89,16 @@ h2{font-size:30px;font-weight:700}
 .stats{display:flex;align-items:center;gap:14px;font-size:14px;font-weight:800;white-space:nowrap;min-width:0;overflow:hidden}
 .stats span small{display:block;font-size:11px;font-weight:700;color:var(--ink-soft);letter-spacing:.3px;text-transform:uppercase}
 .stars{display:inline-flex;gap:2px}
-.stars svg{width:18px;height:18px;fill:rgba(23,59,68,.22)}
+.stars svg{width:18px;height:18px;fill:var(--star-off)}
 .stars svg.on{fill:var(--gold)}
 .actions{display:flex;align-items:center;gap:2px;flex:none}
 #tray{position:fixed;left:50%;transform:translateX(-50%);bottom:14px;display:flex;gap:8px;align-items:center;padding:8px;z-index:10;max-width:calc(100% - 20px);border-radius:24px}
 .tool{position:relative;min-width:64px;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;border-radius:12px;border:1px solid var(--glass-line);background:rgba(255,255,255,.6);color:var(--ink);font-size:12px;font-weight:800;padding:0 6px}
 :root:not([data-theme="light"]) .tool,:root[data-theme="dark"] .tool{background:rgba(255,255,255,.06)}
 .tool.sel{background:var(--accent);border-color:var(--accent-deep);color:#073A3D}
+/* the dark theme's translucent .tool rule outranks .tool.sel, so the selected chip needs its own dark-mode rule */
+:root:not([data-theme="light"]) .tool.sel,:root[data-theme="dark"] .tool.sel{background:#0A6C71;border-color:var(--accent);color:#EAF6F6}
+:root:not([data-theme="light"]) .tool.sel .n,:root[data-theme="dark"] .tool.sel .n{color:#EAF6F6}
 .tool .n{position:absolute;top:3px;left:6px;font-size:10px;color:var(--ink-soft)}
 .tool .c{position:absolute;top:3px;right:5px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--ink);color:var(--paper);font-size:11px;line-height:18px;text-align:center}
 .tool:disabled .c{background:var(--danger)}
@@ -149,15 +152,26 @@ h2{font-size:30px;font-weight:700}
   .card{padding:18px}
   h1{font-size:44px}
 }
-/* short landscape phones: keep the board visible above the tray */
+/* narrow phones: the tool bar wraps to two rows so Fast forward, Undo and Reset all stay on screen */
+@media (max-width:480px){
+  #tray{width:calc(100% - 16px);flex-wrap:wrap;justify-content:center;row-gap:5px}
+  .sep{display:none}
+  .act span.lbl{display:inline}
+}
+/* short landscape phones: keep the board visible above the tray, and the title card's buttons on screen */
 @media (max-height:500px) and (orientation:landscape){
   #tray{bottom:4px;padding:4px}
   .tool{height:44px;min-width:50px}
   .act{height:44px}
-  .card{padding:14px 18px}
-  .logo{width:56px;height:56px}
-  h1{font-size:34px}
-  .sub{margin-top:4px}
+  .overlay{padding:8px}
+  .card{padding:12px 18px}
+  .logo{width:44px;height:44px;margin-bottom:0}
+  h1{font-size:30px}
+  #ov-title .sub:first-of-type{display:none}
+  #ov-title .stack{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+  #ov-title .btn{min-height:40px}
+  #ov-title .best{margin-top:4px}
+  #ov-title .row{margin-top:6px}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
