@@ -12,27 +12,28 @@
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"}}</script>
 <style>
 :root{
-  --ink:#173B44; --ink-soft:#4F6E74; --paper:#FBF7EE; --cream:#F3EDDF;
-  --accent:#2EC4C9; --accent-deep:#12868C; --gold:#E8B04B; --danger:#D9644F;
-  --glass:rgba(255,255,255,.74); --glass-line:rgba(23,59,68,.14);
-  --shadow:0 12px 32px rgba(23,59,68,.2); --focus:#FFB23F;
-  --sky-top:#9ED9EE; --sky-bottom:#F7EBD2;
+  /* palette: travertine #F5F3EE, turquoise #2EC4C9, sunset peach #FFC9A9, ruin stone #CDB89A, sky #BFE6FF */
+  --ink:#1D3F49; --ink-soft:#5C7A80; --paper:#FFFFFF; --cream:#F5F3EE;
+  --accent:#2EC4C9; --accent-deep:#0F8B91; --gold:#E9A53C; --danger:#D9644F;
+  --glass:rgba(255,255,255,.92); --glass-line:rgba(29,63,73,.1);
+  --shadow:0 10px 28px rgba(29,63,73,.12); --focus:#FF9F43;
+  --sky-top:#BFE6FF; --sky-bottom:#FFE3D0;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --ink:#E6F3F1; --ink-soft:#A9C4C2; --paper:#0F2A30; --cream:#16353C;
-    --glass:rgba(12,36,42,.8); --glass-line:rgba(230,243,241,.16);
-    --shadow:0 12px 32px rgba(0,0,0,.5); --sky-top:#1B3D52; --sky-bottom:#3A4E5A;
+    --ink:#EAF6F6; --ink-soft:#A7C3C6; --paper:#132D35; --cream:#1A3840;
+    --glass:rgba(19,45,53,.92); --glass-line:rgba(234,246,246,.14);
+    --shadow:0 10px 28px rgba(0,0,0,.45); --sky-top:#23485A; --sky-bottom:#5A4A4F;
   }
 }
 :root[data-theme="dark"]{
-  --ink:#E6F3F1; --ink-soft:#A9C4C2; --paper:#0F2A30; --cream:#16353C;
-  --glass:rgba(12,36,42,.8); --glass-line:rgba(230,243,241,.16);
-  --shadow:0 12px 32px rgba(0,0,0,.5); --sky-top:#1B3D52; --sky-bottom:#3A4E5A;
+  --ink:#EAF6F6; --ink-soft:#A7C3C6; --paper:#132D35; --cream:#1A3840;
+  --glass:rgba(19,45,53,.92); --glass-line:rgba(234,246,246,.14);
+  --shadow:0 10px 28px rgba(0,0,0,.45); --sky-top:#23485A; --sky-bottom:#5A4A4F;
 }
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;overflow:hidden}
-body{background:#F3EDDF;color:var(--ink);font-family:Nunito,system-ui,sans-serif;-webkit-user-select:none;user-select:none;touch-action:none}
+body{background:#F5F3EE;color:var(--ink);font-family:Nunito,system-ui,sans-serif;-webkit-user-select:none;user-select:none;touch-action:none}
 #stage{position:fixed;inset:0;background:linear-gradient(180deg,var(--sky-top) 0%,var(--sky-bottom) 70%)}
 #c{position:absolute;inset:0;width:100%;height:100%;display:block}
 button{font:inherit;color:inherit;cursor:pointer;min-height:44px;min-width:44px}
@@ -572,10 +573,10 @@ renderer.setClearColor(0x000000, 0);
 renderer.shadowMap.enabled = quality !== 'low';
 renderer.shadowMap.type = THREE.PCFShadowMap;
 const scene = new THREE.Scene();
-scene.fog = new THREE.Fog(0xF4E7CF, 28, 62);
+scene.fog = new THREE.Fog(0xFBE6D6, 28, 62);
 const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 160);
-const hemi = new THREE.HemisphereLight(0xDDF3FF, 0xE8D6B0, 1.05);
-const sun = new THREE.DirectionalLight(0xFFF0D2, 1.7);
+const hemi = new THREE.HemisphereLight(0xEAF8FF, 0xF2E2C8, 1.05);
+const sun = new THREE.DirectionalLight(0xFFF6E6, 1.9);
 sun.position.set(-7, 13, 10);
 sun.target.position.set(0, 0, 0);
 sun.castShadow = quality !== 'low';
@@ -1589,10 +1590,10 @@ document.addEventListener('visibilitychange', () => { if (document.hidden && G.r
 
 // ---------- area sky and light ----------
 const SKIES = [
-  { top: '#9ED9EE', bottom: '#F7EBD2', fog: 0xF4E7CF, sun: 0xFFF0D2, sunI: 1.7 },
-  { top: '#8FD0EA', bottom: '#F9E6C4', fog: 0xF5E5C8, sun: 0xFFEBC4, sunI: 1.75 },
-  { top: '#A9D8EE', bottom: '#F4E2C4', fog: 0xF2E3C6, sun: 0xFFE2B4, sunI: 1.7 },
-  { top: '#FFC48A', bottom: '#F6A27E', fog: 0xF7B68E, sun: 0xFFB67A, sunI: 1.5 }
+  { top: '#BFE6FF', bottom: '#FFE3D0', fog: 0xFBE6D6, sun: 0xFFF6E6, sunI: 1.9 },
+  { top: '#B5E2FA', bottom: '#FFD9C0', fog: 0xF9DCC8, sun: 0xFFEFD8, sunI: 1.9 },
+  { top: '#CDEEFF', bottom: '#FFEAD9', fog: 0xFCE9DA, sun: 0xFFF2E0, sunI: 1.85 },
+  { top: '#FFB997', bottom: '#FFE7D6', fog: 0xFFD2B8, sun: 0xFFC48F, sunI: 1.6 }
 ];
 function applyAreaSky() {
   const a = SKIES[G.def ? G.def.area : 0];
