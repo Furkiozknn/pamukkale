@@ -142,9 +142,22 @@ h2{font-size:30px;font-weight:700}
   #tray{bottom:8px;gap:5px;padding:6px}
   .tool{min-width:50px;height:50px}
   .act span.lbl{display:none}
+  .lvl-name{display:none}
   .stats span small{display:none}
   .stats{gap:8px;font-size:13px}
+  #hud{left:8px;right:8px;top:8px}
   .card{padding:18px}
+  h1{font-size:44px}
+}
+/* short landscape phones: keep the board visible above the tray */
+@media (max-height:500px) and (orientation:landscape){
+  #tray{bottom:4px;padding:4px}
+  .tool{height:44px;min-width:50px}
+  .act{height:44px}
+  .card{padding:14px 18px}
+  .logo{width:56px;height:56px}
+  h1{font-size:34px}
+  .sub{margin-top:4px}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -1465,7 +1478,7 @@ function setLang(code) {
 function renderHUD() {
   if (!G.st) return;
   const cnt = poolCounts();
-  document.getElementById('hud-level').innerHTML = `<small>${t('levelWord')}</small>${G.idx + 1}/${LEVEL_COUNT} · ${levelName(G.idx)}`;
+  document.getElementById('hud-level').innerHTML = `<small>${t('levelWord')}</small>${G.idx + 1}/${LEVEL_COUNT}<span class="lvl-name"> · ${levelName(G.idx)}</span>`;
   document.getElementById('hud-pools').textContent = `${cnt.filled}/${cnt.total}`;
   document.getElementById('hud-water').textContent = G.st.emitted.toFixed(1);
   const [s1, s2, s3] = starState(G.st.pools.length && poolCounts().filled === cnt.total);
