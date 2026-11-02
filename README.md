@@ -34,7 +34,7 @@
   a short solution fills every pool; `tools/solve-levels.mjs` re-checks each stored solution with the same simulation
   code.
 - **Played by a bot.** `?auto` replays each level's stored solution through the same placement function a click uses.
-  Measured: **20/20 levels, 46/60 stars**, 14-18 draw calls.
+  Measured on the redesign branch: **20/20 levels, 46/60 stars**, zero JavaScript errors, with and without `?noassets`.
 - **One file, made in code.** One `index.html` with Three.js r170 from a CDN; terrain, water and tools are procedural
   geometry, and a saz-like plucked loop, a flute line, trickling water, splashes and birdsong are synthesised with
   Web Audio.
@@ -85,6 +85,28 @@ Turkish is the default language (`L` or the **EN** toggle switches). Progress is
 
 ## Screenshots
 
+## Redesign (2026-11)
+
+**Art direction:** bright pastel travertine on a sage meadow: turquoise water with shore foam and caustic light,
+peach sunset sky, airy white cards with turquoise accents. Palette: travertine `#F5F3EE`, turquoise `#2EC4C9`,
+sunset peach `#FFC9A9`, ruin stone `#CDB89A`, sky `#BFE6FF`.
+
+- **Terraces:** travertine step edges that catch the light (the steepest shelf edges brighten towards `#FBF8F2`),
+  slope shading, and stepped travertine ledges down the valley sides. The simulation and level data are unchanged.
+- **Scene:** pastel meadow, shrubs, boulders, a pale distant range inside the fog, lathe-turned spring bowl,
+  rounded theatre benches and ruin columns.
+- **Water and FX:** shore foam, a scrolling caustic texture, a sparkle when a tool is placed, slowly drifting clouds.
+- **UI:** white cards, pill buttons, floating HUD pills, and a layout that works on phones and short landscape screens.
+- **Language:** the default follows the browser (Turkish or English); a saved setting still wins.
+
+Before and after, same level and camera (level 9):
+
+<p align="center"><img src="docs/redesign-before-after.png" width="100%" alt="Level 9 before (left) and after (right) the redesign"></p>
+
+Measured with headless Chrome at 1280x720 on the redesign branch: draw calls 17 before, 21 after (level 9 in play);
+triangles 26k before, 34k after. Frame rate is not claimed; headless rAF is not a GPU budget. The banner, card and
+gameplay GIF still show the old look until the media pass.
+
 <table>
   <tr>
     <td width="33%"><img src="docs/01-title.png" alt="Title screen"><br><sub>Title screen</sub></td>
@@ -92,7 +114,7 @@ Turkish is the default language (`L` or the **EN** toggle switches). Progress is
     <td width="33%"><img src="docs/02-gameplay-level9.png" alt="Level 9: three pools filling in turn"><br><sub>Level 9, three pools</sub></td>
   </tr>
   <tr>
-    <td><img src="docs/04-ending.png" alt="Ending screen after the bot run with 20 of 20 levels and 46 of 60 stars, debug overlay on"><br><sub>Ending after the <code>?auto</code> run (with <code>?debug</code>)</sub></td>
+    <td><img src="docs/04-ending.png" alt="Ending screen after the bot run with 20 of 20 levels and 46 of 60 stars"><br><sub>Ending after the <code>?auto</code> run: 20/20 levels, 46/60 stars</sub></td>
     <td><img src="docs/05-phone-500x900.png" alt="Pamukkale on a phone"><br><sub>On a phone</sub></td>
     <td></td>
   </tr>
@@ -120,7 +142,7 @@ Everything is generated in code, so there are no asset files and no credits to l
 - **Simulation:** the water is a small grid automaton in plain JavaScript between the `SIM-BEGIN` and `SIM-END`
   markers in `index.html`; `tools/solve-levels.mjs` runs the same code.
 - **3D:** terrain, water and tools are procedural geometry with vertex colours, with instanced meshes for repeated
-  objects; 14-18 draw calls measured. The headless frame rate is a rAF reading, not a measured GPU budget, so no fps
+  objects; 21-22 draw calls measured in play on the redesign branch. The headless frame rate is a rAF reading, not a measured GPU budget, so no fps
   figure is claimed.
 - **Known limits:** the terraces are an approximate, plateau-style hillside and the sloped apron at the edge is a
   simplified form; level 16 uses a looser difficulty band than its neighbours.
