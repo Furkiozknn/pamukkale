@@ -13,7 +13,7 @@
 <p align="center"><b>A calm 3D water-flow puzzle on the white travertine terraces of Pamukkale: guide warm spring water down the hillside into the target pools with stones, dams and splitters, while still water slowly builds new white calcium rims and changes the terraces as you play.</b></p>
 
 <p align="center">
-  <img src="docs/gameplay.gif" width="640" alt="Pamukkale gameplay: water from the spring spreads over the terraces around the placed stones and fills the pools of level 8, then level 9 begins">
+  <img src="docs/gameplay.gif" width="640" alt="Pamukkale gameplay after the redesign: turquoise spring water spreads over the pastel travertine terraces around the placed stones and fills the pools">
 </p>
 
 <p align="center"><b>Play online: <a href="https://furkiozknn.github.io/pamukkale/">https://furkiozknn.github.io/pamukkale/</a></b> (desktop and phone, no install)</p>
