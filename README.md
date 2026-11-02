@@ -91,8 +91,8 @@ Turkish is the default language (`L` or the **EN** toggle switches). Progress is
 peach sunset sky, airy white cards with turquoise accents. Palette: travertine `#F5F3EE`, turquoise `#2EC4C9`,
 sunset peach `#FFC9A9`, ruin stone `#CDB89A`, sky `#BFE6FF`.
 
-- **Terraces:** capsule lips on every shelf edge with a step of 1.5 units or more, slope shading, and stepped
-  travertine ledges down the valley sides. The simulation and level data are unchanged.
+- **Terraces:** travertine step edges that catch the light (the steepest shelf edges brighten towards `#FBF8F2`),
+  slope shading, and stepped travertine ledges down the valley sides. The simulation and level data are unchanged.
 - **Scene:** pastel meadow, shrubs, boulders, a pale distant range inside the fog, lathe-turned spring bowl,
   rounded theatre benches and ruin columns.
 - **Water and FX:** shore foam, a scrolling caustic texture, a sparkle when a tool is placed, slowly drifting clouds.
@@ -103,8 +103,8 @@ Before and after, same level and camera (level 9):
 
 <p align="center"><img src="docs/redesign-before-after.png" width="100%" alt="Level 9 before (left) and after (right) the redesign"></p>
 
-Measured with headless Chrome at 1280x720 on the redesign branch: draw calls 17 before, 22 after (level 9 in play);
-triangles 26k before, 48k after. Frame rate is not claimed; headless rAF is not a GPU budget. The banner, card and
+Measured with headless Chrome at 1280x720 on the redesign branch: draw calls 17 before, 21 after (level 9 in play);
+triangles 26k before, 34k after. Frame rate is not claimed; headless rAF is not a GPU budget. The banner, card and
 gameplay GIF still show the old look until the media pass.
 
 <table>
