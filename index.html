@@ -696,6 +696,18 @@ for (let k = 0; k < 36; k++) {
   clouds.setMatrixAt(k, tmpM);
 }
 scene.add(clouds);
+
+// travertine boulders scattered over the valley floor, one draw call
+const boulders = new THREE.InstancedMesh(new THREE.DodecahedronGeometry(0.6, 0), new THREE.MeshLambertMaterial({ color: 0xffffff }), 26);
+for (let k = 0; k < 26; k++) {
+  const a = rnd() * Math.PI * 2, r = 11 + rnd() * 7, sc = 0.5 + rnd() * 0.9;
+  tmpQ.setFromEuler(tmpE.set(rnd() * 3, rnd() * 3, 0));
+  tmpM.compose(tmpP.set(Math.cos(a) * r, -1.5 + 0.12 * sc, Math.sin(a) * r * 0.85), tmpQ, tmpS.set(sc, sc * 0.6, sc));
+  boulders.setMatrixAt(k, tmpM);
+  boulders.setColorAt(k, tmpC.setHSL(0.11, 0.2, 0.86 - rnd() * 0.08));
+}
+boulders.instanceMatrix.needsUpdate = true; boulders.instanceColor.needsUpdate = true;
+scene.add(boulders);
 const sunMesh = new THREE.Mesh(new THREE.SphereGeometry(1.5, 20, 14), new THREE.MeshLambertMaterial({ color: 0xFFD27A, emissive: 0xFFB84A, emissiveIntensity: 0.9 }));
 sunMesh.position.set(7, 6.5, -20);   // above the right-hand hills, clear of the HUD bar
 scene.add(sunMesh);
@@ -984,7 +996,7 @@ const cellZ = (i, n) => Math.floor(i / n) + 0.5 - n / 2;
 
 // rounded lips: a capsule lies along every edge where the shelf height changes by half a unit or more
 const LIP_MAX = 400;   // 2 * 10 * 10 edges at most: the largest level is 10 cells wide
-const lipMesh = new THREE.InstancedMesh(new THREE.CapsuleGeometry(0.1, 0.8, 4, 10), new THREE.MeshLambertMaterial({ color: 0xffffff }), LIP_MAX);
+const lipMesh = new THREE.InstancedMesh(new THREE.CapsuleGeometry(0.085, 0.8, 4, 10), new THREE.MeshLambertMaterial({ color: 0xffffff }), LIP_MAX);
 lipMesh.count = 0;
 lipMesh.castShadow = quality !== 'low';
 scene.add(lipMesh);
@@ -1003,7 +1015,7 @@ function refreshLips(hArr) {
       tmpQ.setFromUnitVectors(AXIS_Y, di ? AXIS_Z : AXIS_X);
       tmpM.compose(tmpP.set((cellX(a, n) + cellX(b, n)) / 2, Math.max(ha, hb) * HU + 0.02, (cellZ(a, n) + cellZ(b, n)) / 2), tmpQ, tmpS.set(1, 1, 1));
       lipMesh.setMatrixAt(c, tmpM);
-      lipMesh.setColorAt(c, tmpC.setRGB(0.98, 0.96, 0.92));
+      lipMesh.setColorAt(c, tmpC.setRGB(0.97, 0.94, 0.88));
       c++;
     }
   }
