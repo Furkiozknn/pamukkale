@@ -708,6 +708,27 @@ for (let k = 0; k < 26; k++) {
 }
 boulders.instanceMatrix.needsUpdate = true; boulders.instanceColor.needsUpdate = true;
 scene.add(boulders);
+
+// stepped travertine ledges on the valley sides: three rounded rings that fall away from the board
+const ledgeProfile = [[0.9, 0], [1.0, 0.03], [1.06, 0.12], [1.0, 0.2], [0.9, 0.14], [0.86, 0.03]].map(([x, y]) => new THREE.Vector2(x, y));
+const ledges = new THREE.InstancedMesh(new THREE.LatheGeometry(ledgeProfile, 64), new THREE.MeshLambertMaterial({ color: 0xF2ECDF, side: THREE.DoubleSide }), 3);
+[[12.5, -1.45], [15, -1.3], [17.5, -1.15]].forEach(([R, y], k) => {
+  tmpM.compose(tmpP.set(0, y, 0), tmpQ.identity(), tmpS.set(R, 1, R));
+  ledges.setMatrixAt(k, tmpM);
+});
+ledges.instanceMatrix.needsUpdate = true;
+scene.add(ledges);
+
+// meadow shrubs around the valley floor, one draw call
+const shrubs = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.5, 0), new THREE.MeshLambertMaterial({ color: 0xffffff }), 40);
+for (let k = 0; k < 40; k++) {
+  const a = rnd() * Math.PI * 2, r = 13 + rnd() * 9, sc = 0.45 + rnd() * 0.5;
+  tmpM.compose(tmpP.set(Math.cos(a) * r, -1.5 + 0.2 * sc, Math.sin(a) * r * 0.85), tmpQ.identity(), tmpS.set(sc * 1.3, sc * 0.8, sc * 1.3));
+  shrubs.setMatrixAt(k, tmpM);
+  shrubs.setColorAt(k, tmpC.setHSL(0.27 + rnd() * 0.05, 0.35, 0.5 + rnd() * 0.1));
+}
+shrubs.instanceMatrix.needsUpdate = true; shrubs.instanceColor.needsUpdate = true;
+scene.add(shrubs);
 const sunMesh = new THREE.Mesh(new THREE.SphereGeometry(1.5, 20, 14), new THREE.MeshLambertMaterial({ color: 0xFFD27A, emissive: 0xFFB84A, emissiveIntensity: 0.9 }));
 sunMesh.position.set(7, 6.5, -20);   // above the right-hand hills, clear of the HUD bar
 scene.add(sunMesh);
@@ -994,7 +1015,7 @@ function shimmer(time) {
 const cellX = (i, n) => (i % n) + 0.5 - n / 2;
 const cellZ = (i, n) => Math.floor(i / n) + 0.5 - n / 2;
 
-// rounded lips: a capsule lies along every edge where the shelf height changes by half a unit or more
+// rounded lips: a capsule lies along every edge where the shelf steps by 1.5 units or more (stones stay ramps)
 const LIP_MAX = 400;   // 2 * 10 * 10 edges at most: the largest level is 10 cells wide
 const lipMesh = new THREE.InstancedMesh(new THREE.CapsuleGeometry(0.085, 0.8, 4, 10), new THREE.MeshLambertMaterial({ color: 0xffffff }), LIP_MAX);
 lipMesh.count = 0;
@@ -1010,7 +1031,7 @@ function refreshLips(hArr) {
       const ni = i + di, nj = j + dj;
       if (ni >= n || nj >= n || c >= LIP_MAX) continue;
       const b = nj * n + ni, ha = hArr[a], hb = hArr[b];
-      if (Math.abs(ha - hb) < 0.5) continue;
+      if (Math.abs(ha - hb) < 1.5) continue;
       // the capsule runs along the edge, so it turns across the step direction
       tmpQ.setFromUnitVectors(AXIS_Y, di ? AXIS_Z : AXIS_X);
       tmpM.compose(tmpP.set((cellX(a, n) + cellX(b, n)) / 2, Math.max(ha, hb) * HU + 0.02, (cellZ(a, n) + cellZ(b, n)) / 2), tmpQ, tmpS.set(1, 1, 1));
