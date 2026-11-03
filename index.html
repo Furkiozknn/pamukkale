@@ -78,13 +78,14 @@ h2{font-size:30px;font-weight:700}
 /* opaque pill backing so footer/credits text keeps >7:1 contrast over the 3D stage in light and dark schemes */
 .footer{position:fixed;left:0;right:0;bottom:8px;width:max-content;max-width:calc(100% - 16px);margin:0 auto;padding:4px 14px;border-radius:999px;background:var(--paper);border:1px solid var(--glass-line);box-shadow:var(--shadow);text-align:center;font-size:13px;color:var(--ink-soft);z-index:5;pointer-events:auto}
 .footer a{color:inherit;font-weight:800}
+.footer a:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
 .lang-seg,.quality-seg{display:flex;gap:6px;justify-content:center}
 .lang-seg button,.quality-seg button{min-width:72px;background:rgba(255,255,255,.55);border:1px solid var(--glass-line);border-radius:12px;padding:0 12px;font-weight:800;color:var(--ink)}
 .lang-seg button[aria-pressed="true"],.quality-seg button[aria-pressed="true"]{background:var(--accent);color:#073A3D;border-color:var(--accent-deep)}
 .set-row{display:grid;grid-template-columns:1fr auto;gap:8px 12px;align-items:center;text-align:left;padding:10px 0;border-bottom:1px solid var(--glass-line)}
 .set-row:last-child{border-bottom:0}
 .set-row label,.set-row .lbl{font-weight:800}
-.set-row input[type=range]{grid-column:1/3;width:100%;accent-color:var(--accent);min-height:36px}
+.set-row input[type=range]{grid-column:1/3;width:100%;accent-color:var(--accent);min-height:44px}
 .val{color:var(--ink-soft);font-size:14px;min-width:42px;text-align:right}
 .toggle{min-width:96px;border-radius:12px;background:rgba(255,255,255,.55);border:1px solid var(--glass-line);font-weight:800;color:var(--ink);padding:0 12px}
 .toggle[aria-pressed="true"]{background:var(--accent);color:#073A3D}
@@ -131,7 +132,7 @@ h2{font-size:30px;font-weight:700}
 .area .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
 .lvl{min-height:52px;border-radius:999px;border:1px solid var(--glass-line);background:rgba(255,255,255,.7);color:var(--ink);font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px}
 :root:not([data-theme="light"]) .lvl,:root[data-theme="dark"] .lvl{background:rgba(255,255,255,.08)}
-.lvl small{font-size:11px;color:var(--gold);letter-spacing:1px}
+.lvl small{font-size:11px;color:var(--ink-soft);letter-spacing:1px}
 .lvl:disabled{opacity:.4}
 .lvl.cur{border-color:var(--accent-deep);box-shadow:inset 0 0 0 2px var(--accent)}
 .lvl:not(:disabled):hover{background:#E9FAFA}
@@ -1480,6 +1481,7 @@ function syncSettingsUI() {
   const bf = document.getElementById('btn-full');
   bf.textContent = fs ? t('onOff')[0] : t('onOff')[1];
   bf.setAttribute('aria-pressed', String(fs));
+  bf.setAttribute('aria-label', `${t('fullscreen')}: ${bf.textContent}`);
 }
 
 function applyI18n() {
