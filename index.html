@@ -345,7 +345,9 @@ var PSim = (function () {
       n: n, size: size, drain: !!def.drain,
       h0: new Float64Array(size), rim: new Float64Array(size),
       tool: new Array(size).fill(null),
-      w: new Float64Array(size), cal: new Int32Array(size),
+      w: new Float64Array(size), wn: new Float64Array(size), // preallocated ping-pong buffers
+      s: new Float64Array(size), moved: new Uint8Array(size),
+      cal: new Int32Array(size),
       tick: 0, emitted: 0, wasted: 0, rimChanged: false,
       spring: def.spring[1] * n + def.spring[0], rate: def.rate, time: def.time,
       pools: def.pools.map(function (p) { return { i: p[1] * n + p[0], m: p[2] }; })
@@ -357,15 +359,17 @@ var PSim = (function () {
   }
 
   function step(st) {
-    var n = st.n, size = st.size, w = st.w, wn = Float64Array.from(w);
-    var s = new Float64Array(size), moved = new Uint8Array(size);
+    var n = st.n, size = st.size, w = st.w, wn = st.wn;
+    wn.set(w); // reuse preallocated buffer instead of per-tick typed array allocation
+    var s = st.s, moved = st.moved;
+    moved.fill(0);
     var i, k, x, y, j, out, cand, best, nx, ny, per, c;
     for (i = 0; i < size; i++) s[i] = height(st, i) + w[i];
     wn[st.spring] += st.rate;
     st.emitted += st.rate;
 
     function deliver(from, to, amount) {
-      if (amount <= EPS) return;
+      if (isNaN(amount) || amount <= EPS) return; // guard against NaN propagation
       wn[from] -= amount; moved[from] = 1;
       if (to < 0) st.wasted += amount;
       else { wn[to] += amount; moved[to] = 1; }
@@ -423,6 +427,7 @@ var PSim = (function () {
       }
     }
     st.w = wn;
+    st.wn = w; // swap buffers (zero GC allocations per tick)
     st.tick++;
     return st;
   }
@@ -510,7 +515,7 @@ const settings = readJSON(SET_KEY, { master: 0.8, music: 0.6, sfx: 0.8, lang: /^
 if (Q.get('lang') === 'en' || Q.get('lang') === 'tr') settings.lang = Q.get('lang');
 const progress = readJSON(SAVE_KEY, { unlocked: 1, stars: {}, last: 0 });
 const best = readJSON(BEST_KEY, { stars: 0, done: 0 });
-const quality = FLAGS.low ? 'low' : settings.quality;
+let quality = FLAGS.low ? 'low' : settings.quality;
 
 // ---------- text (TR default, EN toggle) ----------
 const S = {
@@ -940,7 +945,8 @@ function buildBoard(n) {
   const water = new THREE.Mesh(waterGeo, new THREE.MeshLambertMaterial({ vertexColors: true, map: causticTex, transparent: true, opacity: 0.88, side: THREE.DoubleSide, depthWrite: false }));
   water.renderOrder = 2;
   scene.add(terrain, water);
-  board = { n, M, V, P, perim, terrainGeo, waterGeo, terrain, water, waterBase: new Float32Array(V * 3) };
+  board = { n, M, V, P, perim, terrainGeo, waterGeo, terrain, water, waterBase: new Float32Array(V * 3),
+    hArr: new Float64Array(n * n), sArr: new Float64Array(n * n), rArr: new Float64Array(n * n) };
 }
 
 // caustic light on the water: a tileable pattern of bright veins, built once on a canvas
@@ -972,7 +978,7 @@ const CREAM = [0.94, 0.91, 0.84], WHITE = [1, 1, 1], SHALLOW = [0.74, 0.96, 0.96
 function refreshTerrain() {
   if (!board || !G.st) return;
   const st = G.st, n = board.n, M = board.M, V = board.V;
-  const hArr = new Float64Array(n * n), rArr = new Float64Array(n * n);
+  const hArr = board.hArr, rArr = board.rArr; // reuse preallocated buffers
   for (let i = 0; i < n * n; i++) { hArr[i] = PSim.height(st, i); rArr[i] = st.rim[i]; }
   const pos = board.terrainGeo.attributes.position, col = board.terrainGeo.attributes.color;
   for (let j = 0; j <= M; j++) for (let i = 0; i <= M; i++) {
@@ -1004,7 +1010,7 @@ function refreshTerrain() {
 function refreshWater() {
   if (!board || !G.st) return;
   const st = G.st, n = board.n, M = board.M;
-  const hArr = new Float64Array(n * n), sArr = new Float64Array(n * n);
+  const hArr = board.hArr, sArr = board.sArr; // reuse preallocated buffers
   for (let i = 0; i < n * n; i++) { hArr[i] = PSim.height(st, i); sArr[i] = hArr[i] + st.w[i]; }
   const pos = board.waterGeo.attributes.position, col = board.waterGeo.attributes.color;
   for (let j = 0; j <= M; j++) for (let i = 0; i <= M; i++) {
@@ -1112,7 +1118,7 @@ const CHORDS = [
 const PHRASE = [[0, 2], [1, 3], [2, 1], [3, 0], [1, 2], [2, 3], [3, 1], [0, 0]];
 
 function audioInit() {
-  if (AU.ctx) { if (AU.ctx.state === 'suspended') AU.ctx.resume(); return; }
+  if (AU.ctx) { if (AU.ctx.state === 'suspended') AU.ctx.resume().catch(() => {}); return; }
   try {
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return;
@@ -1268,7 +1274,7 @@ function startLevel(i) {
 }
 
 function placeAt(i, kind = G.tool) {
-  if (G.screen !== 'play' || i < 0) return false;
+  if (G.screen !== 'play' || i < 0 || !G.st || i >= G.st.size) return false;
   const st = G.st;
   if (i === st.spring) { toast(t('toastSpring'), 'bad'); return false; }
   if (st.tool[i]) { toast(t('toastOccupied'), 'bad'); return false; }
@@ -1284,7 +1290,7 @@ function placeAt(i, kind = G.tool) {
 }
 
 function removeAt(i) {
-  if (G.screen !== 'play' || i < 0) return false;
+  if (G.screen !== 'play' || i < 0 || !G.st || i >= G.st.size) return false;
   const kind = G.st.tool[i];
   if (!kind) return false;
   PSim.remove(G.st, i);
@@ -1627,7 +1633,7 @@ function updateGhost() {
     ghost.visible = false; return;
   }
   ghost.visible = true;
-  ghost.geometry = toolGeo[G.tool];
+  if (ghost.geometry !== toolGeo[G.tool]) ghost.geometry = toolGeo[G.tool]; // avoid redundant per-frame geometry assignment
   ghost.position.set(cellX(G.hover, G.n), PSim.height(G.st, G.hover) * HU + 0.2, cellZ(G.hover, G.n));
 }
 
@@ -1689,8 +1695,17 @@ on('btn-sound', () => {
 });
 on('seg-tr', () => setLang('tr'));
 on('seg-en', () => setLang('en'));
-on('q-low', () => { settings.quality = 'low'; writeJSON(SET_KEY, settings); syncSettingsUI(); });
-on('q-high', () => { settings.quality = 'high'; writeJSON(SET_KEY, settings); syncSettingsUI(); });
+function setQuality(q) {
+  settings.quality = q;
+  quality = FLAGS.low ? 'low' : q;
+  writeJSON(SET_KEY, settings);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, quality === 'low' ? 1 : 1.5));
+  sun.castShadow = quality !== 'low';
+  if (board) board.terrain.castShadow = quality !== 'low';
+  syncSettingsUI();
+}
+on('q-low', () => setQuality('low'));
+on('q-high', () => setQuality('high'));
 on('btn-full', () => {
   try {
     if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen();
