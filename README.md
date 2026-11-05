@@ -1,60 +1,71 @@
 <p align="center">
-  <a href="https://furkiozknn.github.io/pamukkale/"><img src="docs/banner.svg" width="100%" alt="Pamukkale: a calm water-flow puzzle on white travertine terraces with turquoise pools, warm water running down from a steaming spring. Click to play in your browser."></a>
+  <a href="https://furkiozknn.github.io/pamukkale/">
+    <img src="docs/card.jpg" width="100%" alt="Pamukkale: a calm 3D water-flow puzzle on white travertine terraces with turquoise pools. Click to play in your browser.">
+  </a>
 </p>
 
 <p align="center">
-  <a href="https://furkiozknn.github.io/pamukkale/"><img src="https://img.shields.io/badge/%E2%96%B6_Play_now-in_your_browser-12868C?style=for-the-badge&labelColor=173B44" alt="Play now in your browser"></a>
+  <a href="https://furkiozknn.github.io/pamukkale/"><img src="https://img.shields.io/badge/%E2%96%B6_Play_free-in_your_browser-12868C?style=for-the-badge&logo=googlechrome&logoColor=white&labelColor=173B44" height="40" alt="Play free in your browser"></a>
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/Three.js-r170-E8B04B?style=for-the-badge&logo=threedotjs&logoColor=white&labelColor=173B44" alt="Three.js r170">
   <img src="https://img.shields.io/badge/built_by-Claude_Haiku_5.5-2EC4C9?style=for-the-badge&logo=claude&logoColor=white&labelColor=173B44" alt="Built by Claude Haiku 5.5">
   <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-D9644F?style=for-the-badge&labelColor=173B44" alt="MIT licence"></a>
   <img src="https://img.shields.io/badge/no_install-desktop_%C2%B7_phone-FBF7EE?style=for-the-badge&labelColor=173B44" alt="No install, desktop and phone">
 </p>
 
-<p align="center"><b>A calm 3D water-flow puzzle on the white travertine terraces of Pamukkale: guide warm spring water down the hillside into the target pools with stones, dams and splitters, while still water slowly builds new white calcium rims and changes the terraces as you play.</b></p>
-
-<p align="center">
-  <img src="docs/gameplay.gif" width="640" alt="Pamukkale gameplay after the redesign: turquoise spring water spreads over the pastel travertine terraces around the placed stones and fills the pools">
-</p>
-
-<p align="center"><b>Play online: <a href="https://furkiozknn.github.io/pamukkale/">https://furkiozknn.github.io/pamukkale/</a></b> (desktop and phone, no install)</p>
-
 <!-- portals:start -->
-<p align="center">Also on: <a href="https://furkiozknn.itch.io/pamukkale">itch.io</a></p>
+<p align="center">
+  Also on: <a href="https://furkiozknn.itch.io/pamukkale"><strong>itch.io</strong></a>
+</p>
 <!-- portals:end -->
 
-## Highlights
+<p align="center">
+  <strong>A calm 3D water-flow puzzle on the white travertine terraces of Pamukkale: guide warm spring water down the hillside into the target pools with stones, dams and splitters, while still water slowly builds new white calcium rims and changes the terraces as you play.</strong>
+</p>
 
-- **Three tools, limited.** A stone raises a cell by one step so the water turns around it, a dam raises it by two
-  and holds water back, and a splitter divides the flow between every lower neighbour.
-- **Living terraces.** Water that stands still for a while builds calcium: dry cells beside a standing pool rise to
-  the water line, so the board changes while the water runs.
-- **20 levels in 4 areas.** Lower Pools, Middle Shelves, Ancient Pool and Sunset. Three stars per level: all pools
-  full, no water spilled, and tool saving (at most the par number of tools).
-- **Every level checked.** Layouts come from seeded random hillsides and were kept only if the empty board fails and
-  a short solution fills every pool; `tools/solve-levels.mjs` re-checks each stored solution with the same simulation
-  code.
-- **Played by a bot.** `?auto` replays each level's stored solution through the same placement function a click uses.
-  Measured on the redesign branch: **20/20 levels, 46/60 stars**, zero JavaScript errors, with and without `?noassets`.
-- **One file, made in code.** One `index.html` with Three.js r170 from a CDN; terrain, water and tools are procedural
-  geometry, and a saz-like plucked loop, a flute line, trickling water, splashes and birdsong are synthesised with
-  Web Audio.
+<!-- gameplay gif -->
+
+## Features
+
+- **Living terraces & procedural puzzle:** Water that stands still builds calcium: dry cells beside a standing pool rise to the water line, so the board dynamically evolves and changes flow paths while water runs.
+- **20 levels across 4 distinct areas:** Progress through Lower Pools, Middle Shelves, Ancient Pool, and Sunset, earning up to 3 stars per level (all pools full, no water spilled, and par tool saving).
+- **Tactical 3-tool water routing:** Place stones (raises a cell by 1 step so water turns around it), dams (raises by 2 steps to hold water back), and splitters (divides flow among lower neighbours).
+- **Verified level design & bot replay:** Layouts originate from seeded random hillsides where empty boards fail; `?auto` bot replays stored solutions at 3x speed, verifying **20/20 levels and 46/60 stars** with 0 JavaScript errors (with and without `?noassets`).
+- **Lean single-file 3D performance:** A single `index.html` running Three.js r170 delivering 21–22 draw calls and 34k triangles in play on Intel UHD 620, complete with procedural geometry and Web Audio synthesis (saz loop, flute, trickling water, splashes, and birdsong).
 
 ## How to play
 
 > [!TIP]
-> Watch where the water leaves the board and block that path first: spilled water costs the "no water spilled" star,
-> and every tool you keep in the tray counts towards the tool-saving star.
+> **Goal:** Guide warm spring water down the terraces into every target pool. Block spill paths early: spilled water costs the "no water spilled" star, and every tool kept in reserve counts towards the tool-saving star.
 
-Warm water comes out of the spring at the top of the terraces. Place your tools on the grid, then start the water.
-Fill every target pool to its mark: the ring in each pool shows the mark and turns turquoise when the pool is full.
-Water that runs off the bottom edge is spilled and wasted.
+1. **Place your tools:** Select a tool (`1` stone, `2` dam, `3` splitter) and click or tap cells on the hillside grid to place them.
+2. **Start the flow (`Space`):** Release warm water from the steaming spring at the top of the terraces and watch how it channels into target pools.
+3. **Fill every pool mark:** Fill each target pool until its ring turns turquoise. Avoid letting water escape off the bottom edge.
+
+<details>
+<summary><b>Rules and star objectives</b></summary>
+
+- **Target pools:** Fill every target pool to its mark. The ring inside each pool indicates the required level and turns turquoise when full.
+- **Three stars per level:**
+  - *All pools full:* Every target pool filled to its mark.
+  - *No water spilled:* Prevent water from flowing off the bottom edge of the board.
+  - *Tool saving:* Complete the level using at most the par number of tools.
+- **Living calcium rims:** Water that stands still builds calcium deposits. Dry cells beside a standing pool rise to the water line, altering the terrain in real time.
+- **Tool roles:**
+  - *Stone:* Raises a cell by 1 step to turn water around it.
+  - *Dam:* Raises a cell by 2 steps to hold water back.
+  - *Splitter:* Divides the flow between every lower neighbour.
+
+</details>
 
 ### Controls
 
 | Action | Keys / mouse / touch |
 |---|---|
-| Place the selected tool | click or tap a cell |
-| Remove a tool | right-click, or long-press on touch |
+| Place selected tool | Click or tap a cell |
+| Remove a tool | Right-click, or long-press on touch |
 | Select tool | `1` stone, `2` dam, `3` splitter, or tap the tray |
 | Start / stop water | `Space` (or the water button) |
 | Fast forward | `F` |
@@ -62,50 +73,28 @@ Water that runs off the bottom edge is spilled and wasted.
 | Reset level | `R` |
 | Pause / resume | `P` or `Esc` |
 | Music / effects / language | `M` / `X` / `L` |
-| Orbit / zoom | drag (mouse or one finger) / mouse wheel or pinch |
+| Orbit / zoom | Drag (mouse or one finger) / mouse wheel or pinch |
 
-Turkish is the default language (`L` or the **EN** toggle switches). Progress is saved in `localStorage` under
-`arena.pamukkale.save`, settings under `arena.pamukkale.settings` and the best result under `arena.pamukkale.best`.
+- **Language:** Turkish or English (`L` or the **EN** toggle switches; follows browser by default).
+- **Persistence:** Progress is saved in `localStorage` under `arena.pamukkale.save`, settings under `arena.pamukkale.settings`, and best results under `arena.pamukkale.best`.
 
 <details>
 <summary><b>URL flags for testing</b></summary>
 
 | Flag | Effect |
 |---|---|
-| `?auto` | the bot plays all 20 levels, replaying each stored solution at 3x speed |
-| `?debug` | fps, draw calls, triangles and any JavaScript errors on screen |
-| `?sim=N` | start the first level with N seconds of water already fast-forwarded |
-| `?low` | shadows off, fewer particles, pixel ratio 1 |
-| `?lang=en` | English |
-| `?noassets` | accepted; the game has no asset files, so nothing changes |
+| `?auto` | The bot plays all 20 levels, replaying each stored solution at 3x speed |
+| `?debug` | FPS, draw calls, triangles, and JavaScript errors on screen |
+| `?sim=N` | Start the first level with N seconds of water already fast-forwarded |
+| `?low` | Shadows off, fewer particles, pixel ratio 1 |
+| `?lang=en` | English start language |
+| `?noassets` | Accepted for the arena convention; the game has no asset files anyway |
 
 `window.pamukkaleSim(seconds)` fast-forwards the simulation without rendering and returns the live state.
 
 </details>
 
 ## Screenshots
-
-## Redesign (2026-11)
-
-**Art direction:** bright pastel travertine on a sage meadow: turquoise water with shore foam and caustic light,
-peach sunset sky, airy white cards with turquoise accents. Palette: travertine `#F5F3EE`, turquoise `#2EC4C9`,
-sunset peach `#FFC9A9`, ruin stone `#CDB89A`, sky `#BFE6FF`.
-
-- **Terraces:** travertine step edges that catch the light (the steepest shelf edges brighten towards `#FBF8F2`),
-  slope shading, and stepped travertine ledges down the valley sides. The simulation and level data are unchanged.
-- **Scene:** pastel meadow, shrubs, boulders, a pale distant range inside the fog, lathe-turned spring bowl,
-  rounded theatre benches and ruin columns.
-- **Water and FX:** shore foam, a scrolling caustic texture, a sparkle when a tool is placed, slowly drifting clouds.
-- **UI:** white cards, pill buttons, floating HUD pills, and a layout that works on phones and short landscape screens.
-- **Language:** the default follows the browser (Turkish or English); a saved setting still wins.
-
-Before and after, same level and camera (level 9):
-
-<p align="center"><img src="docs/redesign-before-after.png" width="100%" alt="Level 9 before (left) and after (right) the redesign"></p>
-
-Measured with headless Chrome at 1280x720 on the redesign branch: draw calls 17 before, 21 after (level 9 in play);
-triangles 26k before, 34k after. Frame rate is not claimed; headless rAF is not a GPU budget. The banner, card and
-gameplay GIF still show the old look until the media pass.
 
 <table>
   <tr>
@@ -120,59 +109,57 @@ gameplay GIF still show the old look until the media pass.
   </tr>
 </table>
 
+## Redesign & Performance
+
+**Art direction:** Bright pastel travertine on a sage meadow: turquoise water with shore foam and caustic light, peach sunset sky, airy white cards with turquoise accents. Palette: travertine `#F5F3EE`, turquoise `#2EC4C9`, sunset peach `#FFC9A9`, ruin stone `#CDB89A`, sky `#BFE6FF`.
+
+**Visual updates (simulation, levels, controls, bot, and saves are untouched):**
+- **Terraces:** Travertine step edges that catch the light (the steepest shelf edges brighten towards `#FBF8F2`), slope shading, and stepped travertine ledges down the valley sides.
+- **Scene:** Pastel meadow, shrubs, boulders, a pale distant range inside the fog, lathe-turned spring bowl, rounded theatre benches, and ruin columns.
+- **Water and FX:** Shore foam, scrolling caustic texture, tool placement sparkle, and slowly drifting clouds.
+- **UI:** White cards, pill buttons, floating HUD pills, and a layout that works on phones and short landscape screens.
+- **Language:** The default follows the browser (Turkish or English); a saved setting still wins.
+
+**Measured on an Intel UHD 620 (headless Chrome, 1280x720):**
+- Draw calls: 17 &rarr; 21 (level 9 in play)
+- Triangles: 26k &rarr; 34k
+- Bot run: `?auto` finishes 20/20 levels and 46/60 stars with 0 JS errors (with and without `?noassets`)
+- Note: Frame rate is not claimed; headless rAF is not a GPU budget.
+
+![Before and after](docs/redesign-before-after.png)
+
 ## Running locally
 
-Serve the folder over HTTP, for example:
+Serve the folder over HTTP (ES modules do not load from `file://`):
 
-```
+```bash
 python -m http.server 8000
 ```
 
-then open <http://localhost:8000/>. Check every level offline with `node tools/solve-levels.mjs`: it prints a
-solution per level, or FAILED.
+Then open <http://localhost:8000/>. Check every level offline with `node tools/solve-levels.mjs`: it prints a solution per level, or FAILED.
 
-## How it was made
+## Made with Claude Code
 
-Built by **Claude Haiku 5.5** with Claude Code from one prompt: [prompts/pamukkale.md](prompts/pamukkale.md).
-Everything is generated in code, so there are no asset files and no credits to list.
+Built by **Claude Haiku 5.5** with Claude Code from one prompt: [prompts/pamukkale.md](prompts/pamukkale.md). Everything is generated in code, so there are no asset files and no credits to list; Three.js is loaded from a CDN under its MIT licence.
 
 <details>
 <summary><b>Technical notes</b></summary>
 
-- **Simulation:** the water is a small grid automaton in plain JavaScript between the `SIM-BEGIN` and `SIM-END`
-  markers in `index.html`; `tools/solve-levels.mjs` runs the same code.
-- **3D:** terrain, water and tools are procedural geometry with vertex colours, with instanced meshes for repeated
-  objects; 21-22 draw calls measured in play on the redesign branch. The headless frame rate is a rAF reading, not a measured GPU budget, so no fps
-  figure is claimed.
-- **Known limits:** the terraces are an approximate, plateau-style hillside and the sloped apron at the edge is a
-  simplified form; level 16 uses a looser difficulty band than its neighbours.
+- **Simulation:** The water is a small grid automaton in plain JavaScript between the `SIM-BEGIN` and `SIM-END` markers in `index.html`; `tools/solve-levels.mjs` runs the same code.
+- **3D:** Terrain, water, and tools are procedural geometry with vertex colours, with instanced meshes for repeated objects; 21–22 draw calls measured in play on the redesign branch. The headless frame rate is a rAF reading, not a measured GPU budget, so no fps figure is claimed.
+- **Known limits:** The terraces are an approximate, plateau-style hillside and the sloped apron at the edge is a simplified form; level 16 uses a looser difficulty band than its neighbours.
 
 </details>
 
-Pamukkale is part of the **Claude Game Arena** series, where each game is built by a Claude model from one prompt. The
-other games: [Hisar](https://furkiozknn.github.io/kale-savunmasi/) ·
-[Çay Ocağı](https://furkiozknn.github.io/cay-ocagi/) · [Çini Ustası](https://furkiozknn.github.io/cini-ustasi/) ·
-[Martı](https://furkiozknn.github.io/marti/) · [Kervan](https://furkiozknn.github.io/kervan/) ·
-[Dolmuş](https://furkiozknn.github.io/dolmus/) · [Peri Golf](https://furkiozknn.github.io/peri-golf/) ·
-[Mehter](https://furkiozknn.github.io/mehter/) · [Boğaz Vapuru](https://furkiozknn.github.io/bogaz-vapuru/) ·
-[Simit Fırını](https://furkiozknn.github.io/simit-firini/) · [Karagöz](https://furkiozknn.github.io/karagoz/) ·
-[Lale Bahçesi](https://furkiozknn.github.io/lale-bahcesi/)
+### Claude Game Arena
 
-**Round 5:** [Kapadokya Balonu](https://furkiozknn.github.io/kapadokya-balonu/) ·
-[Ebru](https://furkiozknn.github.io/ebru/) · [Kırkpınar](https://furkiozknn.github.io/kirkpinar/) ·
-[Çarşı Kaçışı](https://furkiozknn.github.io/carsi-kacisi/)
+Pamukkale is part of the **Claude Game Arena** series, where each game is built by a Claude model from one prompt.
 
-**Round 6:** [Topkapı Gecesi](https://furkiozknn.github.io/topkapi-gecesi/) · [Hamsi](https://furkiozknn.github.io/hamsi/) ·
-**Pamukkale** · [Mimar Sinan](https://furkiozknn.github.io/mimar-sinan/)
+[Hisar](https://furkiozknn.github.io/kale-savunmasi/) · [Çay Ocağı](https://furkiozknn.github.io/cay-ocagi/) · [Çini Ustası](https://furkiozknn.github.io/cini-ustasi/) · [Martı](https://furkiozknn.github.io/marti/) · [Kervan](https://furkiozknn.github.io/kervan/) · [Dolmuş](https://furkiozknn.github.io/dolmus/) · [Peri Golf](https://furkiozknn.github.io/peri-golf/) · [Mehter](https://furkiozknn.github.io/mehter/) · [Boğaz Vapuru](https://furkiozknn.github.io/bogaz-vapuru/) · [Simit Fırını](https://furkiozknn.github.io/simit-firini/) · [Karagöz](https://furkiozknn.github.io/karagoz/) · [Lale Bahçesi](https://furkiozknn.github.io/lale-bahcesi/)
 
-## Türkçe
+**Round 5:** [Kapadokya Balonu](https://furkiozknn.github.io/kapadokya-balonu/) · [Ebru](https://furkiozknn.github.io/ebru/) · [Kırkpınar](https://furkiozknn.github.io/kirkpinar/) · [Çarşı Kaçışı](https://furkiozknn.github.io/carsi-kacisi/)
 
-**Pamukkale**, beyaz travertenlerde geçen sakin bir 3D su akışı bulmacası. Kaynaktan çıkan ılık suyu taş, set ve
-ayırıcılarla yamaçtan aşağı, hedef havuzlara yönlendirirsin. Durgun su zamanla beyaz kireç kenarlar örer, teraslar
-oynarken değişir. 4 bölgede 20 seviye, seviye başına 3 yıldız. Kurulum yok; masaüstünde ve telefonda tarayıcıda
-oynanır. Claude Haiku 5.5 tarafından Claude Code ile tek bir prompt'tan yapıldı.
-
-**Oyna:** https://furkiozknn.github.io/pamukkale/
+**Round 6:** [Topkapı Gecesi](https://furkiozknn.github.io/topkapi-gecesi/) · [Hamsi](https://furkiozknn.github.io/hamsi/) · **Pamukkale** · [Mimar Sinan](https://furkiozknn.github.io/mimar-sinan/)
 
 ## License
 
