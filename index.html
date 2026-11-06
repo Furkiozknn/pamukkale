@@ -16,175 +16,256 @@
 <link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"}}</script>
 <style>
 :root{
-  /* palette: travertine #F5F3EE, turquoise #2EC4C9, sunset peach #FFC9A9, ruin stone #CDB89A, sky #BFE6FF */
-  /* --ink-soft darkened to #3E5C63 (>6.3:1 on cream/glass) so subtitle, result and footer text pass WCAG AA 4.5:1 */
-  --ink:#1D3F49; --ink-soft:#3E5C63; --paper:#FFFFFF; --cream:#F5F3EE;
-  --accent:#2EC4C9; --accent-deep:#0F8B91; --gold:#E9A53C; --danger:#D9644F;
-  --glass:rgba(255,255,255,.94); --glass-line:rgba(29,63,73,.1); --overlay-bg:rgba(245,243,238,.5);
-  --shadow:0 10px 28px rgba(29,63,73,.12); --focus:#0F8B91;
-  --sky-top:#BFE6FF; --sky-bottom:#FFE3D0; --star-off:rgba(23,59,68,.22);
+  /* Pamukkale Travertine & Thermal Turquoise Palette */
+  --ink:#0E252B; --ink-soft:#244B54; --ink-muted:#4E7079;
+  --paper:#FAF8F3; --cream:#F3EFE6;
+  --card-bg:rgba(250,248,243,0.94); --card-border:rgba(14,37,43,0.12);
+  --travertine-ridge:#D6C7AF;
+  --accent:#1199A4; --accent-light:#24CBD5; --accent-deep:#08666E;
+  --accent-glow:rgba(36,203,213,0.35); --accent-bg:rgba(17,153,164,0.12);
+  --gold:#D98E1C; --gold-deep:#9E640B; --gold-soft:#FDE8BD;
+  --star-off:rgba(14,37,43,0.22);
+  --danger:#BA4330; --danger-bg:rgba(186,67,48,0.12);
+  --glass:rgba(250,248,243,0.92); --glass-line:rgba(14,37,43,0.12);
+  --glass-highlight:rgba(255,255,255,0.75); --overlay-bg:rgba(10,28,33,0.56);
+  --shadow-sm:0 2px 6px rgba(10,28,33,0.08);
+  --shadow-md:0 8px 24px -4px rgba(10,28,33,0.12),0 2px 6px -1px rgba(10,28,33,0.06);
+  --shadow-lg:0 16px 40px -6px rgba(10,28,33,0.18),0 4px 12px -2px rgba(10,28,33,0.08);
+  --shadow-glow:0 0 20px rgba(36,203,213,0.35);
+  --focus:#1199A4;
+  --sky-top:#BFE6FF; --sky-bottom:#FFE3D0;
+  --font-display:'Cinzel',serif;
+  --font-ui:'Plus Jakarta Sans',system-ui,sans-serif;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    /* --ink-soft lightened to #B8D4D7 (>7.8:1 on dark paper/glass) and dark overlay backdrop for WCAG AA 4.5:1 */
-    --ink:#EAF6F6; --ink-soft:#B8D4D7; --paper:#132D35; --cream:#1A3840;
-    --glass:rgba(19,45,53,.92); --glass-line:rgba(234,246,246,.14); --overlay-bg:rgba(19,45,53,.6);
-    --shadow:0 10px 28px rgba(0,0,0,.45); --sky-top:#23485A; --sky-bottom:#5A4A4F; --star-off:#B8D4D7;
+    --ink:#EEF7F7; --ink-soft:#B8D6D9; --ink-muted:#85A9AC;
+    --paper:#0D2126; --cream:#122A30;
+    --card-bg:rgba(13,33,38,0.94); --card-border:rgba(184,214,217,0.16);
+    --travertine-ridge:#28545E;
+    --accent:#24CBD5; --accent-light:#5CE0E8; --accent-deep:#0C7F88;
+    --accent-glow:rgba(36,203,213,0.45); --accent-bg:rgba(36,203,213,0.16);
+    --gold:#F2AC35; --gold-deep:#C98216; --gold-soft:#423012;
+    --star-off:rgba(184,214,217,0.25);
+    --danger:#E8604B; --danger-bg:rgba(232,96,75,0.18);
+    --glass:rgba(13,33,38,0.92); --glass-line:rgba(184,214,217,0.15);
+    --glass-highlight:rgba(255,255,255,0.07); --overlay-bg:rgba(6,16,19,0.74);
+    --shadow-sm:0 2px 6px rgba(0,0,0,0.4);
+    --shadow-md:0 8px 24px -4px rgba(0,0,0,0.52);
+    --shadow-lg:0 16px 40px -6px rgba(0,0,0,0.68);
+    --sky-top:#15323C; --sky-bottom:#382C31;
   }
 }
 :root[data-theme="dark"]{
-  --ink:#EAF6F6; --ink-soft:#B8D4D7; --paper:#132D35; --cream:#1A3840;
-  --glass:rgba(19,45,53,.92); --glass-line:rgba(234,246,246,.14); --overlay-bg:rgba(19,45,53,.6);
-  --shadow:0 10px 28px rgba(0,0,0,.45); --sky-top:#23485A; --sky-bottom:#5A4A4F; --star-off:#B8D4D7;
+  --ink:#EEF7F7; --ink-soft:#B8D6D9; --ink-muted:#85A9AC;
+  --paper:#0D2126; --cream:#122A30;
+  --card-bg:rgba(13,33,38,0.94); --card-border:rgba(184,214,217,0.16);
+  --travertine-ridge:#28545E;
+  --accent:#24CBD5; --accent-light:#5CE0E8; --accent-deep:#0C7F88;
+  --accent-glow:rgba(36,203,213,0.45); --accent-bg:rgba(36,203,213,0.16);
+  --gold:#F2AC35; --gold-deep:#C98216; --gold-soft:#423012;
+  --star-off:rgba(184,214,217,0.25);
+  --danger:#E8604B; --danger-bg:rgba(232,96,75,0.18);
+  --glass:rgba(13,33,38,0.92); --glass-line:rgba(184,214,217,0.15);
+  --glass-highlight:rgba(255,255,255,0.07); --overlay-bg:rgba(6,16,19,0.74);
+  --shadow-sm:0 2px 6px rgba(0,0,0,0.4);
+  --shadow-md:0 8px 24px -4px rgba(0,0,0,0.52);
+  --shadow-lg:0 16px 40px -6px rgba(0,0,0,0.68);
+  --sky-top:#15323C; --sky-bottom:#382C31;
 }
 *{box-sizing:border-box}
+::selection{background:var(--accent);color:#FFFFFF}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:var(--cream)}
+::-webkit-scrollbar-thumb{background:var(--travertine-ridge);border-radius:999px;border:2px solid var(--cream)}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-soft)}
 html,body{margin:0;height:100%;overflow:hidden}
-body{background:var(--cream);color:var(--ink);font-family:Nunito,system-ui,sans-serif;-webkit-user-select:none;user-select:none;touch-action:none}
+body{background:var(--cream);color:var(--ink);font-family:var(--font-ui);-webkit-user-select:none;user-select:none;touch-action:none}
 #stage{position:fixed;inset:0;background:linear-gradient(180deg,var(--sky-top) 0%,var(--sky-bottom) 70%)}
+#stage::after{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 50%,transparent 60%,rgba(10,28,33,0.18) 100%),linear-gradient(180deg,rgba(10,28,33,0.12) 0%,transparent 15%,transparent 84%,rgba(10,28,33,0.2) 100%);z-index:1}
 #c{position:absolute;inset:0;width:100%;height:100%;display:block}
 button{font:inherit;color:inherit;cursor:pointer;min-height:44px;min-width:44px}
 button:focus{outline:none}
-button:focus-visible,input:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
-.glass{background:var(--glass);border:1px solid var(--glass-line);border-radius:24px;box-shadow:var(--shadow);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--accent-light);outline-offset:2px}
+.glass{background:var(--card-bg);border:1.5px solid var(--card-border);border-radius:24px;box-shadow:var(--shadow-md),0 0 0 1px var(--glass-highlight) inset;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
 .hidden{display:none !important}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 20px;border-radius:999px;border:1px solid var(--glass-line);background:#FFFFFF;color:var(--ink);font-weight:800;font-size:16px;transition:transform .12s,background .12s}
-:root[data-theme="dark"] .btn:not(.primary):not(.run){background:rgba(255,255,255,.08)}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn:not(.primary):not(.run){background:rgba(255,255,255,.08)}}
-.btn:hover{transform:translateY(-1px)}
-.btn:disabled{opacity:.42;cursor:not-allowed;transform:none}
-.btn.primary{background:var(--accent);border-color:var(--accent-deep);color:#073A3D;box-shadow:0 6px 18px rgba(46,196,201,.38)}
-.btn.small{min-height:44px;padding:0 12px;font-size:14px}
-.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:12px;border:1px solid transparent;background:transparent;color:var(--ink)}
-.icon-btn:hover{background:rgba(23,59,68,.08)}
-.icon-btn.on{background:rgba(46,196,201,.22);border-color:rgba(18,134,140,.35)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:0 22px;border-radius:999px;border:1px solid var(--card-border);background:var(--paper);color:var(--ink);font-family:var(--font-ui);font-weight:700;font-size:15px;letter-spacing:.2px;box-shadow:var(--shadow-sm);transition:transform .14s ease,box-shadow .14s ease,background .14s ease,border-color .14s ease}
+:root[data-theme="dark"] .btn:not(.primary):not(.run){background:rgba(255,255,255,.07);border-color:rgba(184,214,217,.15)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn:not(.primary):not(.run){background:rgba(255,255,255,.07);border-color:rgba(184,214,217,.15)}}
+.btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);border-color:var(--accent)}
+.btn:active{transform:translateY(0) scale(.98)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+.btn.primary{background:linear-gradient(135deg,var(--accent) 0%,var(--accent-deep) 100%);border-color:rgba(255,255,255,.35);color:#FFFFFF;box-shadow:0 6px 20px -2px rgba(17,153,164,.45),0 2px 6px rgba(17,153,164,.25)}
+.btn.primary:hover{background:linear-gradient(135deg,var(--accent-light) 0%,var(--accent) 100%);box-shadow:0 8px 24px -2px rgba(17,153,164,.6)}
+.btn.small{min-height:44px;padding:0 14px;font-size:13px}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:999px;border:1px solid transparent;background:transparent;color:var(--ink);transition:background .12s ease,transform .12s ease,border-color .12s ease}
+.icon-btn:hover{background:var(--accent-bg);border-color:var(--card-border);transform:translateY(-1px)}
+.icon-btn:active{transform:translateY(0)}
+.icon-btn.on{background:var(--accent-bg);border-color:var(--accent);color:var(--accent-deep)}
 .ico{width:22px;height:22px;fill:currentColor;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .ico.f{stroke:none}
 .ico.s{fill:none}
-.overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;background:var(--overlay-bg);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);z-index:20}
-.card{width:min(460px,100%);max-height:100%;overflow:auto;padding:28px 26px;text-align:center}
-.wide{width:min(820px,100%)}
-h1,h2{font-family:Nunito,system-ui,sans-serif;margin:0;letter-spacing:-.2px}
-h1{font-size:clamp(40px,8vw,60px);font-weight:700;line-height:1}
-h2{font-size:30px;font-weight:700}
-.sub{color:var(--ink-soft);font-size:16px;line-height:1.5;margin:8px 0 0}
-.stack{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+.overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;background:var(--overlay-bg);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);z-index:20;animation:overlayFade .2s ease-out}
+@keyframes overlayFade{from{opacity:0}to{opacity:1}}
+.card{position:relative;width:min(480px,100%);max-height:calc(100vh - 32px);overflow-y:auto;padding:32px 28px;text-align:center;background:var(--card-bg);border:1.5px solid var(--card-border);border-radius:28px;box-shadow:var(--shadow-lg),0 0 0 1px var(--glass-highlight) inset;-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px)}
+.wide{width:min(860px,100%)}
+h1,h2,h3{font-family:var(--font-display);margin:0;letter-spacing:.4px;font-weight:700}
+h1{font-size:clamp(38px,7vw,56px);line-height:1.1;color:var(--ink);text-shadow:0 1px 2px rgba(0,0,0,.08)}
+h2{font-size:28px;line-height:1.2;color:var(--ink)}
+h3{font-size:18px}
+.sub{color:var(--ink-soft);font-size:15px;line-height:1.5;margin:8px 0 0;font-weight:500}
+.stack{display:flex;flex-direction:column;gap:10px;margin-top:20px}
 .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px}
-.logo{width:92px;height:92px;margin:0 auto 4px;display:block}
-.best{margin-top:14px;font-size:14px;color:var(--ink-soft)}
-/* opaque pill backing so footer/credits text keeps >7:1 contrast over the 3D stage in light and dark schemes */
-.footer{position:fixed;left:0;right:0;bottom:8px;width:max-content;max-width:calc(100% - 16px);margin:0 auto;padding:4px 14px;border-radius:999px;background:var(--paper);border:1px solid var(--glass-line);box-shadow:var(--shadow);text-align:center;font-size:13px;color:var(--ink-soft);z-index:5;pointer-events:auto}
-.footer a{color:inherit;font-weight:800}
+.logo{width:96px;height:96px;margin:0 auto 10px;display:block;filter:drop-shadow(0 6px 16px rgba(17,153,164,.28))}
+.best{margin-top:16px;font-size:14px;font-weight:700;color:var(--ink-soft);padding:6px 14px;border-radius:999px;background:var(--accent-bg);display:inline-block}
+.footer{position:fixed;left:0;right:0;bottom:8px;width:max-content;max-width:calc(100% - 16px);margin:0 auto;padding:6px 16px;border-radius:999px;background:var(--card-bg);border:1px solid var(--card-border);box-shadow:var(--shadow-sm);text-align:center;font-size:12px;font-weight:600;color:var(--ink-soft);z-index:5;pointer-events:auto}
+.footer a{color:inherit;font-weight:800;text-decoration:none}
+.footer a:hover{color:var(--accent);text-decoration:underline}
 .footer a:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
 .lang-seg,.quality-seg{display:flex;gap:6px;justify-content:center}
-.lang-seg button,.quality-seg button{min-width:72px;background:rgba(255,255,255,.55);border:1px solid var(--glass-line);border-radius:12px;padding:0 12px;font-weight:800;color:var(--ink)}
-.lang-seg button[aria-pressed="true"],.quality-seg button[aria-pressed="true"]{background:var(--accent);color:#073A3D;border-color:var(--accent-deep)}
-.set-row{display:grid;grid-template-columns:1fr auto;gap:8px 12px;align-items:center;text-align:left;padding:10px 0;border-bottom:1px solid var(--glass-line)}
+.lang-seg button,.quality-seg button{min-width:76px;background:var(--paper);border:1.5px solid var(--card-border);border-radius:12px;padding:0 12px;font-weight:800;color:var(--ink);transition:all .14s ease}
+.lang-seg button[aria-pressed="true"],.quality-seg button[aria-pressed="true"]{background:var(--accent);color:#FFFFFF;border-color:var(--accent-deep);box-shadow:0 3px 10px rgba(17,153,164,.35)}
+.set-row{display:grid;grid-template-columns:1fr auto;gap:8px 12px;align-items:center;text-align:left;padding:12px 0;border-bottom:1px solid var(--card-border)}
 .set-row:last-child{border-bottom:0}
-.set-row label,.set-row .lbl{font-weight:800}
+.set-row label,.set-row .lbl{font-weight:700;color:var(--ink);font-size:15px}
 .set-row input[type=range]{grid-column:1/3;width:100%;accent-color:var(--accent);min-height:44px}
-.val{color:var(--ink-soft);font-size:14px;min-width:42px;text-align:right}
-.toggle{min-width:96px;border-radius:12px;background:rgba(255,255,255,.55);border:1px solid var(--glass-line);font-weight:800;color:var(--ink);padding:0 12px}
-.toggle[aria-pressed="true"]{background:var(--accent);color:#073A3D}
+.val{color:var(--ink-soft);font-size:14px;font-weight:800;min-width:44px;text-align:right;font-variant-numeric:tabular-nums}
+.toggle{min-width:96px;border-radius:12px;background:var(--paper);border:1.5px solid var(--card-border);font-weight:800;color:var(--ink);padding:0 12px;transition:all .14s ease}
+.toggle[aria-pressed="true"]{background:var(--accent);color:#FFFFFF;border-color:var(--accent-deep)}
+
 /* HUD */
-#hud{position:fixed;left:10px;right:10px;top:10px;height:58px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 10px 0 12px;z-index:10;background:none;border:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
-/* the HUD is three floating white pills, not one glass bar */
-.brand,.stats,.actions{background:var(--paper);border:1px solid var(--glass-line);border-radius:999px;box-shadow:var(--shadow);height:48px}
-.brand{padding:0 14px 0 8px}
-.stats{padding:0 16px}
-.actions{padding:0 4px;gap:0}
-.brand{display:flex;align-items:center;gap:8px;min-width:0}
-.brand .logo-sm{width:30px;height:30px;flex:none}
-.brand b{font-family:Nunito,system-ui,sans-serif;font-size:20px;font-weight:800;white-space:nowrap}
-.stats{display:flex;align-items:center;gap:14px;font-size:14px;font-weight:800;white-space:nowrap;min-width:0;overflow:hidden}
-.stats span small{display:block;font-size:11px;font-weight:700;color:var(--ink-soft);letter-spacing:.3px;text-transform:uppercase}
-.stars{display:inline-flex;gap:2px}
-.stars svg{width:18px;height:18px;fill:var(--star-off)}
-.stars svg.on{fill:var(--gold)}
-.actions{display:flex;align-items:center;gap:2px;flex:none}
-#tray{position:fixed;left:50%;transform:translateX(-50%);bottom:14px;display:flex;gap:8px;align-items:center;padding:8px;z-index:10;max-width:calc(100% - 20px);border-radius:24px}
-.tool{position:relative;min-width:64px;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;border-radius:12px;border:1px solid var(--glass-line);background:rgba(255,255,255,.6);color:var(--ink);font-size:12px;font-weight:800;padding:0 6px}
-:root:not([data-theme="light"]) .tool,:root[data-theme="dark"] .tool{background:rgba(255,255,255,.06)}
-.tool.sel{background:var(--accent);border-color:var(--accent-deep);color:#073A3D}
-/* the dark theme's translucent .tool rule outranks .tool.sel, so the selected chip needs its own dark-mode rule */
-:root:not([data-theme="light"]) .tool.sel,:root[data-theme="dark"] .tool.sel{background:#0A6C71;border-color:var(--accent);color:#EAF6F6}
-:root:not([data-theme="light"]) .tool.sel .n,:root[data-theme="dark"] .tool.sel .n{color:#EAF6F6}
-.tool .n{position:absolute;top:3px;left:6px;font-size:10px;color:var(--ink-soft)}
-.tool .c{position:absolute;top:3px;right:5px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--ink);color:var(--paper);font-size:11px;line-height:18px;text-align:center}
-.tool:disabled .c{background:var(--danger)}
-.sep{width:1px;height:34px;background:var(--glass-line);margin:0 4px}
-.act{min-width:60px;height:52px;flex-direction:column;gap:0;white-space:nowrap;padding:0 10px;font-size:14px}
-.act.run{min-width:92px;background:var(--accent);border-color:var(--accent-deep);color:#073A3D}
+#hud{position:fixed;left:14px;right:14px;top:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;z-index:10;pointer-events:none}
+.brand-pill,.stats-pill,.actions-pill{pointer-events:auto;background:var(--card-bg);border:1.5px solid var(--card-border);border-radius:999px;box-shadow:var(--shadow-md),0 0 0 1px var(--glass-highlight) inset;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);height:50px;display:flex;align-items:center}
+.brand-pill{padding:0 16px 0 8px;gap:10px;min-width:0}
+.brand-pill .logo-sm{width:34px;height:34px;flex:none;filter:drop-shadow(0 2px 6px rgba(17,153,164,.3))}
+.brand-pill .brand-text{display:flex;flex-direction:column;text-align:left;min-width:0}
+.brand-pill .brand-title{font-family:var(--font-display);font-size:16px;font-weight:800;letter-spacing:.8px;line-height:1.1;color:var(--ink);white-space:nowrap}
+.brand-pill .brand-sub{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--accent-deep);white-space:nowrap}
+.stats-pill{padding:0 18px;gap:16px;font-size:14px;font-weight:700;white-space:nowrap;min-width:0}
+.stat-item{display:flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums}
+.stat-item small{display:block;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-soft);line-height:1}
+.stat-item .stat-val{font-size:15px;font-weight:800;color:var(--ink)}
+.stars{display:inline-flex;align-items:center;gap:3px}
+.stars svg{width:19px;height:19px;fill:var(--star-off);filter:drop-shadow(0 1px 2px rgba(0,0,0,.1));transition:fill .18s ease}
+.stars svg.on{fill:var(--gold);filter:drop-shadow(0 0 6px rgba(217,142,28,.5))}
+.actions-pill{padding:0 6px;gap:4px;flex:none}
+
+/* Hint & Objective Bar */
+#hint-bar{position:fixed;top:72px;left:50%;transform:translateX(-50%);display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:999px;background:var(--card-bg);border:1px solid var(--card-border);box-shadow:var(--shadow-sm);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);z-index:9;font-size:13px;font-weight:600;color:var(--ink-soft);max-width:calc(100% - 28px);pointer-events:none;animation:hintIn .25s ease-out;transition:opacity .3s ease}
+.hint-tag{font-weight:800;color:var(--ink);letter-spacing:.2px}
+.hint-dot{width:4px;height:4px;border-radius:50%;background:var(--accent);flex:none}
+@keyframes hintIn{from{opacity:0;transform:translate(-50%,-6px)}to{opacity:1;transform:translate(-50%,0)}}
+
+/* Tray (Bottom Action Bar) */
+#tray{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;display:flex;gap:10px;align-items:center;padding:8px 12px;z-index:10;max-width:calc(100% - 24px);border-radius:28px;background:var(--card-bg);border:1.5px solid var(--card-border);box-shadow:var(--shadow-lg),0 0 0 1px var(--glass-highlight) inset;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+.tray-tools{display:flex;gap:8px;align-items:center}
+.tool{position:relative;min-width:68px;height:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:14px;border:1.5px solid var(--card-border);background:var(--paper);color:var(--ink);font-family:var(--font-ui);font-size:12px;font-weight:800;padding:0 6px;transition:transform .12s ease,border-color .12s ease,box-shadow .12s ease,background .12s ease}
+:root:not([data-theme="light"]) .tool,:root[data-theme="dark"] .tool{background:rgba(255,255,255,.06);border-color:rgba(184,214,217,.14)}
+.tool:hover:not(:disabled){transform:translateY(-2px);border-color:var(--accent);box-shadow:var(--shadow-sm)}
+.tool:active:not(:disabled){transform:translateY(0)}
+.tool.sel{background:linear-gradient(180deg,var(--paper) 0%,var(--accent-bg) 100%);border-color:var(--accent);color:var(--accent-deep);box-shadow:0 0 0 2px var(--accent),0 6px 16px -2px rgba(17,153,164,.35)}
+:root:not([data-theme="light"]) .tool.sel,:root[data-theme="dark"] .tool.sel{background:#0C4D54;border-color:var(--accent);color:#EEF7F7}
+.tool .tool-ico{width:22px;height:22px;flex:none}
+.tool .n{position:absolute;top:3px;left:6px;font-size:10px;font-weight:800;color:var(--ink-muted);line-height:1}
+.tool .c{position:absolute;top:3px;right:5px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--ink);color:#FFFFFF;font-size:11px;font-weight:800;line-height:18px;text-align:center;box-shadow:0 2px 4px rgba(0,0,0,.2)}
+.tool:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.tool:disabled .c{background:var(--danger);color:#FFFFFF}
+.tray-sep{width:1px;height:36px;background:var(--card-border);margin:0 2px;flex:none}
+.tray-actions{display:flex;gap:8px;align-items:center}
+.act{min-height:54px;padding:0 12px;border-radius:14px;font-size:13px;font-weight:700;gap:4px;flex-direction:column;justify-content:center;min-width:56px}
+.act.run{min-width:116px;background:linear-gradient(135deg,var(--accent) 0%,var(--accent-deep) 100%);border-color:rgba(255,255,255,.35);color:#FFFFFF;font-size:14px;font-weight:800;letter-spacing:.3px;box-shadow:0 6px 20px -2px rgba(17,153,164,.45);flex-direction:row;gap:8px}
+.act.run:hover{background:linear-gradient(135deg,var(--accent-light) 0%,var(--accent) 100%);box-shadow:0 8px 24px -2px rgba(17,153,164,.6)}
+.act.run.running{background:linear-gradient(135deg,var(--gold) 0%,var(--gold-deep) 100%);box-shadow:0 6px 20px -2px rgba(217,142,28,.45)}
 .act small{font-size:10px;font-weight:800}
-#toasts{position:fixed;top:78px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;z-index:12;pointer-events:none;width:min(420px,calc(100% - 24px))}
-.toast{padding:9px 16px;border-radius:999px;font-weight:800;font-size:14px;background:var(--glass);border:1px solid var(--glass-line);box-shadow:var(--shadow);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);animation:tin .2s ease-out}
-.toast.good{border-color:var(--accent-deep)}
-.toast.bad{border-color:var(--danger)}
-@keyframes tin{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
-/* area map */
-.areas{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;text-align:left}
-.area{border-radius:20px;border:1px solid var(--glass-line);padding:14px;background:#FFFFFF}
+
+/* Toasts */
+#toasts{position:fixed;top:74px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;z-index:12;pointer-events:none;width:min(440px,calc(100% - 24px))}
+.toast{padding:10px 18px;border-radius:999px;font-weight:700;font-size:14px;background:var(--card-bg);border:1.5px solid var(--card-border);box-shadow:var(--shadow-md),0 0 0 1px var(--glass-highlight) inset;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);animation:tin .22s cubic-bezier(0.16,1,0.3,1);color:var(--ink)}
+.toast.good{border-color:var(--accent);background:linear-gradient(90deg,var(--accent-bg) 0%,var(--card-bg) 100%);color:var(--accent-deep)}
+.toast.bad{border-color:var(--danger);background:linear-gradient(90deg,var(--danger-bg) 0%,var(--card-bg) 100%);color:var(--danger)}
+@keyframes tin{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+
+/* Area Map */
+.areas{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px;text-align:left}
+.area{border-radius:20px;border:1.5px solid var(--card-border);padding:16px;background:var(--paper);box-shadow:var(--shadow-sm)}
 :root:not([data-theme="light"]) .area,:root[data-theme="dark"] .area{background:rgba(255,255,255,.05)}
-.area h3{margin:0 0 8px;font-size:16px;font-weight:800}
+.area-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.area h3{margin:0;font-size:16px;font-weight:800;color:var(--ink)}
+.area-star-badge{font-size:12px;font-weight:800;color:var(--gold-deep);background:var(--gold-soft);padding:3px 8px;border-radius:999px}
 .area .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
-.lvl{min-height:52px;border-radius:999px;border:1px solid var(--glass-line);background:rgba(255,255,255,.7);color:var(--ink);font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px}
-:root:not([data-theme="light"]) .lvl,:root[data-theme="dark"] .lvl{background:rgba(255,255,255,.08)}
-.lvl small{font-size:11px;color:var(--ink-soft);letter-spacing:1px}
-.lvl:disabled{opacity:.4}
-.lvl.cur{border-color:var(--accent-deep);box-shadow:inset 0 0 0 2px var(--accent)}
-.lvl:not(:disabled):hover{background:#E9FAFA}
-.stat-list{list-style:none;margin:16px 0 0;padding:0;text-align:left}
-.stat-list li{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--glass-line);font-weight:700}
-.stat-list li span:last-child{font-weight:800}
-.check{display:inline-block;width:18px;height:18px;border-radius:5px;border:2px solid var(--ink-soft);vertical-align:-4px;margin-right:6px}
-.check.on{background:var(--accent);border-color:var(--accent-deep)}
-.ending{padding:16px 14px;border-radius:20px;background:linear-gradient(180deg,#FFE3D0,#FFC9A9 60%,#FFA98C);color:#2A1721;margin-bottom:14px}
+.lvl{min-height:54px;border-radius:14px;border:1.5px solid var(--card-border);background:var(--card-bg);color:var(--ink);font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 2px;transition:all .14s ease}
+:root:not([data-theme="light"]) .lvl,:root[data-theme="dark"] .lvl{background:rgba(255,255,255,.07)}
+.lvl-num{font-size:15px;line-height:1}
+.lvl-stars{display:flex;gap:1px;font-size:10px;margin-top:3px;color:var(--star-off);line-height:1}
+.lvl-stars .m-star.on{color:var(--gold)}
+.lvl:disabled{opacity:.4;cursor:not-allowed}
+.lvl.cur{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent),0 4px 12px rgba(17,153,164,.3)}
+.lvl:not(:disabled):hover{background:var(--accent-bg);border-color:var(--accent);transform:translateY(-2px)}
+
+/* Result / Victory Card */
+.res-bento{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:18px 0 14px}
+.res-stat-card{padding:10px 14px;border-radius:14px;background:var(--paper);border:1px solid var(--card-border);display:flex;flex-direction:column;text-align:left;box-shadow:var(--shadow-sm)}
+.res-stat-card .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-soft)}
+.res-stat-card .val{font-size:18px;font-weight:800;color:var(--ink);margin-top:2px;font-variant-numeric:tabular-nums}
+.res-objectives{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.res-obj-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:14px;background:var(--paper);border:1px solid var(--card-border);text-align:left;transition:border-color .15s ease}
+.res-obj-item.on{border-color:rgba(17,153,164,.4);background:linear-gradient(90deg,var(--accent-bg) 0%,var(--paper) 100%)}
+.obj-badge{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none;background:rgba(0,0,0,.06);color:var(--ink-muted)}
+.res-obj-item.on .obj-badge{background:var(--accent);color:#FFFFFF;box-shadow:0 0 10px rgba(17,153,164,.4)}
+.obj-label{flex:1;font-size:14px;font-weight:700;color:var(--ink)}
+.obj-star{font-size:16px;color:var(--star-off)}
+.res-obj-item.on .obj-star{color:var(--gold)}
+.ending{padding:18px 16px;border-radius:22px;background:linear-gradient(180deg,#FFE3D0,#FFC9A9 60%,#FFA98C);color:#2A1721;margin-bottom:16px}
 .ending h2{color:#2A1721}
 #debug{position:fixed;left:8px;top:74px;z-index:30;font:12px/1.5 Consolas,monospace;background:rgba(0,0,0,.7);color:#D7FFFA;padding:8px 10px;border-radius:8px;max-width:min(520px,calc(100% - 16px));white-space:pre-wrap;pointer-events:none}
 #debug.err{color:#FFB3A6}
-#loading{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);font-weight:800;color:var(--ink-soft);z-index:19}
+#loading{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--ink);letter-spacing:1px;z-index:19}
+
+/* Responsive */
 @media (max-width:760px){
-  .brand b{display:none}
-  .stats .hide-s{display:none}
+  .brand-pill .brand-text{display:none}
+  .stat-item.hide-s{display:none}
   .areas{grid-template-columns:1fr}
-  .tool{min-width:56px}
-  .act{min-width:50px}
-  .act.run{min-width:78px}
 }
-@media (max-width:520px){
-  #tray{bottom:8px;gap:5px;padding:6px}
-  .tool{min-width:50px;height:50px}
-  .act span.lbl{display:none}
+@media (max-width:540px){
+  #hud{left:8px;right:8px;top:8px;gap:6px}
+  .brand-pill{height:46px;padding:0 8px}
+  .brand-pill .logo-sm{width:30px;height:30px}
+  .stats-pill{height:46px;padding:0 10px;gap:10px;font-size:12px}
+  .actions-pill{height:46px;padding:0 4px}
+  .icon-btn{width:40px;height:40px}
   .lvl-name{display:none}
-  .stats span small{display:none}
-  .stats{gap:8px;font-size:13px}
-  #hud{left:8px;right:8px;top:8px}
-  .card{padding:18px}
-  h1{font-size:44px}
-}
-/* narrow phones: the tool bar wraps to two rows so Fast forward, Undo and Reset all stay on screen */
-@media (max-width:480px){
-  #tray{width:calc(100% - 16px);flex-wrap:wrap;justify-content:center;row-gap:5px}
-  .sep{display:none}
+  #hint-bar{top:60px;font-size:11px;padding:4px 12px}
+  
+  #tray{bottom:10px;width:calc(100% - 16px);flex-direction:column;padding:8px;gap:6px;border-radius:24px}
+  .tray-tools{width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .tool{min-width:0;width:100%;height:46px}
+  .tray-sep{display:none}
+  .tray-actions{width:100%;display:grid;grid-template-columns:1.8fr 1fr 1fr 1fr;gap:6px}
+  .act{min-width:0;height:44px;padding:0 4px;font-size:11px}
+  .act.run{min-width:0;padding:0 6px;font-size:12px}
   .act span.lbl{display:inline}
+  .card{padding:22px 18px}
+  h1{font-size:36px}
+  h2{font-size:24px}
 }
-/* short landscape phones: keep the board visible above the tray, and the title card's buttons on screen */
-@media (max-height:500px) and (orientation:landscape){
-  #tray{bottom:4px;padding:4px}
-  .tool{height:44px;min-width:50px}
-  .act{height:44px}
+@media (max-height:520px) and (orientation:landscape){
+  #hud{top:6px}
+  .brand-pill,.stats-pill,.actions-pill{height:40px}
+  .icon-btn{width:36px;height:36px}
+  #tray{bottom:6px;padding:4px 8px;gap:6px}
+  .tool{height:40px;min-width:52px}
+  .act{height:40px}
+  .act.run{min-width:90px}
   .overlay{padding:8px}
   .card{padding:12px 18px}
-  .logo{width:44px;height:44px;margin-bottom:0}
-  h1{font-size:30px}
-  #ov-title .sub:first-of-type{display:none}
-  #ov-title .stack{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
-  #ov-title .btn{min-height:40px}
-  #ov-title .best{margin-top:4px}
-  #ov-title .row{margin-top:6px}
+  .logo{width:46px;height:46px}
+  h1{font-size:26px}
+  #hint-bar{display:none}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -194,48 +275,137 @@ h2{font-size:30px;font-weight:700}
 <div id="stage"><canvas id="c" aria-label="Pamukkale board"></canvas></div>
 <div id="loading" data-i18n="loading">Yükleniyor…</div>
 
-<header id="hud" class="glass hidden">
-  <div class="brand">
-    <svg class="logo-sm" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3c0 0-8 9-8 15a8 8 0 0 0 16 0c0-6-8-15-8-15z" fill="#2EC4C9"/><path d="M4 26c3-2 5-2 8 0s5 2 8 0 5-2 8 0" stroke="#173B44" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>
-    <b>Pamukkale</b>
+<header id="hud" class="hidden">
+  <div class="brand-pill">
+    <svg class="logo-sm" viewBox="0 0 36 36" aria-hidden="true">
+      <defs>
+        <linearGradient id="gLogoSm" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#24CBD5"/>
+          <stop offset="100%" stop-color="#08666E"/>
+        </linearGradient>
+      </defs>
+      <circle cx="18" cy="18" r="17" fill="#FAF8F3" stroke="#D6C7AF" stroke-width="1.2"/>
+      <path d="M5 24c3-2 6-2 9 0s6 2 9 0 5-2 8 0v4H5z" fill="url(#gLogoSm)"/>
+      <path d="M7 19c3-1.8 5.5-1.8 8.5 0s5.5 1.8 8.5 0 3.5-1.8 5 0" stroke="#FAF8F3" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <path d="M18 6c0 0-5 5.5-5 9.2a5 5 0 0 0 10 0C23 11.5 18 6 18 6z" fill="#1199A4"/>
+      <circle cx="16.5" cy="12.5" r="1.2" fill="#FFFFFF" opacity=".7"/>
+    </svg>
+    <div class="brand-text">
+      <span class="brand-title">PAMUKKALE</span>
+      <span class="brand-sub" id="hud-area-pill">BÖLGE 1</span>
+    </div>
   </div>
-  <div class="stats">
-    <span id="hud-level"></span>
-    <span><small data-i18n="pools">Havuz</small><b id="hud-pools">0/0</b></span>
-    <span class="hide-s"><small data-i18n="water">Su</small><b id="hud-water">0.0</b></span>
-    <span class="stars" id="hud-stars" aria-label="stars"></span>
+  <div class="stats-pill">
+    <div class="stat-item" id="hud-level-wrap">
+      <span id="hud-level"></span>
+    </div>
+    <div class="stat-item">
+      <small data-i18n="pools">Havuz</small>
+      <b class="stat-val" id="hud-pools">0/0</b>
+    </div>
+    <div class="stat-item hide-s">
+      <small data-i18n="water">Su</small>
+      <b class="stat-val" id="hud-water">0.0</b>
+    </div>
+    <div class="stars" id="hud-stars" aria-label="stars"></div>
   </div>
-  <div class="actions">
+  <div class="actions-pill">
     <button class="icon-btn" id="btn-pause" aria-label="Pause" title="P"></button>
     <button class="icon-btn" id="btn-sound" aria-label="Sound" title="M / X"></button>
-    <button class="icon-btn" id="btn-lang" aria-label="Language" title="L" style="font-weight:800;font-size:13px">TR</button>
+    <button class="icon-btn" id="btn-lang" aria-label="Language" title="L" style="font-weight:800;font-size:12px">TR</button>
   </div>
 </header>
 
+<div id="hint-bar" class="hidden">
+  <span class="hint-tag" id="hint-tag"></span>
+  <span class="hint-dot"></span>
+  <span id="hint-text"></span>
+</div>
+
 <div id="toasts" aria-live="polite"></div>
 
-<nav id="tray" class="glass hidden" aria-label="Tools">
-  <button class="tool" data-tool="stone" id="tool-stone"><span class="n">1</span><span class="c" id="cnt-stone">0</span><span data-i18n="toolStone">Taş</span></button>
-  <button class="tool" data-tool="dam" id="tool-dam"><span class="n">2</span><span class="c" id="cnt-dam">0</span><span data-i18n="toolDam">Set</span></button>
-  <button class="tool" data-tool="split" id="tool-split"><span class="n">3</span><span class="c" id="cnt-split">0</span><span data-i18n="toolSplit">Ayırıcı</span></button>
-  <span class="sep"></span>
-  <button class="btn act run" id="btn-run"><span id="run-label" data-i18n="start">Suyu başlat</span></button>
-  <button class="btn act" id="btn-fast" aria-pressed="false"><svg class="ico f" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6l8 6-8 6zM12 6l8 6-8 6z"/></svg><span data-i18n="fast" class="lbl">Hızlı ileri</span></button>
-  <button class="btn act" id="btn-undo"><span data-i18n="undo">Geri al</span></button>
-  <button class="btn act" id="btn-reset"><span data-i18n="reset">Sıfırla</span></button>
+<nav id="tray" class="hidden" aria-label="Tools">
+  <div class="tray-tools">
+    <button class="tool" data-tool="stone" id="tool-stone" aria-label="Stone (1)">
+      <span class="n">1</span>
+      <svg class="tool-ico" viewBox="0 0 24 24" aria-hidden="true">
+        <ellipse cx="12" cy="14" rx="8" ry="4.5" fill="#C5B59E"/>
+        <ellipse cx="11" cy="12.5" rx="5" ry="2.2" fill="#DFD3C0"/>
+        <path d="M7 13.5c1.8-1.4 4.5-1.8 7.5-1.2" stroke="#FAF8F3" stroke-width="1.1" fill="none"/>
+      </svg>
+      <span class="c" id="cnt-stone">0</span>
+      <span class="lbl" data-i18n="toolStone">Taş</span>
+    </button>
+    <button class="tool" data-tool="dam" id="tool-dam" aria-label="Dam (2)">
+      <span class="n">2</span>
+      <svg class="tool-ico" viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="3" y="10" width="18" height="6.5" rx="2" fill="#BAAA94"/>
+        <path d="M3 12h18" stroke="#1199A4" stroke-width="1.4"/>
+        <path d="M6 10v6.5M12 10v6.5M18 10v6.5" stroke="#FAF8F3" stroke-width=".9" opacity=".6"/>
+      </svg>
+      <span class="c" id="cnt-dam">0</span>
+      <span class="lbl" data-i18n="toolDam">Set</span>
+    </button>
+    <button class="tool" data-tool="split" id="tool-split" aria-label="Splitter (3)">
+      <span class="n">3</span>
+      <svg class="tool-ico" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 4L4 18h16z" fill="#1199A4" opacity=".9"/>
+        <path d="M12 9v7M8.5 15.5L12 9l3.5 6.5" stroke="#FAF8F3" stroke-width="1.3" fill="none"/>
+      </svg>
+      <span class="c" id="cnt-split">0</span>
+      <span class="lbl" data-i18n="toolSplit">Ayırıcı</span>
+    </button>
+  </div>
+  <span class="tray-sep"></span>
+  <div class="tray-actions">
+    <button class="btn act run" id="btn-run">
+      <svg class="ico f run-ico" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 2.5c0 0-6.5 7.2-6.5 12.2a6.5 6.5 0 0 0 13 0c0-5-6.5-12.2-6.5-12.2z"/>
+      </svg>
+      <span id="run-label" data-i18n="start">Suyu başlat</span>
+    </button>
+    <button class="btn act" id="btn-fast" aria-pressed="false" title="F">
+      <svg class="ico f" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6l8 6-8 6zM12 6l8 6-8 6z"/></svg>
+      <span data-i18n="fast" class="lbl">Hızlı</span>
+    </button>
+    <button class="btn act" id="btn-undo" title="Z">
+      <svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14L4 9l5-5M4 9h10a6 6 0 0 1 0 12h-3"/></svg>
+      <span data-i18n="undo" class="lbl">Geri</span>
+    </button>
+    <button class="btn act" id="btn-reset" title="R">
+      <svg class="ico s" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5"/></svg>
+      <span data-i18n="reset" class="lbl">Sıfırla</span>
+    </button>
+  </div>
 </nav>
 
 <section id="ov-title" class="overlay">
-  <div class="card glass">
-    <svg class="logo" viewBox="0 0 96 96" aria-hidden="true">
-      <circle cx="48" cy="48" r="44" fill="#FBF7EE" stroke="#2EC4C9" stroke-width="3"/>
-      <path d="M48 14c0 0-18 20-18 34a18 18 0 0 0 36 0c0-14-18-34-18-34z" fill="#2EC4C9"/>
-      <path d="M18 66c8-6 14-6 22 0s14 6 22 0 10-6 16 0" stroke="#173B44" stroke-width="4" fill="none" stroke-linecap="round"/>
-      <path d="M26 56c6-3 10-3 16 0M54 50c6-3 10-3 16 0" stroke="#FFFFFF" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <div class="card">
+    <svg class="logo" viewBox="0 0 110 110" aria-hidden="true">
+      <defs>
+        <radialGradient id="gLogoBg" cx="50%" cy="40%" r="55%">
+          <stop offset="0%" stop-color="#FFFFFF"/>
+          <stop offset="70%" stop-color="#FAF5EC"/>
+          <stop offset="100%" stop-color="#EBE2D0"/>
+        </radialGradient>
+        <linearGradient id="gWater" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#24CBD5"/>
+          <stop offset="60%" stop-color="#1199A4"/>
+          <stop offset="100%" stop-color="#08666E"/>
+        </linearGradient>
+      </defs>
+      <circle cx="55" cy="55" r="50" fill="url(#gLogoBg)" stroke="#D6C7AF" stroke-width="2.5"/>
+      <circle cx="55" cy="55" r="46" fill="none" stroke="rgba(17,153,164,0.2)" stroke-width="1" stroke-dasharray="3 3"/>
+      <path d="M15 76c12-8 24-8 36 0s24 8 36 0 6-8 8-8v16H15z" fill="url(#gWater)"/>
+      <path d="M12 76c13-8 25-8 38 0s25 8 38 0 8-7 10-7" stroke="#FAF8F3" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M22 62c10-6 20-6 30 0s20 6 30 0 4-6 6-6" stroke="#FAF8F3" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M55 18c0 0-16 18-16 30a16 16 0 0 0 32 0c0-12-16-30-16-30z" fill="url(#gWater)"/>
+      <path d="M47 38c2-6 8-10 12-11" stroke="#FFFFFF" stroke-width="2" fill="none" stroke-linecap="round" opacity=".8"/>
+      <path d="M42 22c-3-4-2-8 2-11M68 22c3-4 2-8-2-11" stroke="#D6C7AF" stroke-width="1.8" fill="none" stroke-linecap="round" opacity=".6"/>
     </svg>
-    <h1>Pamukkale</h1>
+    <h1>PAMUKKALE</h1>
     <p class="sub" data-i18n="subtitle">Travertenlerde su akışı bulmacası</p>
-    <p class="sub" style="margin-top:12px" data-i18n="howto">Kaynaktan akan suyu taş, set ve ayırıcılarla havuzlara yönlendir.</p>
+    <p class="sub" style="margin-top:8px;font-size:14px;color:var(--ink-muted)" data-i18n="howto">Kaynaktan akan suyu taş, set ve ayırıcılarla havuzlara yönlendir.</p>
     <div class="stack">
       <button class="btn primary" id="btn-play" data-i18n="play">Oyna</button>
       <button class="btn" id="btn-continue" data-i18n="continue">Devam et</button>
@@ -249,7 +419,7 @@ h2{font-size:30px;font-weight:700}
 </section>
 
 <section id="ov-areas" class="overlay hidden">
-  <div class="card glass wide">
+  <div class="card wide">
     <h2 data-i18n="areas">Seviyeler</h2>
     <div class="areas" id="areas-grid"></div>
     <div class="row"><button class="btn" id="btn-areas-back" data-i18n="back">Geri</button></div>
@@ -257,7 +427,7 @@ h2{font-size:30px;font-weight:700}
 </section>
 
 <section id="ov-settings" class="overlay hidden">
-  <div class="card glass">
+  <div class="card">
     <h2 data-i18n="settings">Ayarlar</h2>
     <div style="margin-top:12px">
       <div class="set-row"><label for="set-master" data-i18n="master">Ana ses</label><span class="val" id="v-master"></span>
@@ -278,7 +448,7 @@ h2{font-size:30px;font-weight:700}
 </section>
 
 <section id="ov-pause" class="overlay hidden">
-  <div class="card glass">
+  <div class="card">
     <h2 data-i18n="pause">Duraklat</h2>
     <div class="stack">
       <button class="btn primary" id="btn-resume" data-i18n="resume">Devam</button>
@@ -290,15 +460,15 @@ h2{font-size:30px;font-weight:700}
 </section>
 
 <section id="ov-result" class="overlay hidden">
-  <div class="card glass">
+  <div class="card">
     <h2 id="res-title"></h2>
     <p class="sub" id="res-sub"></p>
-    <div class="stars" id="res-stars" style="justify-content:center;margin:14px 0 0"></div>
-    <ul class="stat-list" id="res-list"></ul>
+    <div class="stars" id="res-stars" style="justify-content:center;margin:16px 0 0"></div>
+    <div id="res-list"></div>
     <div class="stack">
       <button class="btn primary" id="btn-next"></button>
       <button class="btn" id="btn-retry" data-i18n="retry">Tekrar dene</button>
-      <div class="row" style="margin-top:0">
+      <div class="row" style="margin-top:4px">
         <button class="btn" id="btn-res-areas" data-i18n="areas">Seviyeler</button>
         <button class="btn" id="btn-res-main" data-i18n="mainMenu">Ana menü</button>
       </div>
@@ -307,12 +477,12 @@ h2{font-size:30px;font-weight:700}
 </section>
 
 <section id="ov-end" class="overlay hidden">
-  <div class="card glass">
+  <div class="card">
     <div class="ending">
       <h2 data-i18n="endTitle">Gün batımında Pamukkale</h2>
       <p class="sub" style="color:#2A1721" data-i18n="endText">Yamaçtaki tüm havuzlar doldu.</p>
     </div>
-    <ul class="stat-list" id="end-list"></ul>
+    <div id="end-list" class="res-bento" style="margin-bottom:20px"></div>
     <div class="row">
       <button class="btn primary" id="btn-again" data-i18n="playAgain">Yeniden oyna</button>
       <button class="btn" id="btn-end-main" data-i18n="mainMenu">Ana menü</button>
@@ -611,7 +781,9 @@ const ICON = {
   reset: '<path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5" class="s"/>',
   sound: '<path d="M4 9.5h4l5-4v13l-5-4H4z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11" class="s"/>',
   mute: '<path d="M4 9.5h4l5-4v13l-5-4H4z"/><path d="M16 9l5 6M21 9l-5 6" class="s"/>',
-  star: '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>'
+  star: '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>',
+  check: '<path d="M5 13l4 4L19 7" class="s"/>',
+  lock: '<rect x="6" y="11" width="12" height="10" rx="2" class="s"/><path d="M8 11V7a4 4 0 0 1 8 0v4" class="s"/>'
 };
 const svg = (name, cls = 'ico') => `<svg class="${cls}${/class="s"/.test(ICON[name]) ? ' s' : ' f'}" viewBox="0 0 24 24" aria-hidden="true">${ICON[name]}</svg>`;
 const starSvg = on => `<svg viewBox="0 0 24 24" class="${on ? 'on' : ''}" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>`;
@@ -1266,11 +1438,26 @@ function loadLevel(i) {
   applyAreaSky();
 }
 
+let hintTimer = null;
+function showHintBar(tag, text) {
+  const bar = document.getElementById('hint-bar');
+  if (!bar) return;
+  document.getElementById('hint-tag').textContent = tag;
+  document.getElementById('hint-text').textContent = text;
+  bar.classList.remove('hidden');
+  bar.style.opacity = '1';
+  clearTimeout(hintTimer);
+  hintTimer = setTimeout(() => {
+    bar.style.opacity = '0';
+    setTimeout(() => { if (bar.style.opacity === '0') bar.classList.add('hidden'); }, 350);
+  }, 6500);
+}
+
 function startLevel(i) {
   if (i > progress.unlocked - 1) return toast(t('toastLocked'), 'bad');
   loadLevel(i);
   showScreen('play');
-  toast(`${levelName(i)}: ${levelHint(i)}`, 'info');
+  showHintBar(levelName(i), levelHint(i));
 }
 
 function placeAt(i, kind = G.tool) {
@@ -1395,16 +1582,19 @@ function showResult() {
   const r = G.res, title = r.win ? t('done') : t('failed');
   document.getElementById('res-title').textContent = title;
   document.getElementById('res-sub').textContent = `${t('levelWord')} ${G.idx + 1} · ${levelName(G.idx)}`;
-  document.getElementById('res-stars').innerHTML = r.stars.map(starSvg).join('') ;
+  document.getElementById('res-stars').innerHTML = r.stars.map(starSvg).join('');
   const cnt = poolCounts(), used = totalUsed();
   const rows = [
     [t('poolsFilled'), `${cnt.filled}/${cnt.total}`],
-    [t('waterUsed'), G.st.emitted.toFixed(1)],
-    [t('spilled'), G.st.wasted.toFixed(1)],
+    [t('waterUsed'), `${G.st.emitted.toFixed(1)} L`],
+    [t('spilled'), `${G.st.wasted.toFixed(1)} L`],
     [t('toolsLeft'), String(G.def.tools.stone + G.def.tools.dam + G.def.tools.split - used)]
   ];
-  document.getElementById('res-list').innerHTML = rows.map(([a, b]) => `<li><span>${a}</span><span>${b}</span></li>`).join('') +
-    [[t('star1'), r.stars[0]], [t('star2'), r.stars[1]], [t('star3'), r.stars[2]]].map(([a, on]) => `<li><span><i class="check ${on ? 'on' : ''}"></i>${a}</span><span></span></li>`).join('');
+  const metricCards = rows.map(([a, b]) => `<div class="res-stat-card"><span class="lbl">${a}</span><b class="val">${b}</b></div>`).join('');
+  const objCards = [[t('star1'), r.stars[0]], [t('star2'), r.stars[1]], [t('star3'), r.stars[2]]].map(([a, on]) =>
+    `<div class="res-obj-item ${on ? 'on' : ''}"><div class="obj-badge">${on ? svg('check') : ''}</div><span class="obj-label">${a}</span><span class="obj-star">★</span></div>`
+  ).join('');
+  document.getElementById('res-list').innerHTML = `<div class="res-bento">${metricCards}</div><div class="res-objectives">${objCards}</div>`;
   const next = document.getElementById('btn-next');
   const last = G.idx === LEVEL_COUNT - 1;
   next.textContent = last ? t('ending') : t('next');
@@ -1417,8 +1607,8 @@ function showEnd() {
   let total = 0, done = 0;
   for (const k in progress.stars) { total += progress.stars[k]; if (progress.stars[k] > 0) done++; }
   document.getElementById('end-list').innerHTML =
-    `<li><span>${t('totalStars')}</span><span>${total}/${LEVEL_COUNT * 3}</span></li>` +
-    `<li><span>${t('levelsDone')}</span><span>${done}/${LEVEL_COUNT}</span></li>`;
+    `<div class="res-stat-card"><span class="lbl">${t('totalStars')}</span><b class="val">${total}/${LEVEL_COUNT * 3} ★</b></div>` +
+    `<div class="res-stat-card"><span class="lbl">${t('levelsDone')}</span><b class="val">${done}/${LEVEL_COUNT}</b></div>`;
   G.endSpin = 0;
   G.inLevel = false;
   showScreen('end');
@@ -1455,7 +1645,11 @@ function renderAreas() {
   for (let a = 0; a < 4; a++) {
     const div = document.createElement('div');
     div.className = 'area';
-    div.innerHTML = `<h3>${AREA_NAMES[a][L]}</h3><div class="grid"></div>`;
+    let areaStars = 0;
+    for (let i = 0; i < LEVEL_COUNT; i++) {
+      if (LEVELS[i].area === a) areaStars += (progress.stars[i] || 0);
+    }
+    div.innerHTML = `<div class="area-header"><h3>${AREA_NAMES[a][L]}</h3><span class="area-star-badge">${areaStars}/15 ★</span></div><div class="grid"></div>`;
     const grid = div.querySelector('.grid');
     for (let i = 0; i < LEVEL_COUNT; i++) {
       if (LEVELS[i].area !== a) continue;
@@ -1465,7 +1659,7 @@ function renderAreas() {
       b.className = 'lvl' + (i === G.idx && G.inLevel ? ' cur' : '');
       b.disabled = locked;
       b.setAttribute('aria-label', `${t('levelWord')} ${i + 1} ${levelName(i)}`);
-      b.innerHTML = `${i + 1}<small>${'★'.repeat(st)}${st ? '' : '·'}</small>`;
+      b.innerHTML = `<span class="lvl-num">${i + 1}</span><span class="lvl-stars">${locked ? svg('lock') : [1, 2, 3].map(k => `<span class="m-star ${k <= st ? 'on' : ''}">★</span>`).join('')}</span>`;
       b.onclick = () => startLevel(i);
       grid.appendChild(b);
     }
@@ -1516,6 +1710,9 @@ function setLang(code) {
 function renderHUD() {
   if (!G.st) return;
   const cnt = poolCounts();
+  const areaIdx = G.def ? G.def.area : 0;
+  const ap = document.getElementById('hud-area-pill');
+  if (ap) ap.textContent = AREA_NAMES[areaIdx][L].toUpperCase();
   document.getElementById('hud-level').innerHTML = `<small>${t('levelWord')}</small>${G.idx + 1}/${LEVEL_COUNT}<span class="lvl-name"> · ${levelName(G.idx)}</span>`;
   document.getElementById('hud-pools').textContent = `${cnt.filled}/${cnt.total}`;
   document.getElementById('hud-water').textContent = G.st.emitted.toFixed(1);
@@ -1537,6 +1734,7 @@ function renderTray() {
   }
   const run = document.getElementById('btn-run');
   document.getElementById('run-label').textContent = G.running ? t('stop') : t('start');
+  run.classList.toggle('running', G.running);
   run.classList.toggle('primary', !G.running);
   document.getElementById('btn-fast').setAttribute('aria-pressed', String(G.speed > 1));
   document.getElementById('btn-fast').classList.toggle('on', G.speed > 1);
