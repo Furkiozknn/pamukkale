@@ -503,10 +503,16 @@ var PSim = (function () {
   var RIM_STEP = 0.5; // height gained by one calcium step
   var RIM_MAX = 2;    // most calcium a single cell can gain
   var ADD = { stone: 1, dam: 2, split: 0 };
+  var GATE_H = 3;     // a closed sluice gate stands this much above its cell
   var DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1]];
 
-  function height(st, i) {
+  // ground under any gate: terrain, placed tool and calcium
+  function base(st, i) {
     return st.h0[i] + (st.tool[i] ? ADD[st.tool[i]] : 0) + st.rim[i];
+  }
+  // what the water meets: the ground plus a closed gate (st.gate: 0 none, 1 closed, 2 open)
+  function height(st, i) {
+    return st.gate[i] === 1 ? base(st, i) + GATE_H : base(st, i);
   }
 
   function create(def) {
@@ -517,7 +523,7 @@ var PSim = (function () {
       tool: new Array(size).fill(null),
       w: new Float64Array(size), wn: new Float64Array(size), // preallocated ping-pong buffers
       s: new Float64Array(size), moved: new Uint8Array(size),
-      cal: new Int32Array(size),
+      cal: new Int32Array(size), gate: new Uint8Array(size), gates: [],
       tick: 0, emitted: 0, wasted: 0, rimChanged: false,
       spring: def.spring[1] * n + def.spring[0], rate: def.rate, time: def.time,
       pools: def.pools.map(function (p) { return { i: p[1] * n + p[0], m: p[2] }; })
@@ -525,6 +531,11 @@ var PSim = (function () {
     for (var y = 0; y < n; y++) {
       for (var x = 0; x < n; x++) st.h0[y * n + x] = +def.rows[y].charAt(x);
     }
+    (def.gates || []).forEach(function (g) { // [x, y, startsOpen]
+      var gi = g[1] * n + g[0];
+      st.gate[gi] = g[2] ? 2 : 1;
+      st.gates.push(gi);
+    });
     return st;
   }
 
@@ -589,7 +600,7 @@ var PSim = (function () {
           nx = x + DIRS[k][0]; ny = y + DIRS[k][1];
           if (nx < 0 || nx >= n || ny < 0 || ny >= n) continue;
           j = ny * n + nx;
-          if (wn[j] < 0.05 && height(st, j) <= s[i] + 0.01 && st.rim[j] < RIM_MAX - 1e-9) {
+          if (wn[j] < 0.05 && !st.gate[j] && height(st, j) <= s[i] + 0.01 && st.rim[j] < RIM_MAX - 1e-9) {
             st.rim[j] = Math.min(RIM_MAX, st.rim[j] + RIM_STEP);
             st.rimChanged = true;
           }
@@ -625,9 +636,16 @@ var PSim = (function () {
 
   function place(st, tool, i) { st.tool[i] = tool; st.rimChanged = true; }
   function remove(st, i) { st.tool[i] = null; st.rimChanged = true; }
+  // opens a closed gate or closes an open one, any time, also while the water runs
+  function toggle(st, i) {
+    if (!st.gate[i]) return false;
+    st.gate[i] = st.gate[i] === 1 ? 2 : 1;
+    st.rimChanged = true;
+    return true;
+  }
 
-  return { create: create, step: step, run: run, status: status, height: height, place: place, remove: remove,
-    ADD: ADD, RIM_MAX: RIM_MAX, EPS: EPS };
+  return { create: create, step: step, run: run, status: status, height: height, base: base, place: place, remove: remove,
+    toggle: toggle, ADD: ADD, GATE_H: GATE_H, RIM_MAX: RIM_MAX, EPS: EPS };
 })();
 /* SIM-END */
 
@@ -652,7 +670,11 @@ var LEVELS = [
   { area: 3, n: 10, rows: ['8888888888', '8778777777', '7709776777', '6696696666', '5999545095', '5555556556', '4444445054', '3303393323', '3433333342', '9939993999'], spring: [6, 0], rate: 0.5, time: 320, drain: true, pools: [[7, 4, 1], [7, 6, 1], [2, 2, 2], [2, 7, 1]], tools: { stone: 5, dam: 1, split: 1 }, par: 3, sol: [["dam",6,4],["stone",4,2],["stone",7,0]] },
   { area: 3, n: 10, rows: ['8888888777', '7777777677', '9077067777', '6666666666', '9555540564', '5555466559', '3034494344', '3333333323', '3333433432', '9499929999'], spring: [6, 0], rate: 0.5, time: 340, drain: true, pools: [[4, 2, 2], [1, 6, 1], [1, 2, 1], [6, 4, 1]], tools: { stone: 5, dam: 1, split: 1 }, par: 4, sol: [["dam",5,8],["stone",6,1],["stone",4,3],["stone",5,3]] },
   { area: 3, n: 10, rows: ['8888878888', '6787777776', '7077677707', '9665066666', '4555545655', '4554555665', '4449430449', '3340333439', '3323333233', '9999949399'], spring: [6, 0], rate: 0.5, time: 385, drain: true, pools: [[6, 6, 1], [3, 7, 2], [4, 3, 2], [8, 2, 2], [1, 2, 2]], tools: { stone: 6, dam: 1, split: 1 }, par: 4, sol: [["dam",7,9],["stone",5,9],["stone",1,4],["stone",2,5]] },
-  { area: 3, n: 10, rows: ['8888788888', '7877777767', '7097787777', '6766566665', '5646555555', '5564059959', '4444444044', '4033033343', '3343423333', '9492999999'], spring: [6, 0], rate: 0.5, time: 380, drain: true, pools: [[7, 6, 1], [1, 2, 1], [1, 7, 2], [4, 5, 1], [4, 7, 1]], tools: { stone: 6, dam: 1, split: 1 }, par: 4, sol: [["dam",3,8],["stone",4,2],["stone",3,2],["stone",6,2]] }
+  { area: 3, n: 10, rows: ['8888788888', '7877777767', '7097787777', '6766566665', '5646555555', '5564059959', '4444444044', '4033033343', '3343423333', '9492999999'], spring: [6, 0], rate: 0.5, time: 380, drain: true, pools: [[7, 6, 1], [1, 2, 1], [1, 7, 2], [4, 5, 1], [4, 7, 1]], tools: { stone: 6, dam: 1, split: 1 }, par: 4, sol: [["dam",3,8],["stone",4,2],["stone",3,2],["stone",6,2]] },
+  // area 4: sluice gates. gates: [x, y, startsOpen]; gsol: the verified toggles [x, y, tick] the ?auto bot replays
+  { area: 4, n: 7, rows: ['8888888', '9997999', '9266999', '9495999', '9394999', '9290999', '9192999'], spring: [3, 0], rate: 0.4, time: 240, drain: true, pools: [[1, 2, 2], [3, 5, 2]], gates: [[3, 3, 0]], tools: { stone: 0, dam: 0, split: 0 }, par: 0, sol: [], gsol: [[3,3,15]] },
+  { area: 4, n: 8, rows: ['88888888', '99997999', '99266999', '99495999', '99394409', '99293929', '99190919', '99092909'], spring: [4, 0], rate: 0.4, time: 320, drain: true, pools: [[2, 2, 2], [6, 4, 2], [4, 6, 2]], gates: [[4, 3, 0], [4, 5, 1]], tools: { stone: 1, dam: 0, split: 0 }, par: 0, sol: [], gsol: [[4,3,15],[4,5,25]] },
+  { area: 4, n: 7, rows: ['8888888', '9997999', '9266999', '9495999', '9394999', '9290999', '9191999'], spring: [3, 0], rate: 0.4, time: 300, drain: true, pools: [[1, 2, 2], [3, 5, 2.5]], gates: [[3, 3, 1]], tools: { stone: 0, dam: 0, split: 0 }, par: 0, sol: [], gsol: [[3,3,10],[3,3,55]] }
 ];
 /* LEVELS-END */
 </script>
@@ -709,7 +731,9 @@ const S = {
     toastReset: 'Seviye sıfırlandı', toastPoolFull: 'Bir havuz doldu', toastTimeUp: 'Süre doldu. R ile tekrar dene.',
     toastLocked: 'Önce önceki seviyeyi tamamla', toastCalcium: 'Kalsiyum yeni bir kenar ördü', toastNoPlace: 'Burada araç yerleşmez',
     hint: '1-3 araç seç · tıkla yerleştir · sağ tık sil · Space su', tipKeys: 'P duraklat · M müzik · X efekt · L dil',
-    lockedTag: 'kilitli', onOff: ['açık', 'kapalı']
+    lockedTag: 'kilitli', onOff: ['açık', 'kapalı'],
+    toastGateOpen: 'Kapak açıldı', toastGateClosed: 'Kapak kapandı', toastGateCell: 'Kapağa araç konmaz',
+    gateTutorial: 'Yeni: savak kapağı. Kapağa tıkla (ya da G): su akarken bile açılır, kapanır. Önce soldaki havuz dolsun, sonra kapağı aç.'
   },
   en: {
     loading: 'Loading…', subtitle: 'A water-flow puzzle on the white terraces',
@@ -731,14 +755,17 @@ const S = {
     toastReset: 'Level reset', toastPoolFull: 'A pool is full', toastTimeUp: 'Time is up. Press R to try again.',
     toastLocked: 'Finish the previous level first', toastCalcium: 'Calcium built a new rim', toastNoPlace: 'Nothing can go here',
     hint: '1-3 pick a tool · click to place · right-click to remove · Space water', tipKeys: 'P pause · M music · X effects · L language',
-    lockedTag: 'locked', onOff: ['on', 'off']
+    lockedTag: 'locked', onOff: ['on', 'off'],
+    toastGateOpen: 'Gate opened', toastGateClosed: 'Gate closed', toastGateCell: 'Tools cannot go on a gate',
+    gateTutorial: 'New: the sluice gate. Click it (or press G) to open or close it, even while the water runs. Let the left pool fill first, then open the gate.'
   }
 };
 const LV = [
   ['İlk Damla', 'First Drop'], ['Kıvrık Oluk', 'Winding Channel'], ['Çift Havuz', 'Twin Pools'], ['Taş Set', 'Stone Weir'], ['Bölünen Akış', 'Split Stream'],
   ['İlk Basamak', 'First Shelf'], ['Kalsiyum Kenarı', 'Calcium Edge'], ['Dar Geçit', 'Narrow Gate'], ['Üç Havuz', 'Three Pools'], ['Beyaz Dizi', 'White Row'],
   ['Tiyatro Basamağı', 'Theatre Step'], ['Kutsal Kaynak', 'Sacred Spring'], ['Yedi Kanal', 'Seven Channels'], ['Sütun Gölgesi', 'Column Shadow'], ['Büyük Havuz', 'The Great Pool'],
-  ['Altın Saat', 'Golden Hour'], ['Kızıl Yamaç', 'Red Slope'], ['Kireç Köprüsü', 'Lime Bridge'], ['Son Havuzlar', 'Last Pools'], ['Pamukkale', 'Pamukkale']
+  ['Altın Saat', 'Golden Hour'], ['Kızıl Yamaç', 'Red Slope'], ['Kireç Köprüsü', 'Lime Bridge'], ['Son Havuzlar', 'Last Pools'], ['Pamukkale', 'Pamukkale'],
+  ['İlk Kapak', 'First Gate'], ['Savak Sırası', 'Sluice Relay'], ['Kalsiyum Zamanı', 'Calcium Time']
 ];
 const HINTS = [
   ['Bir taş koy, su havuza doğru dönsün.', 'Place one stone to turn the water toward the pool.'],
@@ -760,9 +787,12 @@ const HINTS = [
   ['Kızıl yamaçta su hızlı kayar.', 'On the red slope the water runs fast.'],
   ['Köprünün aralığından geçir.', 'Pass the water through the bridge gap.'],
   ['Altı havuz, az araç.', 'Six pools, few tools.'],
-  ['Son havuzları doldur, gün batsın.', 'Fill the last pools as the sun sets.']
+  ['Son havuzları doldur, gün batsın.', 'Fill the last pools as the sun sets.'],
+  ['Kapak kapalıyken su yana döner. Havuz dolunca kapağı aç.', 'With the gate shut the water turns aside. Open it once the pool is full.'],
+  ['İki kapak, bir sıra: üsttekini aç, alttaki havuz dolunca alttakini kapat.', 'Two gates, one order: open the upper one, then close the lower one once its pool is full.'],
+  ['Akarken bu havuz sızar. Kapağı kapat, durgun su kenarı yükseltsin, sonra yeniden aç.', 'This pool leaks while water runs. Close the gate, let still water raise its rim, then open it again.']
 ];
-const AREA_NAMES = [['Alt Havuzlar', 'Lower Pools'], ['Orta Basamaklar', 'Middle Shelves'], ['Antik Havuz', 'Ancient Pool'], ['Gün Batımı', 'Sunset']];
+const AREA_NAMES = [['Alt Havuzlar', 'Lower Pools'], ['Orta Basamaklar', 'Middle Shelves'], ['Antik Havuz', 'Ancient Pool'], ['Gün Batımı', 'Sunset'], ['Kalsiyum Zamanı', 'Calcium Time']];
 const t = k => (S[settings.lang] && S[settings.lang][k] !== undefined ? S[settings.lang][k] : S.en[k]) || k;
 const L = settings.lang === 'en' ? 1 : 0;
 const levelName = i => LV[i][L];
@@ -994,6 +1024,53 @@ const springBowl = [[0.12, 0], [0.26, 0.04], [0.34, 0.16], [0.33, 0.3], [0.26, 0
 const spring = new THREE.Mesh(new THREE.LatheGeometry(springBowl, 20), new THREE.MeshLambertMaterial({ color: 0xF5F3EE }));
 spring.castShadow = quality !== 'low';
 scene.add(spring);
+// sluice gates: two posts and a beam that stay, and a plank that drops in (closed) or lifts out (open)
+const GATE_UP = PSim.GATE_H * HU;   // world height of a closed gate
+const gateGeo = {
+  post: new THREE.BoxGeometry(0.11, GATE_UP * 2 + 0.2, 0.11),
+  beam: new THREE.BoxGeometry(0.98, 0.1, 0.13),
+  plank: new THREE.BoxGeometry(0.76, GATE_UP, 0.09)
+};
+const gateWood = new THREE.MeshLambertMaterial({ color: 0x8C6E52 });
+const GATE_COL = { closed: 0xC9784A, open: 0x2EC4C9 };
+let gates = [];   // { i, group, plank, mat, y }
+function clearGates() {
+  for (const g of gates) { scene.remove(g.group); g.mat.dispose(); }
+  gates = [];
+}
+function buildGates() {
+  clearGates();
+  const st = G.st, n = G.n;
+  for (const i of st.gates) {
+    const x = i % n, y = (i - x) / n, h = k => (k >= 0 && k < n * n ? st.h0[k] : 9);
+    // the plank spans the channel: across x when the water runs along z, else turned
+    const sideX = Math.min(x > 0 ? h(i - 1) : 9, x < n - 1 ? h(i + 1) : 9);
+    const sideZ = Math.min(h(i - n), h(i + n));
+    const group = new THREE.Group();
+    const mat = new THREE.MeshLambertMaterial({ color: GATE_COL.closed });
+    const plank = new THREE.Mesh(gateGeo.plank, mat);
+    const pa = new THREE.Mesh(gateGeo.post, gateWood), pb = new THREE.Mesh(gateGeo.post, gateWood), beam = new THREE.Mesh(gateGeo.beam, gateWood);
+    pa.position.set(-0.45, GATE_UP + 0.1, 0); pb.position.set(0.45, GATE_UP + 0.1, 0); beam.position.set(0, GATE_UP * 2 + 0.2, 0);
+    for (const m of [plank, pa, pb, beam]) { m.castShadow = quality !== 'low'; group.add(m); }
+    if (sideX < sideZ) group.rotation.y = Math.PI / 2;
+    scene.add(group);
+    gates.push({ i, group, plank, mat, y: st.gate[i] === 1 ? 0 : 1 });
+  }
+  placeGates(true);
+}
+// eases each plank toward its state; snap jumps there at once
+function placeGates(snap, dt = 0) {
+  if (!G.st) return;
+  const st = G.st, n = G.n;
+  for (const g of gates) {
+    const target = st.gate[g.i] === 1 ? 0 : 1;
+    g.y = snap ? target : g.y + (target - g.y) * Math.min(1, dt * 7);
+    const ground = PSim.base(st, g.i) * HU;
+    g.group.position.set(cellX(g.i, n), ground, cellZ(g.i, n));
+    g.plank.position.y = GATE_UP / 2 + g.y * GATE_UP;
+    g.mat.color.setHex(target === 0 ? GATE_COL.closed : GATE_COL.open);
+  }
+}
 const ghost = new THREE.Mesh(toolGeo.stone, new THREE.MeshLambertMaterial({ color: 0xFFFFFF, transparent: true, opacity: 0.5, depthWrite: false }));
 ghost.visible = false;
 scene.add(ghost);
@@ -1151,7 +1228,7 @@ function refreshTerrain() {
   if (!board || !G.st) return;
   const st = G.st, n = board.n, M = board.M, V = board.V;
   const hArr = board.hArr, rArr = board.rArr; // reuse preallocated buffers
-  for (let i = 0; i < n * n; i++) { hArr[i] = PSim.height(st, i); rArr[i] = st.rim[i]; }
+  for (let i = 0; i < n * n; i++) { hArr[i] = PSim.base(st, i); rArr[i] = st.rim[i]; }   // a gate is drawn as its own mesh
   const pos = board.terrainGeo.attributes.position, col = board.terrainGeo.attributes.color;
   for (let j = 0; j <= M; j++) for (let i = 0; i <= M; i++) {
     const k = j * (M + 1) + i;
@@ -1183,7 +1260,7 @@ function refreshWater() {
   if (!board || !G.st) return;
   const st = G.st, n = board.n, M = board.M;
   const hArr = board.hArr, sArr = board.sArr; // reuse preallocated buffers
-  for (let i = 0; i < n * n; i++) { hArr[i] = PSim.height(st, i); sArr[i] = hArr[i] + st.w[i]; }
+  for (let i = 0; i < n * n; i++) { hArr[i] = PSim.base(st, i); sArr[i] = hArr[i] + st.w[i]; }
   const pos = board.waterGeo.attributes.position, col = board.waterGeo.attributes.color;
   for (let j = 0; j <= M; j++) for (let i = 0; i <= M; i++) {
     const k = j * (M + 1) + i;
@@ -1433,13 +1510,14 @@ function loadLevel(i) {
   progress.last = G.idx;
   writeJSON(SAVE_KEY, progress);
   refreshTerrain(); refreshTools(); refreshWater();
+  buildGates();
   renderTray();
   document.body.dataset.area = String(G.def.area);
   applyAreaSky();
 }
 
 let hintTimer = null;
-function showHintBar(tag, text) {
+function showHintBar(tag, text, ms = 6500) {
   const bar = document.getElementById('hint-bar');
   if (!bar) return;
   document.getElementById('hint-tag').textContent = tag;
@@ -1450,20 +1528,37 @@ function showHintBar(tag, text) {
   hintTimer = setTimeout(() => {
     bar.style.opacity = '0';
     setTimeout(() => { if (bar.style.opacity === '0') bar.classList.add('hidden'); }, 350);
-  }, 6500);
+  }, ms);
 }
 
 function startLevel(i) {
   if (i > progress.unlocked - 1) return toast(t('toastLocked'), 'bad');
   loadLevel(i);
   showScreen('play');
-  showHintBar(levelName(i), levelHint(i));
+  const firstGate = LEVELS[i].gates && LEVELS.findIndex(d => d.gates && d.gates.length) === i;
+  if (firstGate) {   // tutorial: the hint bar stays longer and a toast repeats it where the bar is hidden (short landscape screens)
+    showHintBar(levelName(i), t('gateTutorial'), 14000);
+    if (window.matchMedia && matchMedia('(max-height:520px) and (orientation:landscape)').matches) toast(t('gateTutorial'), 'info');
+  } else showHintBar(levelName(i), levelHint(i));
+}
+
+// opens or closes the sluice gate on cell i; works before and during the flow
+function toggleGate(i) {
+  if (G.screen !== 'play' || !G.st || i < 0 || i >= G.st.size || !G.st.gate[i]) return false;
+  PSim.toggle(G.st, i);
+  G.dirty = true;
+  const open = G.st.gate[i] === 2;
+  toast(t(open ? 'toastGateOpen' : 'toastGateClosed'), open ? 'good' : 'info');
+  sfxChime(open ? [587.33, 880] : [440, 329.63]);
+  for (let b = 0; b < 6; b++) burst(i);
+  return true;
 }
 
 function placeAt(i, kind = G.tool) {
   if (G.screen !== 'play' || i < 0 || !G.st || i >= G.st.size) return false;
   const st = G.st;
   if (i === st.spring) { toast(t('toastSpring'), 'bad'); return false; }
+  if (st.gate[i]) { toast(t('toastGateCell'), 'bad'); return false; }
   if (st.tool[i]) { toast(t('toastOccupied'), 'bad'); return false; }
   if (budget(kind) <= 0) { toast(t('toastNoTool'), 'bad'); return false; }
   PSim.place(st, kind, i);
@@ -1525,6 +1620,9 @@ function resetLevel() {
 // advances one tick and checks for the end of the level
 function advance() {
   const st = G.st;
+  if (bot.active && bot.phase === 'run' && G.def.gsol) {
+    for (const [x, y, tk] of G.def.gsol) if (st.tick === tk) toggleGate(y * G.n + x);
+  }
   PSim.step(st);
   if (st.rimChanged) {
     G.dirty = true;
@@ -1622,6 +1720,7 @@ function showScreen(name) {
   const inGame = name === 'play' || name === 'pause' || name === 'result';
   document.getElementById('hud').classList.toggle('hidden', !inGame || !G.inLevel);
   document.getElementById('tray').classList.toggle('hidden', !(name === 'play' || name === 'pause'));
+  if (name !== 'play' && name !== 'pause') { const hb = document.getElementById('hint-bar'); if (hb) hb.classList.add('hidden'); }
   if (name === 'areas') renderAreas();
   if (name === 'settings') syncSettingsUI();
   if (name === 'title') renderTitle();
@@ -1642,14 +1741,14 @@ function renderTitle() {
 function renderAreas() {
   const box = document.getElementById('areas-grid');
   box.innerHTML = '';
-  for (let a = 0; a < 4; a++) {
+  for (let a = 0; a < AREA_NAMES.length; a++) {
     const div = document.createElement('div');
     div.className = 'area';
-    let areaStars = 0;
+    let areaStars = 0, areaLevels = 0;
     for (let i = 0; i < LEVEL_COUNT; i++) {
-      if (LEVELS[i].area === a) areaStars += (progress.stars[i] || 0);
+      if (LEVELS[i].area === a) { areaStars += (progress.stars[i] || 0); areaLevels++; }
     }
-    div.innerHTML = `<div class="area-header"><h3>${AREA_NAMES[a][L]}</h3><span class="area-star-badge">${areaStars}/15 ★</span></div><div class="grid"></div>`;
+    div.innerHTML = `<div class="area-header"><h3>${AREA_NAMES[a][L]}</h3><span class="area-star-badge">${areaStars}/${areaLevels * 3} ★</span></div><div class="grid"></div>`;
     const grid = div.querySelector('.grid');
     for (let i = 0; i < LEVEL_COUNT; i++) {
       if (LEVELS[i].area !== a) continue;
@@ -1784,7 +1883,7 @@ canvas.addEventListener('pointerdown', e => {
   drag = { x: e.clientX, y: e.clientY, moved: false, long: false, button: e.button, touch: e.pointerType !== 'mouse' };
   if (drag.touch && G.screen === 'play') {
     longTimer = setTimeout(() => {
-      if (drag && !drag.moved) { drag.long = true; removeAt(cellAt(drag.x, drag.y)); }
+      if (drag && !drag.moved) { const c = cellAt(drag.x, drag.y); if (!(c >= 0 && G.st.gate[c])) { drag.long = true; removeAt(c); } }
     }, 520);
   }
 });
@@ -1814,7 +1913,7 @@ canvas.addEventListener('pointerup', e => {
   if (drag && !drag.moved && !drag.long && pointers.size === 0 && G.screen === 'play') {
     const i = cellAt(e.clientX, e.clientY);
     if (drag.button === 2) removeAt(i);
-    else if (drag.button === 0) placeAt(i);
+    else if (drag.button === 0) { if (G.st.gate[i]) toggleGate(i); else placeAt(i); }
   }
   if (pointers.size === 0) drag = null;
 });
@@ -1827,7 +1926,7 @@ canvas.addEventListener('wheel', e => {
 }, { passive: false });
 
 function updateGhost() {
-  if (G.screen !== 'play' || G.hover < 0 || !G.st || G.st.tool[G.hover] || G.hover === G.st.spring || budget(G.tool) <= 0) {
+  if (G.screen !== 'play' || G.hover < 0 || !G.st || G.st.tool[G.hover] || G.st.gate[G.hover] || G.hover === G.st.spring || budget(G.tool) <= 0) {
     ghost.visible = false; return;
   }
   ghost.visible = true;
@@ -1855,6 +1954,7 @@ window.addEventListener('keydown', e => {
   if (k === '1') setTool('stone');
   else if (k === '2') setTool('dam');
   else if (k === '3') setTool('split');
+  else if (k === 'g' && G.st && G.st.gates.length) toggleGate(G.st.gate[G.hover] ? G.hover : G.st.gates.length === 1 ? G.st.gates[0] : -1);
   else if (k === ' ') { e.preventDefault(); if (G.screen === 'play') toggleRun(); }
   else if (k === 'f' || k === 'F') { G.speed = G.speed > 1 ? 1 : 3; renderTray(); }
   else if (k === 'r' || k === 'R') resetLevel();
@@ -1925,7 +2025,8 @@ const SKIES = [
   { top: '#BFE6FF', bottom: '#FFE3D0', fog: 0xFBE6D6, sun: 0xFFF6E6, sunI: 1.9 },
   { top: '#B5E2FA', bottom: '#FFD9C0', fog: 0xF9DCC8, sun: 0xFFEFD8, sunI: 1.9 },
   { top: '#CDEEFF', bottom: '#FFEAD9', fog: 0xFCE9DA, sun: 0xFFF2E0, sunI: 1.85 },
-  { top: '#FFB997', bottom: '#FFE7D6', fog: 0xFFD2B8, sun: 0xFFC48F, sunI: 1.6 }
+  { top: '#FFB997', bottom: '#FFE7D6', fog: 0xFFD2B8, sun: 0xFFC48F, sunI: 1.6 },
+  { top: '#C9C2F0', bottom: '#FFE2D4', fog: 0xF3DCD8, sun: 0xFFD9B0, sunI: 1.55 }
 ];
 function applyAreaSky() {
   const a = SKIES[G.def ? G.def.area : 0];
@@ -1955,7 +2056,9 @@ function summary() {
     quality: FLAGS.low ? 'low' : quality, drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles,
     fps: fpsNow, errors: errors.length, bot: bot.state, progress: { unlocked: progress.unlocked },
     // test hooks: the same functions a click or tap calls
-    sol: G.def ? G.def.sol : null,
+    sol: G.def ? G.def.sol : null, gsol: G.def ? G.def.gsol || null : null,
+    gates: G.st ? G.st.gates.map(i => ({ x: i % G.n, y: Math.floor(i / G.n), open: G.st.gate[i] === 2 })) : [],
+    toggle: (x, y) => toggleGate(y * G.n + x),
     place: (x, y, kind) => placeAt(y * G.n + x, kind),
     remove: (x, y) => removeAt(y * G.n + x)
   };
@@ -2021,6 +2124,7 @@ function frame(now) {
   if (G.dirty && G.st) { refreshTerrain(); refreshTools(); G.dirty = false; G.waterDirty = true; }
   if (G.waterDirty && G.st) { refreshWater(); G.waterDirty = false; }
   if (G.st && board) shimmer(now / 1000);
+  if (gates.length) placeGates(false, dt);
   hudClock += dt;
   if (hudClock > 0.25) {   // keep the HUD counters in step with the simulation
     hudClock = 0;
