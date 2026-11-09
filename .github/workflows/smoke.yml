@@ -1,0 +1,43 @@
+name: smoke
+
+# Opens the game in three real browsers and fails on page errors or a stale SRI hash.
+# Also reports whether each browser enforces the import-map "integrity" hashes.
+# Details: tools/smoke.mjs. Pilot for the other games; read-only, no secrets, no deploy.
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Playwright 1.63.0 and ${{ matrix.browser }}
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.63.0
+          npx --no-install playwright install --with-deps "${{ matrix.browser }}"
+
+      - name: Smoke test
+        run: node tools/smoke.mjs "${{ matrix.browser }}"
