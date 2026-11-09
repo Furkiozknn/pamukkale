@@ -514,6 +514,8 @@ h3{font-size:18px}
 .hint-tag{font-weight:800;color:var(--ink);letter-spacing:.2px}
 .hint-dot{width:4px;height:4px;border-radius:50%;background:var(--accent);flex:none}
 @keyframes hintIn{from{opacity:0;transform:translate(-50%,-6px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes flashRed{0%,100%{color:var(--ink)}50%{color:var(--danger)}}
+.exceed-par{animation:flashRed 1s infinite}
 
 /* Tray (Bottom Action Bar) */
 #tray{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;display:flex;gap:10px;align-items:center;padding:8px 12px;z-index:10;max-width:calc(100% - 24px);border-radius:28px;background:var(--card-bg);border:1.5px solid var(--card-border);box-shadow:var(--shadow-lg),0 0 0 1px var(--glass-highlight) inset;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
@@ -661,6 +663,10 @@ h3{font-size:18px}
     <div class="stat-item hide-s">
       <small data-i18n="water">Su</small>
       <b class="stat-val" id="hud-water">0.0</b>
+    </div>
+    <div class="stat-item">
+      <small data-i18n="toolsWord">Araç</small>
+      <b class="stat-val" id="hud-tools">0/0 ★</b>
     </div>
     <div class="stars" id="hud-stars" aria-label="stars"></div>
   </div>
@@ -1082,7 +1088,7 @@ const S = {
     restart: 'Baştan', mainMenu: 'Ana menü', next: 'Sonraki seviye', ending: 'Sonuç', retry: 'Tekrar dene', undo: 'Geri al',
     reset: 'Sıfırla', start: 'Suyu başlat', stop: 'Suyu durdur', fast: 'Hızlı ileri', master: 'Ana ses', music: 'Müzik',
     sfx: 'Efektler', language: 'Dil', quality: 'Kalite', low: 'Düşük', high: 'Yüksek', fullscreen: 'Tam ekran',
-    pools: 'Havuz', water: 'Su', levelWord: 'Seviye', pause: 'Duraklat', toolStone: 'Taş', toolDam: 'Set', toolSplit: 'Ayırıcı',
+    pools: 'Havuz', water: 'Su', toolsWord: 'Araç', levelWord: 'Seviye', pause: 'Duraklat', toolStone: 'Taş', toolDam: 'Set', toolSplit: 'Ayırıcı',
     done: 'Seviye tamamlandı', failed: 'Süre doldu', poolsFilled: 'Dolu havuz', waterUsed: 'Kullanılan su',
     spilled: 'Taşan su', toolsLeft: 'Kalan araç', toolsUsed: 'Kullanılan araç', star1: 'Tüm havuzlar dolu', star2: 'Taşan su yok',
     star3: 'Araç tasarrufu', best: 'En iyi', endTitle: 'Gün batımında Pamukkale',
@@ -1111,7 +1117,7 @@ const S = {
     restart: 'Restart', mainMenu: 'Main menu', next: 'Next level', ending: 'Ending', retry: 'Try again', undo: 'Undo',
     reset: 'Reset', start: 'Start water', stop: 'Stop water', fast: 'Fast forward', master: 'Master', music: 'Music',
     sfx: 'Effects', language: 'Language', quality: 'Quality', low: 'Low', high: 'High', fullscreen: 'Fullscreen',
-    pools: 'Pools', water: 'Water', levelWord: 'Level', pause: 'Pause', toolStone: 'Stone', toolDam: 'Dam', toolSplit: 'Splitter',
+    pools: 'Pools', water: 'Water', toolsWord: 'Tools', levelWord: 'Level', pause: 'Pause', toolStone: 'Stone', toolDam: 'Dam', toolSplit: 'Splitter',
     done: 'Level complete', failed: 'Out of time', poolsFilled: 'Pools filled', waterUsed: 'Water used',
     spilled: 'Water spilled', toolsLeft: 'Tools left', toolsUsed: 'Tools used', star1: 'All pools full', star2: 'No water spilled',
     star3: 'Tool saving', best: 'Best', endTitle: 'Pamukkale at sunset',
@@ -2239,6 +2245,13 @@ function renderHUD() {
   document.getElementById('hud-level').innerHTML = `<small>${t('levelWord')}</small>${G.idx + 1}/${LEVEL_COUNT}<span class="lvl-name"> · ${levelName(G.idx)}</span>`;
   document.getElementById('hud-pools').textContent = `${cnt.filled}/${cnt.total}`;
   document.getElementById('hud-water').textContent = G.st.emitted.toFixed(1);
+  const used = totalUsed();
+  const par = G.def ? G.def.par : 0;
+  const toolsEl = document.getElementById('hud-tools');
+  if (toolsEl) {
+    toolsEl.textContent = `${used}/${par} ★`;
+    toolsEl.classList.toggle('exceed-par', used > par);
+  }
   const [s1, s2, s3] = starState(G.st.pools.length && poolCounts().filled === cnt.total);
   document.getElementById('hud-stars').innerHTML = [s1, s2, s3].map(starSvg).join('');
   document.getElementById('btn-pause').innerHTML = svg(G.screen === 'play' ? 'pause' : 'play');
