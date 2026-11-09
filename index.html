@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="arena-game" content="pamukkale">
 <title>Pamukkale</title>
 <meta name="description" content="A 3D water-flow puzzle on the white travertine terraces of Pamukkale, redesigned in pastel travertine and turquoise water: guide the spring into the pools with stones, dams and splitters across 20 levels. Plays in the browser.">
 <meta property="og:type" content="website">
@@ -763,6 +764,7 @@ h3{font-size:18px}
     <div class="stack">
       <button class="btn primary" id="btn-play" data-i18n="play">Oyna</button>
       <button class="btn" id="btn-continue" data-i18n="continue">Devam et</button>
+      <button class="btn" id="btn-daily"><span data-i18n="daily">Günün Meydan Okuması</span><small id="daily-info" style="font-weight:600;opacity:.75"></small></button>
       <button class="btn" id="btn-areas" data-i18n="areas">Seviyeler</button>
       <button class="btn" id="btn-settings-title" data-i18n="settings">Ayarlar</button>
     </div>
@@ -796,6 +798,8 @@ h3{font-size:18px}
         <div class="quality-seg" style="grid-column:2"><button id="q-low" aria-pressed="false" data-i18n="low">Düşük</button><button id="q-high" aria-pressed="false" data-i18n="high">Yüksek</button></div></div>
       <div class="set-row"><span class="lbl" data-i18n="fullscreen">Tam ekran</span>
         <button class="toggle" id="btn-full" aria-pressed="false">—</button></div>
+      <div class="set-row"><span class="lbl" data-i18n="a11y">Erişilebilirlik</span>
+        <button class="toggle" id="btn-a11y" data-i18n="a11yOpen" style="grid-column:2">Aç</button></div>
     </div>
     <div class="row"><button class="btn" id="btn-settings-back" data-i18n="back">Geri</button></div>
   </div>
@@ -822,6 +826,8 @@ h3{font-size:18px}
     <div class="stack">
       <button class="btn primary" id="btn-next"></button>
       <button class="btn" id="btn-retry" data-i18n="retry">Tekrar dene</button>
+      <p class="sub hidden" id="res-daily" style="margin:0"></p>
+      <button class="btn hidden" id="btn-res-share" data-i18n="share">Paylaş</button>
       <div class="row" style="margin-top:4px">
         <button class="btn" id="btn-res-areas" data-i18n="areas">Seviyeler</button>
         <button class="btn" id="btn-res-main" data-i18n="mainMenu">Ana menü</button>
@@ -840,6 +846,10 @@ h3{font-size:18px}
     <div class="row">
       <button class="btn primary" id="btn-again" data-i18n="playAgain">Yeniden oyna</button>
       <button class="btn" id="btn-end-main" data-i18n="mainMenu">Ana menü</button>
+    </div>
+    <div class="row">
+      <button class="btn" id="btn-end-share" data-i18n="share">Paylaş</button>
+      <a class="btn" id="end-another" href="https://furkiozknn.github.io/" target="_blank" rel="noopener" style="text-decoration:none" data-i18n="another">Başka oyun</a>
     </div>
   </div>
 </section>
@@ -1087,7 +1097,12 @@ const S = {
     hint: '1-3 araç seç · tıkla yerleştir · sağ tık sil · Space su', tipKeys: 'P duraklat · M müzik · X efekt · L dil',
     lockedTag: 'kilitli', onOff: ['açık', 'kapalı'],
     toastGateOpen: 'Kapak açıldı', toastGateClosed: 'Kapak kapandı', toastGateCell: 'Kapağa araç konmaz',
-    gateTutorial: 'Yeni: savak kapağı. Kapağa tıkla (ya da G): su akarken bile açılır, kapanır. Önce soldaki havuz dolsun, sonra kapağı aç.'
+    gateTutorial: 'Yeni: savak kapağı. Kapağa tıkla (ya da G): su akarken bile açılır, kapanır. Önce soldaki havuz dolsun, sonra kapağı aç.',
+    daily: 'Günün Meydan Okuması', dailyInfo: 'seri {s} · en iyi {b}', dailyDone: 'bugün tamam · seri {s}',
+    dailyRes: 'Günün Meydan Okuması {d}: seri {s} gün · en iyi {b}', dailyFail: 'Günün Meydan Okuması {d}: tamamlanınca seri sayılır',
+    share: 'Paylaş', another: 'Başka oyun', a11y: 'Erişilebilirlik', a11yOpen: 'Aç',
+    shareDaily: 'Günün Meydan Okuması {d} · seri {k}', shareTotal: 'Toplam {s}/{m} ★', shareEnd: '{n}/{m} seviye · {s}/{x} ★',
+    awFirst: 'İlk havuzlar doldu', awPerfect: 'Üç yıldızlı seviye', awAll: '23 seviyenin hepsi'
   },
   en: {
     loading: 'Loading…', subtitle: 'A water-flow puzzle on the white terraces',
@@ -1111,7 +1126,12 @@ const S = {
     hint: '1-3 pick a tool · click to place · right-click to remove · Space water', tipKeys: 'P pause · M music · X effects · L language',
     lockedTag: 'locked', onOff: ['on', 'off'],
     toastGateOpen: 'Gate opened', toastGateClosed: 'Gate closed', toastGateCell: 'Tools cannot go on a gate',
-    gateTutorial: 'New: the sluice gate. Click it (or press G) to open or close it, even while the water runs. Let the left pool fill first, then open the gate.'
+    gateTutorial: 'New: the sluice gate. Click it (or press G) to open or close it, even while the water runs. Let the left pool fill first, then open the gate.',
+    daily: 'Daily challenge', dailyInfo: 'streak {s} · best {b}', dailyDone: 'done today · streak {s}',
+    dailyRes: 'Daily challenge {d}: streak {s} days · best {b}', dailyFail: 'Daily challenge {d}: the streak counts once it is complete',
+    share: 'Share', another: 'Another game', a11y: 'Accessibility', a11yOpen: 'Open',
+    shareDaily: 'Daily challenge {d} · streak {k}', shareTotal: 'Total {s}/{m} ★', shareEnd: '{n}/{m} levels · {s}/{x} ★',
+    awFirst: 'First pools filled', awPerfect: 'A three-star level', awAll: 'All 23 levels'
   }
 };
 const LV = [
@@ -1148,6 +1168,7 @@ const HINTS = [
 ];
 const AREA_NAMES = [['Alt Havuzlar', 'Lower Pools'], ['Orta Basamaklar', 'Middle Shelves'], ['Antik Havuz', 'Ancient Pool'], ['Gün Batımı', 'Sunset'], ['Kalsiyum Zamanı', 'Calcium Time']];
 const t = k => (S[settings.lang] && S[settings.lang][k] !== undefined ? S[settings.lang][k] : S.en[k]) || k;
+const tv = (k, vars) => t(k).replace(/\{(\w+)\}/g, (m, v) => (v in vars ? vars[v] : m));
 const L = settings.lang === 'en' ? 1 : 0;
 const levelName = i => LV[i][L];
 const levelHint = i => HINTS[i][L];
@@ -1176,6 +1197,9 @@ const starSvg = on => `<svg viewBox="0 0 24 24" class="${on ? 'on' : ''}" aria-h
 const canvas = document.getElementById('c');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, quality === 'low' ? 1 : 1.5));
+// arena-kit: dynamic pixel ratio for weak GPUs, capped by the game's own quality setting (re-attached in setQuality)
+const perfCap = () => Math.min(window.devicePixelRatio || 1, quality === 'low' ? 1 : 1.5);
+let perfHandle = window.Arena ? Arena.perf.attach(renderer, { max: perfCap() }) : null;
 renderer.setClearColor(0x000000, 0);
 renderer.shadowMap.enabled = quality !== 'low';
 renderer.shadowMap.type = THREE.PCFShadowMap;
@@ -1861,8 +1885,7 @@ function loadLevel(i) {
   G.dirty = true; G.waterDirty = true;
   G.inLevel = true;
   document.getElementById('toasts').innerHTML = '';   // toasts from the previous level do not carry over
-  progress.last = G.idx;
-  writeJSON(SAVE_KEY, progress);
+  if (!G.daily) { progress.last = G.idx; writeJSON(SAVE_KEY, progress); }
   refreshTerrain(); refreshTools(); refreshWater();
   buildGates();
   renderTray();
@@ -1887,6 +1910,7 @@ function showHintBar(tag, text, ms = 6500) {
 
 function startLevel(i) {
   if (i > progress.unlocked - 1) return toast(t('toastLocked'), 'bad');
+  G.daily = null;
   loadLevel(i);
   showScreen('play');
   const firstGate = LEVELS[i].gates && LEVELS.findIndex(d => d.gates && d.gates.length) === i;
@@ -2009,7 +2033,9 @@ function finish(win) {
   const stars = (s1 ? 1 : 0) + (s2 ? 1 : 0) + (s3 ? 1 : 0);
   G.lastWin = win;
   G.res = { win, stars: [s1, s2, s3] };
-  if (win) {
+  G.dailyRes = null;
+  if (win && G.daily) { if (!FLAGS.auto) G.dailyRes = G.daily.complete(stars); sfxChime([523.25, 659.25, 783.99, 1046.5]); }
+  else if (win) {
     progress.stars[G.idx] = Math.max(progress.stars[G.idx] || 0, stars);
     progress.unlocked = Math.max(progress.unlocked, Math.min(LEVEL_COUNT, G.idx + 2));
     writeJSON(SAVE_KEY, progress);
@@ -2018,6 +2044,11 @@ function finish(win) {
   } else {
     sfxFail();
     toast(t('toastTimeUp'), 'bad');
+  }
+  if (win) {
+    arenaAward('first', 'awFirst');
+    if (stars === 3) arenaAward('perfect', 'awPerfect');
+    if (LEVELS.every((d, k) => progress.stars[k] > 0)) arenaAward('all', 'awAll');
   }
   showResult();
 }
@@ -2051,7 +2082,12 @@ function showResult() {
   const last = G.idx === LEVEL_COUNT - 1;
   next.textContent = last ? t('ending') : t('next');
   next.disabled = !r.win;
-  document.getElementById('btn-retry').classList.toggle('primary', !r.win);
+  next.classList.toggle('hidden', !!G.daily);
+  document.getElementById('btn-retry').classList.toggle('primary', !r.win || !!G.daily);
+  document.getElementById('btn-res-share').classList.toggle('hidden', !r.win || !window.Arena);
+  const rd = document.getElementById('res-daily');
+  rd.classList.toggle('hidden', !G.daily);
+  if (G.daily) rd.textContent = G.dailyRes ? tv('dailyRes', { d: dayText(G.daily.day), s: G.dailyRes.streak, b: G.dailyRes.best }) : tv('dailyFail', { d: dayText(G.daily.day) });
   showScreen('result');
 }
 
@@ -2063,12 +2099,14 @@ function showEnd() {
     `<div class="res-stat-card"><span class="lbl">${t('levelsDone')}</span><b class="val">${done}/${LEVEL_COUNT}</b></div>`;
   G.endSpin = 0;
   G.inLevel = false;
+  if (window.Arena) { const others = Arena.games.filter(g => g !== 'pamukkale'); document.getElementById('end-another').href = 'https://furkiozknn.github.io/' + others[Math.floor(Math.random() * others.length)] + '/'; }
   showScreen('end');
 }
 
 // ---------- screens and overlays ----------
 const OVERLAYS = { title: 'ov-title', areas: 'ov-areas', settings: 'ov-settings', pause: 'ov-pause', result: 'ov-result', end: 'ov-end' };
 function showScreen(name) {
+  if (name === 'title' || name === 'areas') G.daily = null;
   G.screen = name;
   for (const k in OVERLAYS) document.getElementById(OVERLAYS[k]).classList.toggle('hidden', k !== name);
   const inGame = name === 'play' || name === 'pause' || name === 'result';
@@ -2090,7 +2128,39 @@ function renderTitle() {
   cont.classList.toggle('hidden', !started);
   const bl = document.getElementById('best-line');
   bl.textContent = best.stars > 0 ? `${t('best')}: ${best.stars}/${LEVEL_COUNT * 3} ★ · ${best.done}/${LEVEL_COUNT}` : '';
+  const d = dailyInfo();
+  document.getElementById('btn-daily').classList.toggle('hidden', !d);
+  if (d) document.getElementById('daily-info').textContent = tv(d.done ? 'dailyDone' : 'dailyInfo', { s: d.streak, b: d.best });
 }
+
+// ---------- arena-kit: daily challenge, share, badges ----------
+// The levels are fixed and the water is deterministic, so the day's seed picks "today's level" out of all
+// of them (locks do not apply). A daily run does not touch the campaign save (stars, unlocks, continue point).
+const ARENA_URL = 'https://furkiozknn.github.io/pamukkale/';
+function dailyInfo() { if (!window.Arena) return null; const d = Arena.daily(); d.idx = d.seed % LEVEL_COUNT; return d; }
+const dayText = d => String(d).replace(/^(\d{4})(\d{2})(\d{2})$/, '$1-$2-$3');
+function startDaily() {
+  const d = dailyInfo(); if (!d) return;
+  G.daily = d;
+  loadLevel(d.idx);
+  showScreen('play');
+  showHintBar(t('daily'), LEVELS[d.idx].gates ? t('gateTutorial') : levelHint(d.idx), LEVELS[d.idx].gates ? 14000 : 6500);
+}
+function totalStars() { let s = 0, n = 0; for (const k in progress.stars) { s += progress.stars[k]; if (progress.stars[k] > 0) n++; } return { s, n }; }
+function shareResult(ending) {
+  if (!window.Arena) return;
+  const tot = totalStars(), m = LEVEL_COUNT * 3;
+  let lines;
+  if (ending) lines = [tv('shareEnd', { n: tot.n, m: LEVEL_COUNT, s: tot.s, x: m })];
+  else {
+    const st = G.res ? G.res.stars.filter(Boolean).length : 0;
+    lines = [`${t('levelWord')} ${G.idx + 1} · ${levelName(G.idx)}: ${'★'.repeat(st)}${'☆'.repeat(3 - st)}`];
+    if (G.daily) lines.unshift(tv('shareDaily', { d: dayText(G.daily.day), k: G.dailyRes ? G.dailyRes.streak : G.daily.streak }));
+    else lines.push(tv('shareTotal', { s: tot.s, m }));
+  }
+  Arena.share({ title: 'Pamukkale', lines, url: ARENA_URL });
+}
+function arenaAward(id, key) { if (window.Arena && !FLAGS.auto) Arena.award('pamukkale:' + id, 'Pamukkale · ' + t(key)); }
 
 function renderAreas() {
   const box = document.getElementById('areas-grid');
@@ -2138,7 +2208,7 @@ function syncSettingsUI() {
 }
 
 function applyI18n() {
-  document.documentElement.lang = settings.lang;
+  document.documentElement.lang = settings.lang; if (window.Arena) Arena.lang(settings.lang); // kit panel in the game's language
   document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
   document.querySelector('.footer').innerHTML = `<a href="${GAME_URL}" target="_blank" rel="noopener">Claude Game Arena</a> · built by Claude Haiku 5.5`;
   document.getElementById('btn-lang').textContent = settings.lang.toUpperCase();
@@ -2165,7 +2235,7 @@ function renderHUD() {
   const cnt = poolCounts();
   const areaIdx = G.def ? G.def.area : 0;
   const ap = document.getElementById('hud-area-pill');
-  if (ap) ap.textContent = AREA_NAMES[areaIdx][L].toUpperCase();
+  if (ap) ap.textContent = (G.daily ? t('daily') : AREA_NAMES[areaIdx][L]).toUpperCase();
   document.getElementById('hud-level').innerHTML = `<small>${t('levelWord')}</small>${G.idx + 1}/${LEVEL_COUNT}<span class="lvl-name"> · ${levelName(G.idx)}</span>`;
   document.getElementById('hud-pools').textContent = `${cnt.filled}/${cnt.total}`;
   document.getElementById('hud-water').textContent = G.st.emitted.toFixed(1);
@@ -2331,6 +2401,10 @@ const on = (id, fn) => document.getElementById(id).addEventListener('click', fn)
 on('btn-play', () => { audioInit(); startLevel(0); });
 on('btn-continue', () => { audioInit(); startLevel(Math.min(progress.unlocked - 1, Math.max(0, progress.last))); });
 on('btn-areas', () => { audioInit(); showScreen('areas'); });
+on('btn-daily', () => { audioInit(); startDaily(); });
+on('btn-a11y', () => { if (window.Arena) Arena.openSettings(); });
+on('btn-res-share', () => shareResult(false));
+on('btn-end-share', () => shareResult(true));
 on('btn-areas-back', () => showScreen('title'));
 on('btn-settings-title', () => { G.returnTo = 'title'; showScreen('settings'); });
 on('btn-pause-settings', () => { G.returnTo = 'pause'; showScreen('settings'); });
@@ -2363,6 +2437,7 @@ function setQuality(q) {
   quality = FLAGS.low ? 'low' : q;
   writeJSON(SET_KEY, settings);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, quality === 'low' ? 1 : 1.5));
+  if (perfHandle) { perfHandle.stop(); perfHandle = Arena.perf.attach(renderer, { max: perfCap() }); }
   sun.castShadow = quality !== 'low';
   if (board) board.terrain.castShadow = quality !== 'low';
   syncSettingsUI();
@@ -2384,6 +2459,11 @@ on('btn-fast', () => { G.speed = G.speed > 1 ? 1 : 3; renderTray(); });
 on('btn-undo', () => undoLast());
 on('btn-reset', () => resetLevel());
 document.addEventListener('visibilitychange', () => { if (document.hidden && G.running) setRunning(false); });
+// arena-kit: music and birdsong also stop while the tab is hidden (kit setting "pause when the tab is hidden")
+if (window.Arena) {
+  Arena.on('pause', () => { if (AU.ctx && AU.ctx.state === 'running') AU.ctx.suspend().catch(() => {}); });
+  Arena.on('resume', () => { if (AU.ctx && AU.ctx.state === 'suspended') AU.ctx.resume().catch(() => {}); });
+}
 
 // ---------- area sky and light ----------
 const SKIES = [
