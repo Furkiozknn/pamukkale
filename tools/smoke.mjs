@@ -71,7 +71,12 @@ async function openPage(browser, { tamper }) {
   page.on('pageerror', (e) => errors.push('pageerror: ' + e.message));
   page.on('console', (m) => { if (m.type() === 'error') errors.push('console: ' + m.text()); });
   page.on('requestfailed', (r) => { if (!IGNORED.test(r.url())) errors.push('requestfailed: ' + r.url()); });
-  await page.route(IGNORED, (r) => r.fulfill({ status: 204, body: '' }));
+  // Answer analytics and font requests with an empty body of the right type, so no browser logs them.
+  await page.route(IGNORED, (r) => {
+    const t = r.request().resourceType();
+    const contentType = t === 'stylesheet' ? 'text/css' : t === 'script' ? 'text/javascript' : 'text/plain';
+    return r.fulfill({ status: 200, contentType, body: '' });
+  });
   if (cdnDir || tamper) {
     await page.route(/cdn\.jsdelivr\.net\/npm\/three@/, async (r) => {
       let body = await cdnBytes(r.request().url());
@@ -91,7 +96,8 @@ async function openPage(browser, { tamper }) {
 }
 
 for (const name of browsers) {
-  const browser = await pw[name].launch();
+  // Headless Firefox on a machine without a GPU refuses WebGL unless it is forced on.
+  const browser = await pw[name].launch(name === 'firefox' ? { firefoxUserPrefs: { 'webgl.force-enabled': true } } : {});
   const version = browser.version();
   // 2. load
   const load = await openPage(browser, { tamper: false });
