@@ -25,19 +25,20 @@ jobs:
       matrix:
         browser: [chromium, firefox, webkit]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           persist-credentials: false
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
         with:
           node-version: "22"
 
-      - name: Playwright 1.63.0 and ${{ matrix.browser }}
+      # tools/package-lock.json pins playwright 1.63.0 with its sha512; npm ci refuses anything else.
+      - name: Playwright (lockfile) and ${{ matrix.browser }}
         run: |
           set -euo pipefail
-          npm install --no-save --no-package-lock --ignore-scripts playwright@1.63.0
-          npx --no-install playwright install --with-deps "${{ matrix.browser }}"
+          npm ci --prefix tools --ignore-scripts --no-audit --no-fund
+          tools/node_modules/.bin/playwright install --with-deps "${{ matrix.browser }}"
 
       # The runner has no GPU and no GL driver; Firefox needs Mesa's software renderer for WebGL.
       - name: Mesa software GL (firefox)

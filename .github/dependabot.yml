@@ -8,8 +8,23 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
+    # A newly published version waits 7 days before it is proposed (zizmor dependabot-cooldown).
+    cooldown:
+      default-days: 7
     commit-message:
       prefix: "ci"
     groups:
       actions:
+        patterns: ["*"]
+  # Dev-only test tooling (tools/package.json: playwright for tools/smoke.mjs).
+  - package-ecosystem: "npm"
+    directory: "/tools"
+    schedule:
+      interval: "monthly"
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: "test"
+    groups:
+      tools:
         patterns: ["*"]
