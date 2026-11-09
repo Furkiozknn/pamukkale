@@ -136,7 +136,7 @@ Serve the folder over HTTP (ES modules do not load from `file://`):
 python -m http.server 8000
 ```
 
-Then open <http://localhost:8000/>. Check every level offline with `node tools/solve-levels.mjs`: it prints a solution per level, or FAILED.
+Then open <http://localhost:8000/>. Check every level offline with `node tools/solve-levels.mjs`: it prints a solution per level, or FAILED. `node tools/smoke.mjs chromium firefox webkit` (needs `playwright`) opens the game in real browsers, fails on page errors or a stale SRI hash in the import map, and runs on every pull request (`.github/workflows/smoke.yml`).
 
 ## Made with Claude Code
 
