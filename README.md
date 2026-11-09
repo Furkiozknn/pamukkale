@@ -30,9 +30,10 @@
 ## Features
 
 - **Living terraces & procedural puzzle:** Water that stands still builds calcium: dry cells beside a standing pool rise to the water line, so the board dynamically evolves and changes flow paths while water runs.
-- **20 levels across 4 distinct areas:** Progress through Lower Pools, Middle Shelves, Ancient Pool, and Sunset, earning up to 3 stars per level (all pools full, no water spilled, and par tool saving).
+- **23 levels across 5 distinct areas:** Progress through Lower Pools, Middle Shelves, Ancient Pool, Sunset, and Calcium Time, earning up to 3 stars per level (all pools full, no water spilled, and par tool saving).
+- **Calcium Time: sluice gates:** The last three levels add a fixed gate the player opens or closes while the water runs. Timing matters: let a pool fill, then redirect; or shut the gate so still water raises a leaking pool's rim, then open it again. `tools/solve-levels.mjs` checks that no fixed gate setting solves these levels and prints a timed solution with its tick window.
 - **Tactical 3-tool water routing:** Place stones (raises a cell by 1 step so water turns around it), dams (raises by 2 steps to hold water back), and splitters (divides flow among lower neighbours).
-- **Verified level design & bot replay:** Layouts originate from seeded random hillsides where empty boards fail; `?auto` bot replays stored solutions at 3x speed, verifying **20/20 levels and 46/60 stars** with 0 JavaScript errors (with and without `?noassets`).
+- **Verified level design & bot replay:** Layouts originate from seeded random hillsides where empty boards fail; `?auto` bot replays stored solutions at 3x speed, verifying **20/20 levels and 46/60 stars** with 0 JavaScript errors (with and without `?noassets`); with the gate levels: 23/23 levels and 52/69 stars, 0 errors (headless Chromium, 2026-11-09, without `?noassets`).
 - **Lean single-file 3D performance:** A single `index.html` running Three.js r170 delivering 21–22 draw calls and 34k triangles in play on Intel UHD 620, complete with procedural geometry and Web Audio synthesis (saz loop, flute, trickling water, splashes, and birdsong).
 
 ## How to play
@@ -53,6 +54,7 @@
   - *No water spilled:* Prevent water from flowing off the bottom edge of the board.
   - *Tool saving:* Complete the level using at most the par number of tools.
 - **Living calcium rims:** Water that stands still builds calcium deposits. Dry cells beside a standing pool rise to the water line, altering the terrain in real time.
+- **Sluice gates (levels 21-23):** A closed gate stands 3 steps above its cell; an open one lets water through. Click it any time, also while the water runs. Gates cost no tools and gather no calcium.
 - **Tool roles:**
   - *Stone:* Raises a cell by 1 step to turn water around it.
   - *Dam:* Raises a cell by 2 steps to hold water back.
@@ -67,6 +69,7 @@
 | Place selected tool | Click or tap a cell |
 | Remove a tool | Right-click, or long-press on touch |
 | Select tool | `1` stone, `2` dam, `3` splitter, or tap the tray |
+| Open / close a sluice gate | Click or tap the gate, or `G` (the gate under the cursor, or the only gate) |
 | Start / stop water | `Space` (or the water button) |
 | Fast forward | `F` |
 | Undo last tool change | `Z` |
@@ -83,7 +86,7 @@
 
 | Flag | Effect |
 |---|---|
-| `?auto` | The bot plays all 20 levels, replaying each stored solution at 3x speed |
+| `?auto` | The bot plays all 23 levels, replaying each stored solution (and gate toggles at their verified ticks) at 3x speed |
 | `?debug` | FPS, draw calls, triangles, and JavaScript errors on screen |
 | `?sim=N` | Start the first level with N seconds of water already fast-forwarded |
 | `?low` | Shadows off, fewer particles, pixel ratio 1 |
@@ -136,7 +139,7 @@ Serve the folder over HTTP (ES modules do not load from `file://`):
 python -m http.server 8000
 ```
 
-Then open <http://localhost:8000/>. Check every level offline with `node tools/solve-levels.mjs`: it prints a solution per level, or FAILED. `node tools/smoke.mjs chromium firefox webkit` (needs `playwright`) opens the game in real browsers, fails on page errors or a stale SRI hash in the import map, and runs on every pull request (`.github/workflows/smoke.yml`).
+Then open <http://localhost:8000/>. Check every level offline with `node tools/solve-levels.mjs`: it prints a solution per level, or FAILED; for gate levels also the toggles `[x, y, tick]`, each toggle's working tick window, and `needsTiming`. `node tools/smoke.mjs chromium firefox webkit` (needs `playwright`) opens the game in real browsers, fails on page errors or a stale SRI hash in the import map, and runs on every pull request (`.github/workflows/smoke.yml`).
 
 ## Made with Claude Code
 
