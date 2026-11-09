@@ -97,7 +97,10 @@ async function openPage(browser, { tamper }) {
 
 for (const name of browsers) {
   // Headless Firefox on a machine without a GPU refuses WebGL unless it is forced on.
-  const browser = await pw[name].launch(name === 'firefox' ? { firefoxUserPrefs: { 'webgl.force-enabled': true } } : {});
+  // SMOKE_HEADED=1 runs a real window (under xvfb in CI), where Firefox gets a GL context from Mesa.
+  const opts = { headless: process.env.SMOKE_HEADED !== '1' };
+  if (name === 'firefox') opts.firefoxUserPrefs = { 'webgl.force-enabled': true };
+  const browser = await pw[name].launch(opts);
   const version = browser.version();
   // 2. load
   const load = await openPage(browser, { tamper: false });

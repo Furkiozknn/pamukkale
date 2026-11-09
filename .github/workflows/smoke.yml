@@ -49,4 +49,12 @@ jobs:
           echo "LIBGL_ALWAYS_SOFTWARE=1" >> "$GITHUB_ENV"
 
       - name: Smoke test
+        if: matrix.browser != 'firefox'
         run: node tools/smoke.mjs "${{ matrix.browser }}"
+
+      # Headless Firefox finds no GL driver on the runner; a headed window under xvfb uses Mesa.
+      - name: Smoke test (firefox, headed under xvfb)
+        if: matrix.browser == 'firefox'
+        env:
+          SMOKE_HEADED: "1"
+        run: xvfb-run -a node tools/smoke.mjs firefox
