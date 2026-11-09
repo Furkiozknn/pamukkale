@@ -126,7 +126,7 @@
 **Measured on an Intel UHD 620 (headless Chrome, 1280x720):**
 - Draw calls: 17 &rarr; 21 (level 9 in play)
 - Triangles: 26k &rarr; 34k
-- Bot run: `?auto` finishes 20/20 levels and 46/60 stars with 0 JS errors (with and without `?noassets`)
+- Bot run: `?auto` finishes 20/20 levels and 46/60 stars with 0 JS errors (with and without `?noassets`); this was before the 3 gate levels, the game now has 23 levels (23/23 and 52/69 stars, see Features)
 - Note: Frame rate is not claimed; headless rAF is not a GPU budget.
 
 ![Before and after](docs/redesign-before-after.png)
