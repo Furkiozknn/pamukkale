@@ -39,5 +39,14 @@ jobs:
           npm install --no-save --no-package-lock --ignore-scripts playwright@1.63.0
           npx --no-install playwright install --with-deps "${{ matrix.browser }}"
 
+      # The runner has no GPU and no GL driver; Firefox needs Mesa's software renderer for WebGL.
+      - name: Mesa software GL (firefox)
+        if: matrix.browser == 'firefox'
+        run: |
+          set -euo pipefail
+          sudo apt-get update -q
+          sudo apt-get install -y -q libgl1-mesa-dri libegl1 libgl1
+          echo "LIBGL_ALWAYS_SOFTWARE=1" >> "$GITHUB_ENV"
+
       - name: Smoke test
         run: node tools/smoke.mjs "${{ matrix.browser }}"
