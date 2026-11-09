@@ -12,7 +12,7 @@
 // Needs the `playwright` package and its browsers. SMOKE_CDN_DIR=<dir> serves the CDN files from
 // a local copy of the npm package instead of the network (for machines without CDN access).
 import { createServer } from 'node:http';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, extname, normalize } from 'node:path';
@@ -28,7 +28,9 @@ const browsers = process.argv.slice(2).length ? process.argv.slice(2) : ['chromi
 const cdnDir = process.env.SMOKE_CDN_DIR;
 const IGNORED = /gc\.zgo\.at|goatcounter|fonts\.googleapis\.com|fonts\.gstatic\.com/;
 let failed = false;
-const fail = (msg) => { failed = true; console.log('FAIL ' + msg); };
+const cases = []; // for the optional JUnit report (SMOKE_JUNIT=<file>)
+const fail = (msg, name = msg.split(':')[0]) => { failed = true; console.log('FAIL ' + msg); cases.push({ name, failure: msg }); };
+const pass = (msg, name = msg.split(':')[0]) => { console.log('ok   ' + msg); cases.push({ name }); };
 
 // Bytes of a CDN URL: from the local package copy if SMOKE_CDN_DIR is set, else from the network.
 async function cdnBytes(url) {
@@ -46,7 +48,7 @@ for (const url of sriUrls) {
   const body = await cdnBytes(url);
   if (!body) { fail(`sri ${url}: could not download`); continue; }
   const got = 'sha384-' + createHash('sha384').update(body).digest('base64');
-  if (got === integrity[url]) console.log(`ok   sri ${url} (${body.length} bytes)`);
+  if (got === integrity[url]) pass(`sri ${url} (${body.length} bytes)`, `sri ${url}`);
   else fail(`sri ${url}: import map says ${integrity[url]}, CDN serves ${got}`);
 }
 for (const url of Object.values(importMap.imports || {})) {
@@ -86,7 +88,15 @@ async function openPage(browser, { tamper }) {
     });
   }
   await page.goto(base, { waitUntil: 'load', timeout: 60000 });
-  await page.waitForTimeout(5000);
+  // No fixed sleeps: wait for a drawn canvas (or give up after 30 s), then let 120 frames run so
+  // errors thrown by the first render and update ticks are caught.
+  const drawn = () => [...document.querySelectorAll('canvas')].some((c) => c.width * c.height > 100000);
+  if (!tamper) await page.waitForFunction(drawn, null, { timeout: 30000 }).catch(() => {});
+  await page.evaluate(() => new Promise((done) => {
+    let n = 0;
+    const tick = () => (++n >= 120 ? done() : requestAnimationFrame(tick));
+    requestAnimationFrame(tick);
+  }));
   const state = await page.evaluate(() => ({
     tampered: globalThis.__smokeTampered === true,
     canvas: [...document.querySelectorAll('canvas')].some((c) => c.width * c.height > 100000),
@@ -106,15 +116,22 @@ for (const name of browsers) {
   const load = await openPage(browser, { tamper: false });
   if (load.errors.length) fail(`load ${name} ${version}: ${load.errors.length} error(s)\n  ` + load.errors.slice(0, 5).join('\n  '));
   else if (!load.canvas) fail(`load ${name} ${version}: no drawn canvas`);
-  else console.log(`ok   load ${name} ${version}: canvas drawn, 0 errors`);
+  else pass(`load ${name} ${version}: canvas drawn, 0 errors`);
   // 3. tamper
   if (sriUrls.length) {
     const t = await openPage(browser, { tamper: true });
-    if (!t.tampered) console.log(`ok   tamper ${name} ${version}: modified module was blocked`);
+    if (!t.tampered) pass(`tamper ${name} ${version}: modified module was blocked`);
     else console.log(`note tamper ${name} ${version}: modified module RAN (this browser does not enforce import-map integrity)`);
   }
   await browser.close();
 }
 server.close();
+if (process.env.SMOKE_JUNIT) {
+  const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  const body = cases.map((c) => `  <testcase classname="smoke" name="${esc(c.name)}">` +
+    (c.failure ? `<failure message="${esc(c.failure.split('\n')[0])}">${esc(c.failure)}</failure>` : '') + '</testcase>').join('\n');
+  const nFail = cases.filter((c) => c.failure).length;
+  writeFileSync(process.env.SMOKE_JUNIT, `<?xml version="1.0" encoding="UTF-8"?>\n<testsuite name="smoke" tests="${cases.length}" failures="${nFail}" errors="0" skipped="0" timestamp="${new Date().toISOString().slice(0, 19)}">\n${body}\n</testsuite>\n`);
+}
 console.log(failed ? 'RESULT FAIL' : 'RESULT OK');
 process.exit(failed ? 1 : 0);
