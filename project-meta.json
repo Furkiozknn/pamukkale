@@ -33,7 +33,7 @@
     "Still water slowly builds a white calcium rim, just like the real terraces",
     "Redesign: pastel travertine with lit step edges, turquoise water with caustic light and shore foam, a sage meadow and ruin stones",
     "Redesign: airy white cards with turquoise accents, floating HUD pills and a dark-mode theme; works on phones in both orientations",
-    "Measured after the redesign: 60 fps; the ?auto bot clears 20/20 levels with 46/60 stars and 0 JS errors"
+    "Measured after the redesign: 60 fps; the ?auto bot cleared 20/20 levels with 46/60 stars and 0 JS errors (before the 3 gate levels; the game now has 23 levels, 23/23 and 52/69 stars on 2026-11-09)"
   ],
   "media": {
     "hero": "docs/02-gameplay-level9.png",

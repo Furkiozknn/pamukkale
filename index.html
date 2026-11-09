@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="arena-game" content="pamukkale">
 <title>Pamukkale</title>
-<meta name="description" content="A 3D water-flow puzzle on the white travertine terraces of Pamukkale, redesigned in pastel travertine and turquoise water: guide the spring into the pools with stones, dams and splitters across 20 levels. Plays in the browser.">
+<meta name="description" content="A 3D water-flow puzzle on the white travertine terraces of Pamukkale, redesigned in pastel travertine and turquoise water: guide the spring into the pools with stones, dams and splitters across 23 levels. Plays in the browser.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Pamukkale · Travertine Water Puzzle">
-<meta property="og:description" content="A 3D water-flow puzzle on the white travertine terraces of Pamukkale, redesigned in pastel travertine and turquoise water: guide the spring into the pools with stones, dams and splitters across 20 levels. Plays in the browser.">
+<meta property="og:description" content="A 3D water-flow puzzle on the white travertine terraces of Pamukkale, redesigned in pastel travertine and turquoise water: guide the spring into the pools with stones, dams and splitters across 23 levels. Plays in the browser.">
 <meta property="og:url" content="https://furkiozknn.github.io/pamukkale/">
 <meta property="og:image" content="https://furkiozknn.github.io/pamukkale/docs/card.jpg">
 <meta property="og:image:width" content="960">
@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script>/*ARENA-KIT:BEGIN v1.0.0 sha256:a9b9a8b52b3e*/
+<script>/*ARENA-KIT:BEGIN v1.0.1 sha256:bc575c398c95*/
 /* ARENA-KIT v1 — shared layer for the 21 Claude Game Arena games.
  *
  * Injected inline into each game's index.html (between begin/end marker comments) by
@@ -28,7 +28,8 @@
  *   Arena.perf.attach(renderer)        dynamic pixel ratio for weak GPUs (Intel UHD)
  *   Arena.hint(id, text)               one-time hint toast (first 30 s guidance)
  *   Arena.endCard({...})               end-of-session card: reason, score, "again", another game
- *   Arena.daily(game)                  UTC-day seed + mulberry32 rng + streak
+ *   Arena.daily(game, {dayKey})        UTC-day seed (or the game's own day key) + mulberry32 rng + streak
+ *   Arena.quiet                        true on ?auto / ?nosave / ?demo: nothing is written to localStorage
  *   Arena.share({...})                 Web Share / clipboard text + optional PNG card
  *   Arena.profile(), Arena.award(id)   cross-game passport (shared origin localStorage)
  *   Arena.settings / openSettings()    accessibility panel (text size, contrast, motion, vibration, auto-pause)
@@ -39,7 +40,7 @@
 (function (root) {
   'use strict';
   if (root.Arena && root.Arena.version) return; // injected twice (e.g. iframe) -> keep the first
-  var VERSION = '1.0.0';
+  var VERSION = '1.0.1';
   var hasDOM = typeof document !== 'undefined';
 
   /* ---------- core (pure, Node-testable) ---------- */
@@ -49,6 +50,12 @@
     var d = date || new Date();
     return d.getUTCFullYear() * 10000 + (d.getUTCMonth() + 1) * 100 + d.getUTCDate();
   };
+  core.localDayKey = function (date) { // local-time YYYYMMDD (for games whose own daily turns at local midnight)
+    var d = date || new Date();
+    return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+  };
+  // Bot / demo / no-save runs must not touch the player's storage: ?auto, ?nosave, ?demo (any value).
+  core.isQuiet = function (search) { return /[?&](auto|nosave|demo)(=|&|$)/.test(search || ''); };
   core.prevDayKey = function (key) {
     var y = Math.floor(key / 10000), m = Math.floor(key / 100) % 100, d = key % 100;
     return core.dayKey(new Date(Date.UTC(y, m - 1, d) - 86400000));
@@ -103,7 +110,9 @@
 
   /* ---------- storage ---------- */
   var mem = {};
-  function store() { try { return root.localStorage; } catch (e) { return null; } }
+  var quiet = false;
+  try { quiet = hasDOM && core.isQuiet(location.search); } catch (e) {}
+  function store() { if (quiet) return null; try { return root.localStorage; } catch (e) { return null; } }
   function get(key, fallback) {
     var s = store(), raw = null;
     try { raw = s ? s.getItem('arena.' + key) : (key in mem ? mem[key] : null); } catch (e) { raw = null; }
@@ -264,11 +273,12 @@
     return close;
   }
 
-  function daily(game) {
+  function daily(game, opts) {
     game = game || gameId;
+    var own = opts && /^\d{8}$/.test(String(opts.dayKey || '')) ? +opts.dayKey : 0;
     var q = null;
     try { q = hasDOM && new URLSearchParams(location.search).get('d'); } catch (e) {}
-    var day = /^\d{8}$/.test(q || '') ? +q : core.dayKey();
+    var day = /^\d{8}$/.test(q || '') ? +q : (own || core.dayKey());
     var seed = core.hash(game + ':' + day);
     var recs = get('daily.v1', {});
     var rec = recs[game] || { last: 0, streak: 0, best: 0 };
@@ -364,7 +374,7 @@
   }
 
   root.Arena = {
-    version: VERSION, game: gameId, games: GAMES.slice(), lang: function (l) { if (l) lang = l === 'tr' ? 'tr' : 'en'; return lang; },
+    version: VERSION, quiet: quiet, game: gameId, games: GAMES.slice(), lang: function (l) { if (l) lang = l === 'tr' ? 'tr' : 'en'; return lang; },
     perf: perf, hint: hint, toast: toast, endCard: endCard, daily: daily, share: share, shareCard: shareCard,
     profile: profile, award: award, settings: settings, openSettings: openSettings, mountSettingsButton: mountSettingsButton,
     on: function (name, fn) { (listeners[name] = listeners[name] || []).push(fn); },
@@ -502,6 +512,12 @@ h3{font-size:18px}
 .brand-pill .brand-sub{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--accent-deep);white-space:nowrap}
 .stats-pill{padding:0 18px;gap:16px;font-size:14px;font-weight:700;white-space:nowrap;min-width:0}
 .stat-item{display:flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums}
+/* remaining time: a thin bar along the stats pill (always shown) plus a number where there is room */
+.stats-pill{position:relative}
+#hud-timebar{position:absolute;left:16px;right:16px;bottom:4px;height:3px;border-radius:2px;background:rgba(14,37,43,.10);overflow:hidden;pointer-events:none}
+#hud-timebar i{display:block;height:100%;width:100%;background:var(--accent);transform-origin:left center;transition:transform .25s linear}
+#hud-timebar.low i{background:var(--danger)}
+#hud-time-wrap.low .stat-val{color:var(--danger)}
 .stat-item small{display:block;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-soft);line-height:1}
 .stat-item .stat-val{font-size:15px;font-weight:800;color:var(--ink)}
 .stars{display:inline-flex;align-items:center;gap:3px}
@@ -662,7 +678,12 @@ h3{font-size:18px}
       <small data-i18n="water">Su</small>
       <b class="stat-val" id="hud-water">0.0</b>
     </div>
+    <div class="stat-item hide-s" id="hud-time-wrap">
+      <small data-i18n="timeLeft">Süre</small>
+      <b class="stat-val" id="hud-time">0</b>
+    </div>
     <div class="stars" id="hud-stars" aria-label="stars"></div>
+    <div id="hud-timebar" role="progressbar" aria-valuemin="0" aria-valuemax="100"><i></i></div>
   </div>
   <div class="actions-pill">
     <button class="icon-btn" id="btn-pause" aria-label="Pause" title="P"></button>
@@ -1082,7 +1103,7 @@ const S = {
     restart: 'Baştan', mainMenu: 'Ana menü', next: 'Sonraki seviye', ending: 'Sonuç', retry: 'Tekrar dene', undo: 'Geri al',
     reset: 'Sıfırla', start: 'Suyu başlat', stop: 'Suyu durdur', fast: 'Hızlı ileri', master: 'Ana ses', music: 'Müzik',
     sfx: 'Efektler', language: 'Dil', quality: 'Kalite', low: 'Düşük', high: 'Yüksek', fullscreen: 'Tam ekran',
-    pools: 'Havuz', water: 'Su', levelWord: 'Seviye', pause: 'Duraklat', toolStone: 'Taş', toolDam: 'Set', toolSplit: 'Ayırıcı',
+    pools: 'Havuz', water: 'Su', timeLeft: 'Süre', secShort: 'sn', levelWord: 'Seviye', pause: 'Duraklat', toolStone: 'Taş', toolDam: 'Set', toolSplit: 'Ayırıcı',
     done: 'Seviye tamamlandı', failed: 'Süre doldu', poolsFilled: 'Dolu havuz', waterUsed: 'Kullanılan su',
     spilled: 'Taşan su', toolsLeft: 'Kalan araç', toolsUsed: 'Kullanılan araç', star1: 'Tüm havuzlar dolu', star2: 'Taşan su yok',
     star3: 'Araç tasarrufu', best: 'En iyi', endTitle: 'Gün batımında Pamukkale',
@@ -1111,7 +1132,7 @@ const S = {
     restart: 'Restart', mainMenu: 'Main menu', next: 'Next level', ending: 'Ending', retry: 'Try again', undo: 'Undo',
     reset: 'Reset', start: 'Start water', stop: 'Stop water', fast: 'Fast forward', master: 'Master', music: 'Music',
     sfx: 'Effects', language: 'Language', quality: 'Quality', low: 'Low', high: 'High', fullscreen: 'Fullscreen',
-    pools: 'Pools', water: 'Water', levelWord: 'Level', pause: 'Pause', toolStone: 'Stone', toolDam: 'Dam', toolSplit: 'Splitter',
+    pools: 'Pools', water: 'Water', timeLeft: 'Time', secShort: 's', levelWord: 'Level', pause: 'Pause', toolStone: 'Stone', toolDam: 'Dam', toolSplit: 'Splitter',
     done: 'Level complete', failed: 'Out of time', poolsFilled: 'Pools filled', waterUsed: 'Water used',
     spilled: 'Water spilled', toolsLeft: 'Tools left', toolsUsed: 'Tools used', star1: 'All pools full', star2: 'No water spilled',
     star3: 'Tool saving', best: 'Best', endTitle: 'Pamukkale at sunset',
@@ -1160,7 +1181,7 @@ const HINTS = [
   ['Altın saatte son damlaya kadar çalış.', 'Work through the golden hour.'],
   ['Kızıl yamaçta su hızlı kayar.', 'On the red slope the water runs fast.'],
   ['Köprünün aralığından geçir.', 'Pass the water through the bridge gap.'],
-  ['Altı havuz, az araç.', 'Six pools, few tools.'],
+  ['Beş havuz, az araç.', 'Five pools, few tools.'],
   ['Son havuzları doldur, gün batsın.', 'Fill the last pools as the sun sets.'],
   ['Kapak kapalıyken su yana döner. Havuz dolunca kapağı aç.', 'With the gate shut the water turns aside. Open it once the pool is full.'],
   ['İki kapak, bir sıra: üsttekini aç, alttaki havuz dolunca alttakini kapat.', 'Two gates, one order: open the upper one, then close the lower one once its pool is full.'],
@@ -1169,9 +1190,9 @@ const HINTS = [
 const AREA_NAMES = [['Alt Havuzlar', 'Lower Pools'], ['Orta Basamaklar', 'Middle Shelves'], ['Antik Havuz', 'Ancient Pool'], ['Gün Batımı', 'Sunset'], ['Kalsiyum Zamanı', 'Calcium Time']];
 const t = k => (S[settings.lang] && S[settings.lang][k] !== undefined ? S[settings.lang][k] : S.en[k]) || k;
 const tv = (k, vars) => t(k).replace(/\{(\w+)\}/g, (m, v) => (v in vars ? vars[v] : m));
-const L = settings.lang === 'en' ? 1 : 0;
-const levelName = i => LV[i][L];
-const levelHint = i => HINTS[i][L];
+const L = () => (settings.lang === 'en' ? 1 : 0);   // read live, so a language switch also renames levels, hints and areas
+const levelName = i => LV[i][L()];
+const levelHint = i => HINTS[i][L()];
 
 // ---------- icons (inline SVG, no emoji) ----------
 const ICON = {
@@ -1893,12 +1914,19 @@ function loadLevel(i) {
   applyAreaSky();
 }
 
-let hintTimer = null;
+let hintTimer = null, hintSrc = null;
+// tag and text may be functions: applyI18n repaints a visible bar in the new language
+function paintHintBar() {
+  if (!hintSrc) return;
+  const v = x => (typeof x === 'function' ? x() : x);
+  document.getElementById('hint-tag').textContent = v(hintSrc[0]);
+  document.getElementById('hint-text').textContent = v(hintSrc[1]);
+}
 function showHintBar(tag, text, ms = 6500) {
   const bar = document.getElementById('hint-bar');
   if (!bar) return;
-  document.getElementById('hint-tag').textContent = tag;
-  document.getElementById('hint-text').textContent = text;
+  hintSrc = [tag, text];
+  paintHintBar();
   bar.classList.remove('hidden');
   bar.style.opacity = '1';
   clearTimeout(hintTimer);
@@ -1915,9 +1943,9 @@ function startLevel(i) {
   showScreen('play');
   const firstGate = LEVELS[i].gates && LEVELS.findIndex(d => d.gates && d.gates.length) === i;
   if (firstGate) {   // tutorial: the hint bar stays longer and a toast repeats it where the bar is hidden (short landscape screens)
-    showHintBar(levelName(i), t('gateTutorial'), 14000);
+    showHintBar(() => levelName(i), () => t('gateTutorial'), 14000);
     if (window.matchMedia && matchMedia('(max-height:520px) and (orientation:landscape)').matches) toast(t('gateTutorial'), 'info');
-  } else showHintBar(levelName(i), levelHint(i));
+  } else showHintBar(() => levelName(i), () => levelHint(i));
 }
 
 // opens or closes the sluice gate on cell i; works before and during the flow
@@ -2144,7 +2172,7 @@ function startDaily() {
   G.daily = d;
   loadLevel(d.idx);
   showScreen('play');
-  showHintBar(t('daily'), LEVELS[d.idx].gates ? t('gateTutorial') : levelHint(d.idx), LEVELS[d.idx].gates ? 14000 : 6500);
+  showHintBar(() => t('daily'), () => (LEVELS[d.idx].gates ? t('gateTutorial') : levelHint(d.idx)), LEVELS[d.idx].gates ? 14000 : 6500);
 }
 function totalStars() { let s = 0, n = 0; for (const k in progress.stars) { s += progress.stars[k]; if (progress.stars[k] > 0) n++; } return { s, n }; }
 function shareResult(ending) {
@@ -2172,7 +2200,7 @@ function renderAreas() {
     for (let i = 0; i < LEVEL_COUNT; i++) {
       if (LEVELS[i].area === a) { areaStars += (progress.stars[i] || 0); areaLevels++; }
     }
-    div.innerHTML = `<div class="area-header"><h3>${AREA_NAMES[a][L]}</h3><span class="area-star-badge">${areaStars}/${areaLevels * 3} ★</span></div><div class="grid"></div>`;
+    div.innerHTML = `<div class="area-header"><h3>${AREA_NAMES[a][L()]}</h3><span class="area-star-badge">${areaStars}/${areaLevels * 3} ★</span></div><div class="grid"></div>`;
     const grid = div.querySelector('.grid');
     for (let i = 0; i < LEVEL_COUNT; i++) {
       if (LEVELS[i].area !== a) continue;
@@ -2215,7 +2243,7 @@ function applyI18n() {
   document.getElementById('btn-lang-title').textContent = settings.lang === 'tr' ? 'TR / EN' : 'EN / TR';
   document.getElementById('btn-sound').innerHTML = svg(settings.musicOn || settings.sfxOn ? 'sound' : 'mute');
   document.getElementById('btn-pause').innerHTML = svg(G.screen === 'play' ? 'pause' : 'play');
-  renderHUD(); renderTray();
+  renderHUD(); renderTray(); paintHintBar();
   renderTitle();
   if (G.screen === 'areas') renderAreas();
   if (G.screen === 'result' && G.res) showResult();
@@ -2235,10 +2263,23 @@ function renderHUD() {
   const cnt = poolCounts();
   const areaIdx = G.def ? G.def.area : 0;
   const ap = document.getElementById('hud-area-pill');
-  if (ap) ap.textContent = (G.daily ? t('daily') : AREA_NAMES[areaIdx][L]).toUpperCase();
+  if (ap) ap.textContent = (G.daily ? t('daily') : AREA_NAMES[areaIdx][L()]).toUpperCase();
   document.getElementById('hud-level').innerHTML = `<small>${t('levelWord')}</small>${G.idx + 1}/${LEVEL_COUNT}<span class="lvl-name"> · ${levelName(G.idx)}</span>`;
   document.getElementById('hud-pools').textContent = `${cnt.filled}/${cnt.total}`;
   document.getElementById('hud-water').textContent = G.st.emitted.toFixed(1);
+  // time limit (def.time ticks); finish(false) fires at st.tick >= def.time
+  const limit = G.def ? G.def.time : 0, leftSec = Math.max(0, (limit - G.st.tick) * TICK);
+  const frac = limit > 0 ? Math.max(0, Math.min(1, 1 - G.st.tick / limit)) : 0, lowTime = frac <= 0.2;
+  const timeText = `${Math.ceil(leftSec)} ${t('secShort')}`;
+  document.getElementById('hud-time').textContent = timeText;
+  document.getElementById('hud-time-wrap').classList.toggle('low', lowTime);
+  const tb = document.getElementById('hud-timebar');
+  tb.firstElementChild.style.transform = `scaleX(${frac.toFixed(3)})`;
+  tb.classList.toggle('low', lowTime);
+  tb.setAttribute('aria-valuenow', String(Math.round(frac * 100)));
+  tb.setAttribute('aria-label', t('timeLeft'));
+  tb.setAttribute('aria-valuetext', timeText);
+  tb.title = `${t('timeLeft')}: ${timeText}`;
   const [s1, s2, s3] = starState(G.st.pools.length && poolCounts().filled === cnt.total);
   document.getElementById('hud-stars').innerHTML = [s1, s2, s3].map(starSvg).join('');
   document.getElementById('btn-pause').innerHTML = svg(G.screen === 'play' ? 'pause' : 'play');
