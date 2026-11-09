@@ -15,6 +15,7 @@
 <meta property="og:image:height" content="540">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:,">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Pamukkale%22%2C%22short_name%22%3A%22Pamukkale%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23F3EFE6%22%2C%22theme_color%22%3A%22%231199A4%22%7D">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -2631,6 +2632,19 @@ function boot() {
   Object.defineProperty(window, 'pamukkale', { get: summary, configurable: true });
 }
 boot();
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    const sw = `
+      self.addEventListener('install', e => {
+        e.waitUntil(caches.open('pamukkale-v1').then(c => c.addAll(['./', './index.html', 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js'])));
+      });
+      self.addEventListener('fetch', e => {
+        e.respondWith(caches.match(e.request).then(res => res || fetch(e.request)));
+      });
+    `;
+    navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw], { type: 'text/javascript' }))).catch(() => {});
+  });
+}
 </script>
 </body>
 </html>
