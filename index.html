@@ -15,7 +15,6 @@
 <meta property="og:image:height" content="540">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:,">
-<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Pamukkale%22%2C%22short_name%22%3A%22Pamukkale%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23F3EFE6%22%2C%22theme_color%22%3A%22%231199A4%22%7D">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -443,7 +442,7 @@ html,body{margin:0;height:100%;overflow:hidden}
 body{background:var(--cream);color:var(--ink);font-family:var(--font-ui);-webkit-user-select:none;user-select:none;touch-action:none}
 #stage{position:fixed;inset:0;background:linear-gradient(180deg,var(--sky-top) 0%,var(--sky-bottom) 70%)}
 #stage::after{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 50%,transparent 60%,rgba(10,28,33,0.18) 100%),linear-gradient(180deg,rgba(10,28,33,0.12) 0%,transparent 15%,transparent 84%,rgba(10,28,33,0.2) 100%);z-index:1}
-#c{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+#c{position:absolute;inset:0;width:100%;height:100%;display:block}
 button{font:inherit;color:inherit;cursor:pointer;min-height:44px;min-width:44px}
 button:focus{outline:none}
 button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--accent-light);outline-offset:2px}
@@ -515,8 +514,6 @@ h3{font-size:18px}
 .hint-tag{font-weight:800;color:var(--ink);letter-spacing:.2px}
 .hint-dot{width:4px;height:4px;border-radius:50%;background:var(--accent);flex:none}
 @keyframes hintIn{from{opacity:0;transform:translate(-50%,-6px)}to{opacity:1;transform:translate(-50%,0)}}
-@keyframes flashRed{0%,100%{color:var(--ink)}50%{color:var(--danger)}}
-.exceed-par{animation:flashRed 1s infinite}
 
 /* Tray (Bottom Action Bar) */
 #tray{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;display:flex;gap:10px;align-items:center;padding:8px 12px;z-index:10;max-width:calc(100% - 24px);border-radius:28px;background:var(--card-bg);border:1.5px solid var(--card-border);box-shadow:var(--shadow-lg),0 0 0 1px var(--glass-highlight) inset;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
@@ -664,10 +661,6 @@ h3{font-size:18px}
     <div class="stat-item hide-s">
       <small data-i18n="water">Su</small>
       <b class="stat-val" id="hud-water">0.0</b>
-    </div>
-    <div class="stat-item">
-      <small data-i18n="toolsWord">Araç</small>
-      <b class="stat-val" id="hud-tools">0/0 ★</b>
     </div>
     <div class="stars" id="hud-stars" aria-label="stars"></div>
   </div>
@@ -1089,7 +1082,7 @@ const S = {
     restart: 'Baştan', mainMenu: 'Ana menü', next: 'Sonraki seviye', ending: 'Sonuç', retry: 'Tekrar dene', undo: 'Geri al',
     reset: 'Sıfırla', start: 'Suyu başlat', stop: 'Suyu durdur', fast: 'Hızlı ileri', master: 'Ana ses', music: 'Müzik',
     sfx: 'Efektler', language: 'Dil', quality: 'Kalite', low: 'Düşük', high: 'Yüksek', fullscreen: 'Tam ekran',
-    pools: 'Havuz', water: 'Su', toolsWord: 'Araç', levelWord: 'Seviye', pause: 'Duraklat', toolStone: 'Taş', toolDam: 'Set', toolSplit: 'Ayırıcı',
+    pools: 'Havuz', water: 'Su', levelWord: 'Seviye', pause: 'Duraklat', toolStone: 'Taş', toolDam: 'Set', toolSplit: 'Ayırıcı',
     done: 'Seviye tamamlandı', failed: 'Süre doldu', poolsFilled: 'Dolu havuz', waterUsed: 'Kullanılan su',
     spilled: 'Taşan su', toolsLeft: 'Kalan araç', toolsUsed: 'Kullanılan araç', star1: 'Tüm havuzlar dolu', star2: 'Taşan su yok',
     star3: 'Araç tasarrufu', best: 'En iyi', endTitle: 'Gün batımında Pamukkale',
@@ -1118,7 +1111,7 @@ const S = {
     restart: 'Restart', mainMenu: 'Main menu', next: 'Next level', ending: 'Ending', retry: 'Try again', undo: 'Undo',
     reset: 'Reset', start: 'Start water', stop: 'Stop water', fast: 'Fast forward', master: 'Master', music: 'Music',
     sfx: 'Effects', language: 'Language', quality: 'Quality', low: 'Low', high: 'High', fullscreen: 'Fullscreen',
-    pools: 'Pools', water: 'Water', toolsWord: 'Tools', levelWord: 'Level', pause: 'Pause', toolStone: 'Stone', toolDam: 'Dam', toolSplit: 'Splitter',
+    pools: 'Pools', water: 'Water', levelWord: 'Level', pause: 'Pause', toolStone: 'Stone', toolDam: 'Dam', toolSplit: 'Splitter',
     done: 'Level complete', failed: 'Out of time', poolsFilled: 'Pools filled', waterUsed: 'Water used',
     spilled: 'Water spilled', toolsLeft: 'Tools left', toolsUsed: 'Tools used', star1: 'All pools full', star2: 'No water spilled',
     star3: 'Tool saving', best: 'Best', endTitle: 'Pamukkale at sunset',
@@ -2246,13 +2239,6 @@ function renderHUD() {
   document.getElementById('hud-level').innerHTML = `<small>${t('levelWord')}</small>${G.idx + 1}/${LEVEL_COUNT}<span class="lvl-name"> · ${levelName(G.idx)}</span>`;
   document.getElementById('hud-pools').textContent = `${cnt.filled}/${cnt.total}`;
   document.getElementById('hud-water').textContent = G.st.emitted.toFixed(1);
-  const used = totalUsed();
-  const par = G.def ? G.def.par : 0;
-  const toolsEl = document.getElementById('hud-tools');
-  if (toolsEl) {
-    toolsEl.textContent = `${used}/${par} ★`;
-    toolsEl.classList.toggle('exceed-par', used > par);
-  }
   const [s1, s2, s3] = starState(G.st.pools.length && poolCounts().filled === cnt.total);
   document.getElementById('hud-stars').innerHTML = [s1, s2, s3].map(starSvg).join('');
   document.getElementById('btn-pause').innerHTML = svg(G.screen === 'play' ? 'pause' : 'play');
@@ -2307,18 +2293,15 @@ function cellAt(clientX, clientY) {
 }
 
 const pointers = new Map();
-let drag = null, pinchStart = 0, pinchDist = 0, lastCentroid = null, longTimer = 0;
+let drag = null, pinchStart = 0, pinchDist = 0, longTimer = 0;
 canvas.addEventListener('pointerdown', e => {
   audioInit();
   canvas.setPointerCapture(e.pointerId);
   pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
   if (pointers.size === 2) {
     const [a, b] = [...pointers.values()];
-    pinchStart = Math.hypot(a.x - b.x, a.y - b.y);
-    pinchDist = view.dist;
-    lastCentroid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
-    drag = null;
-    clearTimeout(longTimer);
+    pinchStart = Math.hypot(a.x - b.x, a.y - b.y); pinchDist = view.dist;
+    drag = null; clearTimeout(longTimer);
     return;
   }
   drag = { x: e.clientX, y: e.clientY, moved: false, long: false, button: e.button, touch: e.pointerType !== 'mouse' };
@@ -2330,16 +2313,9 @@ canvas.addEventListener('pointerdown', e => {
 });
 canvas.addEventListener('pointermove', e => {
   if (pointers.has(e.pointerId)) pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-  if (pointers.size >= 2) {
+  if (pointers.size === 2) {
     const [a, b] = [...pointers.values()];
     const d = Math.hypot(a.x - b.x, a.y - b.y);
-    const cx = (a.x + b.x) / 2, cy = (a.y + b.y) / 2;
-    if (lastCentroid) {
-      const dcx = cx - lastCentroid.x, dcy = cy - lastCentroid.y;
-      view.yaw = Math.max(-0.8, Math.min(0.8, view.yaw - dcx * 0.005));
-      view.pitch = Math.max(0.12, Math.min(1.15, view.pitch + dcy * 0.004));
-    }
-    lastCentroid = { x: cx, y: cy };
     view.dist = Math.min(24, Math.max(8, pinchDist * (pinchStart / Math.max(1, d))));
     return;
   }
@@ -2357,7 +2333,6 @@ canvas.addEventListener('pointermove', e => {
 });
 canvas.addEventListener('pointerup', e => {
   pointers.delete(e.pointerId);
-  if (pointers.size < 2) lastCentroid = null;
   clearTimeout(longTimer);
   if (drag && !drag.moved && !drag.long && pointers.size === 0 && G.screen === 'play') {
     const i = cellAt(e.clientX, e.clientY);
@@ -2366,7 +2341,7 @@ canvas.addEventListener('pointerup', e => {
   }
   if (pointers.size === 0) drag = null;
 });
-canvas.addEventListener('pointercancel', e => { pointers.delete(e.pointerId); lastCentroid = null; drag = null; clearTimeout(longTimer); });
+canvas.addEventListener('pointercancel', e => { pointers.delete(e.pointerId); drag = null; clearTimeout(longTimer); });
 canvas.addEventListener('pointerleave', () => { G.hover = -1; });
 canvas.addEventListener('contextmenu', e => e.preventDefault());
 canvas.addEventListener('wheel', e => {
@@ -2632,19 +2607,6 @@ function boot() {
   Object.defineProperty(window, 'pamukkale', { get: summary, configurable: true });
 }
 boot();
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    const sw = `
-      self.addEventListener('install', e => {
-        e.waitUntil(caches.open('pamukkale-v1').then(c => c.addAll(['./', './index.html', 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js'])));
-      });
-      self.addEventListener('fetch', e => {
-        e.respondWith(caches.match(e.request).then(res => res || fetch(e.request)));
-      });
-    `;
-    navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw], { type: 'text/javascript' }))).catch(() => {});
-  });
-}
 </script>
 </body>
 </html>
