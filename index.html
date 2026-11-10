@@ -18,11 +18,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script>/*ARENA-KIT:BEGIN v1.0.1 sha256:bc575c398c95*/
+<script>/*ARENA-KIT:BEGIN v1.1.0 sha256:3bea83137e26*/
 /* ARENA-KIT v1 — shared layer for the 21 Claude Game Arena games.
  *
  * Injected inline into each game's index.html (between begin/end marker comments) by
- * arena-kit/inject.py, so every game stays a single file. Plain script, no imports, no network.
+ * arena-kit/inject.py, so every game stays a single file. Plain script, no imports; the kit itself opens no
+ * connection (v1.1 play events are handed to the page's existing GoatCounter counter, if it is there).
  * Everything is optional: a game that never calls Arena.* behaves exactly as before.
  *
  *   Arena.perf.attach(renderer)        dynamic pixel ratio for weak GPUs (Intel UHD)
@@ -33,6 +34,10 @@
  *   Arena.share({...})                 Web Share / clipboard text + optional PNG card
  *   Arena.profile(), Arena.award(id)   cross-game passport (shared origin localStorage)
  *   Arena.settings / openSettings()    accessibility panel (text size, contrast, motion, vibration, auto-pause)
+ *   Arena.complete({mount, feedback})  v1.1: "completed" event + one-tap 👍/👎 (once a day per game), inline in `mount`
+ *   Arena.track(name)                  v1.1: one GoatCounter event "<game>/<name>" per page load; automatic:
+ *                                      "start" (first real input) and "return" (played this game on an earlier day)
+ *                                      Nothing is sent or shown on quiet runs; no cookies, no ids, no new service.
  *
  * Storage: every key starts with "arena." and is versioned; every access is wrapped in try/catch
  * (private mode, quota, portals). Pure logic lives in Arena._core so it can be tested in Node.
@@ -40,7 +45,7 @@
 (function (root) {
   'use strict';
   if (root.Arena && root.Arena.version) return; // injected twice (e.g. iframe) -> keep the first
-  var VERSION = '1.0.1';
+  var VERSION = '1.1.0';
   var hasDOM = typeof document !== 'undefined';
 
   /* ---------- core (pure, Node-testable) ---------- */
@@ -60,6 +65,12 @@
     var y = Math.floor(key / 10000), m = Math.floor(key / 100) % 100, d = key % 100;
     return core.dayKey(new Date(Date.UTC(y, m - 1, d) - 86400000));
   };
+  // v1.1: a player is "returning" if this game was last played on an earlier day (old profiles: any earlier play)
+  core.isReturn = function (lastDay, plays, lastAnyAt, today) {
+    if (lastDay) return lastDay < today;
+    return !!(plays > 0 && lastAnyAt && core.dayKey(new Date(lastAnyAt)) < today);
+  };
+  core.eventName = function (name) { return String(name || '').replace(/[^a-z0-9-]/gi, '').slice(0, 24).toLowerCase(); };
   core.hash = function (str) { // FNV-1a 32-bit
     var h = 0x811c9dc5;
     for (var i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; }
@@ -128,10 +139,12 @@
   var STR = {
     tr: { again: 'Bir daha', another: 'Başka bir oyun dene', close: 'Kapat', settings: 'Erişilebilirlik',
       textSize: 'Yazı boyutu', contrast: 'Yüksek karşıtlık', motion: 'Hareketi azalt', vibration: 'Titreşim',
-      autoPause: 'Sekme değişince duraklat', copied: 'Panoya kopyalandı', streak: 'Seri', days: 'gün', share: 'Paylaş' },
+      autoPause: 'Sekme değişince duraklat', copied: 'Panoya kopyalandı', streak: 'Seri', days: 'gün', share: 'Paylaş',
+      fbAsk: 'Beğendin mi?', like: 'Beğendim', dislike: 'Beğenmedim', thanks: 'Teşekkürler!' },
     en: { again: 'Play again', another: 'Try another game', close: 'Close', settings: 'Accessibility',
       textSize: 'Text size', contrast: 'High contrast', motion: 'Reduce motion', vibration: 'Vibration',
-      autoPause: 'Pause when the tab is hidden', copied: 'Copied to clipboard', streak: 'Streak', days: 'days', share: 'Share' },
+      autoPause: 'Pause when the tab is hidden', copied: 'Copied to clipboard', streak: 'Streak', days: 'days', share: 'Share',
+      fbAsk: 'Did you enjoy it?', like: 'I liked it', dislike: 'I did not like it', thanks: 'Thanks!' },
   };
   var lang = 'en';
   try { lang = /^tr/i.test((hasDOM && document.documentElement.lang) || (root.navigator && navigator.language) || '') ? 'tr' : 'en'; } catch (e) {}
@@ -148,9 +161,13 @@
     gameId = (meta && meta.content) || (GAMES.indexOf(seg) >= 0 ? seg : 'unknown');
   } catch (e) {}
   function profile() { return get('profile.v1', { plays: {}, badges: {}, last: null, first: null }); }
+  var returning = false;
   function touchProfile() {
-    var p = profile(), now = Date.now();
+    var p = profile(), now = Date.now(), today = core.dayKey();
+    p.lastDay = p.lastDay || {};
+    returning = core.isReturn(p.lastDay[gameId], p.plays[gameId] || 0, p.last && p.last.at, today);
     p.plays[gameId] = (p.plays[gameId] || 0) + 1; p.last = { game: gameId, at: now }; p.first = p.first || now;
+    p.lastDay[gameId] = today;
     set('profile.v1', p); return p;
   }
   function award(id, label) {
@@ -203,6 +220,13 @@
     'width:40px;height:40px;border-radius:50%;border:0;background:rgba(14,13,11,.7);color:#f6f1e6;font:20px/40px system-ui;cursor:pointer;opacity:.7}' +
     '.arena-gear:hover,.arena-gear:focus-visible{opacity:1}' +
     'html[data-arena-contrast] body{filter:contrast(1.25) saturate(1.1)}' +
+    '.arena-fb{position:fixed;left:50%;top:calc(10px + env(safe-area-inset-top));transform:translateX(-50%);z-index:2147483000;white-space:nowrap;' +
+    'display:flex;align-items:center;gap:8px;padding:6px 6px 6px 14px;border-radius:999px;background:rgba(14,13,11,.9);color:#f6f1e6;' +
+    'font:600 calc(15px*var(--arena-text-scale,1))/1.2 system-ui,sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.35)}' +
+    '.arena-fb button{min-width:44px;min-height:44px;border:0;border-radius:50%;background:#2b2722;color:#f6f1e6;font:22px/1 system-ui;cursor:pointer}' +
+    '.arena-fb button.arena-fb-x{font-size:16px;background:transparent}' +
+    '.arena-fb.arena-fb-inline{position:static;transform:none;margin:12px auto 0;width:max-content;max-width:100%;box-shadow:none}' +
+    '.arena-fb button:focus-visible{outline:3px solid #3fd4dc;outline-offset:2px}' +
     'html[data-arena-reduced-motion] *{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}';
   var styled = false;
   function style() {
@@ -271,6 +295,55 @@
     var close = modal(el('div', { class: 'arena-card' }, kids));
     again.addEventListener('click', function () { close(); if (o.onAgain) o.onAgain(); });
     return close;
+  }
+
+  /* ---------- play events (v1.1) ---------- */
+  // Handed to the page's own GoatCounter (`window.goatcounter.count`, already on 20 of 21 pages). The kit opens no
+  // connection itself; without the counter (or on ?auto / ?nosave / ?demo) the events are simply dropped.
+  var sent = {}, pending = [];
+  function gcSend(path, title) {
+    var gc = root.goatcounter;
+    if (!gc || typeof gc.count !== 'function') return false;
+    try { gc.count({ path: path, title: title || path, event: true }); } catch (e) {}
+    return true;
+  }
+  function flush(tries) {
+    pending = pending.filter(function (e) { return !gcSend(e[0], e[1]); });
+    if (pending.length && tries < 20) setTimeout(function () { flush(tries + 1); }, 500); // count.js loads async
+  }
+  function track(name, title) {
+    name = core.eventName(name);
+    if (quiet || !hasDOM || !name || sent[name]) return false;
+    sent[name] = 1;
+    var path = gameId + '/' + name;
+    if (!gcSend(path, title)) { pending.push([path, title]); if (pending.length === 1) flush(0); }
+    return true;
+  }
+  var fbEl = null;
+  function complete(o) {
+    o = o || {};
+    track('complete');
+    if (quiet || !hasDOM || !document.body || o.feedback === false || fbEl) return;
+    var asked = get('feedback.v1', {}), today = core.dayKey();
+    if (asked[gameId] === today) return;
+    style();
+    var up = el('button', { type: 'button', 'aria-label': t('like'), title: t('like'), text: '👍' });
+    var down = el('button', { type: 'button', 'aria-label': t('dislike'), title: t('dislike'), text: '👎' });
+    var x = el('button', { type: 'button', class: 'arena-fb-x', 'aria-label': t('close'), title: t('close'), text: '✕' });
+    var label = el('span', { text: t('fbAsk') });
+    var mount = o.mount && o.mount.appendChild ? o.mount : null;   // inline in the game's own end screen if given
+    fbEl = el('div', { class: mount ? 'arena-fb arena-fb-inline' : 'arena-fb', role: 'group', 'aria-label': t('fbAsk') }, [label, up, down, x]);
+    function done() { if (fbEl && fbEl.parentNode) fbEl.parentNode.removeChild(fbEl); fbEl = null; }
+    function vote(v) {
+      track(v); var a = get('feedback.v1', {}); a[gameId] = today; set('feedback.v1', a);
+      [up, down, x].forEach(function (b) { b.remove(); }); label.textContent = t('thanks'); announce(t('thanks'));
+      setTimeout(done, 1500);
+    }
+    up.addEventListener('click', function () { vote('like'); });
+    down.addEventListener('click', function () { vote('dislike'); });
+    x.addEventListener('click', done);
+    (mount || document.body).appendChild(fbEl);
+    if (!mount) setTimeout(done, o.ms || 20000);   // floating panel fades out; an inline one stays with the end screen
   }
 
   function daily(game, opts) {
@@ -369,7 +442,16 @@
       if (!settings.autoPause) return;
       emit(document.hidden ? 'pause' : 'resume');
     });
-    var boot = function () { applySettings(); touchProfile(); };
+    var boot = function () {
+      applySettings(); touchProfile();
+      if (quiet) return;
+      var first = function (e) {
+        if (e && e.isTrusted === false) return;
+        ['pointerdown', 'keydown', 'touchstart'].forEach(function (n) { document.removeEventListener(n, first, true); });
+        track('start'); if (returning) track('return');
+      };
+      ['pointerdown', 'keydown', 'touchstart'].forEach(function (n) { document.addEventListener(n, first, true); });
+    };
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
   }
 
@@ -377,6 +459,7 @@
     version: VERSION, quiet: quiet, game: gameId, games: GAMES.slice(), lang: function (l) { if (l) lang = l === 'tr' ? 'tr' : 'en'; return lang; },
     perf: perf, hint: hint, toast: toast, endCard: endCard, daily: daily, share: share, shareCard: shareCard,
     profile: profile, award: award, settings: settings, openSettings: openSettings, mountSettingsButton: mountSettingsButton,
+    track: track, complete: complete,
     on: function (name, fn) { (listeners[name] = listeners[name] || []).push(fn); },
     _core: core, _store: { get: get, set: set },
   };
@@ -654,6 +737,15 @@ h3{font-size:18px}
   h1{font-size:36px}
   h2{font-size:24px}
 }
+/* narrow phones: the stars were clipped under the buttons (390 px: stars 196-259, pill ends near 244). Two rows:
+   level on the left, pools over the stars on the right */
+@media (max-width:430px){
+  .stats-pill{display:grid;grid-template-columns:auto auto;grid-template-rows:auto auto;align-content:center;justify-content:center;column-gap:10px;row-gap:2px}
+  #hud-level-wrap{grid-column:1;grid-row:1/3;align-self:center}
+  .stats-pill .stat-item:not(.hide-s):not(#hud-level-wrap){grid-column:2;grid-row:1}
+  #hud-stars{grid-column:2;grid-row:2;justify-content:center}
+  .stats-pill .stars svg{width:13px;height:13px}
+}
 @media (max-height:520px) and (orientation:landscape){
   #hud{top:6px}
   .brand-pill,.stats-pill,.actions-pill{height:40px}
@@ -753,7 +845,7 @@ h3{font-size:18px}
   </div>
 </aside>
 
-<div id="toasts" aria-live="polite"></div>
+<div id="toasts" role="status" aria-live="polite"></div>
 
 <nav id="tray" class="hidden" aria-label="Tools">
   <div class="tray-tools">
@@ -1143,6 +1235,8 @@ function readJSON(key, fallback) {
 function writeJSON(key, obj) { try { localStorage.setItem(key, JSON.stringify(obj)); } catch (e) { /* private mode */ } }
 
 const coarse = window.matchMedia && matchMedia('(pointer: coarse)').matches;
+/** arena-kit "reduce motion": no water shimmer, no drifting caustics or clouds, no automatic camera orbit. Read live every frame (visual layer only, the water automaton never reads it). */
+const calm = () => !!(window.Arena && Arena.settings && Arena.settings.reducedMotion);
 const settings = readJSON(SET_KEY, { master: 0.8, music: 0.6, sfx: 0.8, lang: /^tr/i.test(navigator.language || '') ? 'tr' : 'en', quality: coarse ? 'low' : 'high', musicOn: true, sfxOn: true });
 if (Q.get('lang') === 'en' || Q.get('lang') === 'tr') settings.lang = Q.get('lang');
 const progress = readJSON(SAVE_KEY, { unlocked: 1, stars: {}, last: 0 });
@@ -1485,6 +1579,19 @@ for (const k of TOOL_KINDS) {
 const ringMesh = new THREE.InstancedMesh(new THREE.TorusGeometry(0.4, 0.04, 6, 28).rotateX(Math.PI / 2), new THREE.MeshLambertMaterial({ color: 0xffffff }), 12);
 ringMesh.count = 0;
 scene.add(ringMesh);
+// colour-blind second channel next to the ring colour: a check mark floats over every full pool (drawing only)
+const poolMarkMat = (() => {
+  const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d');
+  g.beginPath(); g.arc(32, 32, 27, 0, Math.PI * 2); g.fillStyle = '#0B5F66'; g.fill(); g.lineWidth = 4; g.strokeStyle = '#FFFFFF'; g.stroke();
+  g.lineWidth = 7; g.lineCap = 'round'; g.lineJoin = 'round'; g.beginPath(); g.moveTo(19, 33); g.lineTo(28, 42); g.lineTo(45, 23); g.stroke();
+  const tx = new THREE.CanvasTexture(c); tx.colorSpace = THREE.SRGBColorSpace;
+  return new THREE.SpriteMaterial({ map: tx, depthTest: false, depthWrite: false, fog: false, toneMapped: false });
+})();
+const poolMarks = [];
+function poolMark(k) {
+  if (!poolMarks[k]) { const sp = new THREE.Sprite(poolMarkMat); sp.name = 'poolMark'; sp.scale.set(0.5, 0.5, 1); sp.renderOrder = 6; sp.visible = false; scene.add(sp); poolMarks[k] = sp; }
+  return poolMarks[k];
+}
 // the spring basin is a turned bowl with a rounded rim
 const springBowl = [[0.12, 0], [0.26, 0.04], [0.34, 0.16], [0.33, 0.3], [0.26, 0.37], [0.21, 0.32], [0.19, 0.2]].map(([x, y]) => new THREE.Vector2(x, y));
 const spring = new THREE.Mesh(new THREE.LatheGeometry(springBowl, 20), new THREE.MeshLambertMaterial({ color: 0xF5F3EE }));
@@ -1750,12 +1857,13 @@ function refreshWater() {
 
 // soft shimmer: a slow, per-vertex brightness wave over the turquoise surface
 function shimmer(time) {
-  causticTex.offset.set(time * 0.035, time * 0.02);
+  const still = calm();
+  if (!still) causticTex.offset.set(time * 0.035, time * 0.02);
   if (!board || !board.waterBase) return;
   const col = board.waterGeo.attributes.color, base = board.waterBase, M = board.M, arr = col.array;
   for (let j = 0; j <= M; j++) for (let i = 0; i <= M; i++) {
     const k = (j * (M + 1) + i) * 3;
-    const f = 1 + 0.07 * Math.sin(time * 1.6 + i * 0.5 + j * 0.37) * Math.cos(time * 0.9 - j * 0.45);
+    const f = still ? 1 : 1 + 0.07 * Math.sin(time * 1.6 + i * 0.5 + j * 0.37) * Math.cos(time * 0.9 - j * 0.45);
     arr[k] = base[k] * f; arr[k + 1] = base[k + 1] * f; arr[k + 2] = base[k + 2] * f;
   }
   col.needsUpdate = true;
@@ -1795,8 +1903,10 @@ function refreshTools() {
     ringMesh.setMatrixAt(r, tmpM);
     tmpC.set(full ? 0x2EC4C9 : 0xB9C9C4);
     ringMesh.setColorAt(r, tmpC);
+    const mark = poolMark(r); mark.visible = full; mark.position.set(cellX(p.i, n), (h + p.m) * HU + 0.55, cellZ(p.i, n));
     r++;
   }
+  for (let k = r; k < poolMarks.length; k++) poolMarks[k].visible = false;
   ringMesh.count = r;
   ringMesh.instanceMatrix.needsUpdate = true;
   if (ringMesh.instanceColor) ringMesh.instanceColor.needsUpdate = true;
@@ -1805,9 +1915,29 @@ function refreshTools() {
 // ---------- camera ----------
 const TARGET = new THREE.Vector3(0, 1.4, 0);   // a little above the board, so the blue sky shows at the top of the frame
 const view = { yaw: 0.22, pitch: 0.78, dist: 15 };   // about 45 degrees down onto the terraces
+// Portrait phones: the board did not fit (390 px: the left column and its pool were off-screen; fixed 1.35 x distance).
+// Now the four corners of the cell grid fit between the screen edges at the current orbit angle: first a wider field of
+// view (up to 64 degrees), then as much extra distance as is still needed (distance alone sinks the board into the haze).
+// Pinch still zooms: both are taken against the level's own distance, not against view.dist.
+const PV = { fov: 36, mul: 1.35 };
+function portraitView() {
+  const n = G.n || 7, half = n / 2, base = 9 + n * 0.35, d0 = base * 1.35;
+  const cy = Math.cos(view.yaw), sy = Math.sin(view.yaw), cp = Math.cos(view.pitch);
+  let tanH = 0;
+  const C = [[-half, -half], [half, -half], [-half, half], [half, half]].map(([x, z]) => [Math.abs(x * cy - z * sy), (x * sy + z * cy) * cp]);   // across the view, towards the camera
+  for (const [side, toward] of C) if (d0 - toward > 1) tanH = Math.max(tanH, side / (0.92 * (d0 - toward)));
+  PV.fov = Math.min(64, Math.max(36, Math.atan(tanH / camera.aspect) * 360 / Math.PI));
+  const tH = Math.tan(PV.fov * Math.PI / 360) * camera.aspect;
+  let need = 0;
+  for (const [side, toward] of C) need = Math.max(need, side / (0.92 * tH) + toward);
+  PV.mul = Math.max(1.35, need / base);
+  return PV;
+}
 function updateCamera() {
-  const portrait = camera.aspect < 1;
-  const d = view.dist * (portrait ? 1.35 : 1);
+  const portrait = camera.aspect < 1, pv = portrait ? portraitView() : null;
+  const d = view.dist * (pv ? pv.mul : 1);
+  const fov = pv ? pv.fov : 36;
+  if (Math.abs(camera.fov - fov) > 0.05) { camera.fov = fov; camera.updateProjectionMatrix(); }
   const cp = Math.cos(view.pitch), sp = Math.sin(view.pitch);
   camera.position.set(TARGET.x + d * Math.sin(view.yaw) * cp, TARGET.y + d * sp, TARGET.z + d * Math.cos(view.yaw) * cp);
   camera.lookAt(TARGET);
@@ -2317,6 +2447,7 @@ function showResult() {
   rd.classList.toggle('hidden', !G.daily);
   if (G.daily) rd.textContent = G.dailyRes ? tv('dailyRes', { d: dayText(G.daily.day), s: G.dailyRes.streak, b: G.dailyRes.best }) : tv('dailyFail', { d: dayText(G.daily.day) });
   showScreen('result');
+  if (window.Arena && Arena.complete) Arena.complete({ mount: document.querySelector('#ov-result .stack') });   // arena-kit v1.1: pamukkale/complete + one-tap 👍/👎 (nothing on ?auto)
 }
 
 function showEnd() {
@@ -2814,9 +2945,10 @@ function frame(now) {
   }
   if (G.screen === 'play' || G.screen === 'pause') updateGhost(); else ghost.visible = false;
 
-  clouds.position.x = Math.sin(now / 12000) * 2;
-  if (G.screen === 'title') view.yaw += dt * 0.07;
-  if (G.screen === 'end') view.yaw += dt * 0.1;
+  const still = calm();   // reduce motion: the clouds and the title / ending camera stand still
+  if (!still) clouds.position.x = Math.sin(now / 12000) * 2;
+  if (!still && G.screen === 'title') view.yaw += dt * 0.07;
+  if (!still && G.screen === 'end') view.yaw += dt * 0.1;
   updateCamera();
   renderer.render(scene, camera);
 
