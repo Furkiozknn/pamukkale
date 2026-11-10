@@ -531,6 +531,31 @@ h3{font-size:18px}
 .hint-dot{width:4px;height:4px;border-radius:50%;background:var(--accent);flex:none}
 @keyframes hintIn{from{opacity:0;transform:translate(-50%,-6px)}to{opacity:1;transform:translate(-50%,0)}}
 
+/* Interactive 3-Step Tutorial Overlay */
+#tutorial-card{position:fixed;top:72px;left:50%;transform:translateX(-50%);width:min(440px,calc(100% - 24px));padding:12px 16px;border-radius:20px;background:var(--card-bg);border:1.5px solid var(--card-border);box-shadow:var(--shadow-md),0 0 0 1px var(--glass-highlight) inset;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);z-index:11;pointer-events:auto;animation:tutIn .24s cubic-bezier(0.16,1,0.3,1);transition:opacity .2s ease,transform .2s ease}
+@keyframes tutIn{from{opacity:0;transform:translate(-50%,-8px)}to{opacity:1;transform:translate(-50%,0)}}
+.tut-header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.tut-steps{display:flex;align-items:center;gap:5px}
+.tut-dot{width:7px;height:7px;border-radius:999px;background:var(--star-off);transition:all .2s ease}
+.tut-dot.active{width:18px;background:var(--accent)}
+.tut-dot.done{background:var(--accent-deep)}
+.tut-badge{font-size:11px;font-weight:800;color:var(--ink-muted);font-variant-numeric:tabular-nums;letter-spacing:.5px}
+.tut-skip{border:none;background:transparent;color:var(--ink-muted);font-size:12px;font-weight:700;padding:6px 10px;min-height:36px;min-width:44px;cursor:pointer;border-radius:8px;transition:color .12s,background .12s}
+.tut-skip:hover{color:var(--ink);background:var(--accent-bg)}
+.tut-content{display:flex;align-items:flex-start;gap:12px}
+.tut-ico-wrap{width:36px;height:36px;border-radius:50%;background:var(--accent-bg);color:var(--accent-deep);display:flex;align-items:center;justify-content:center;flex:none;box-shadow:0 2px 8px var(--accent-glow)}
+:root:not([data-theme="light"]) .tut-ico-wrap,:root[data-theme="dark"] .tut-ico-wrap{color:var(--accent-light)}
+.tut-ico-wrap svg{width:20px;height:20px;fill:currentColor}
+.tut-ico-wrap svg.s{stroke:currentColor;fill:none}
+.tut-text{flex:1;min-width:0;text-align:left}
+.tut-title{font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:.3px;color:var(--ink);margin:0;line-height:1.2}
+.tut-desc{font-size:12px;line-height:1.45;color:var(--ink-soft);margin:3px 0 0;font-weight:500}
+.tut-action-row{display:flex;justify-content:flex-end;margin-top:8px}
+.tut-done-btn{min-height:36px;padding:0 18px;font-size:12px;font-weight:800;border-radius:999px;background:var(--accent);color:#fff;border:none;cursor:pointer;box-shadow:0 2px 8px var(--accent-glow);transition:transform .12s,background .12s}
+.tut-done-btn:hover{background:var(--accent-light);transform:translateY(-1px)}
+.tut-pulse{animation:tutPulse 1.5s ease-in-out infinite!important;border-color:var(--accent)!important}
+@keyframes tutPulse{0%,100%{box-shadow:0 0 0 2px var(--accent),0 0 10px var(--accent-glow)}50%{box-shadow:0 0 0 4px var(--accent-light),0 0 18px var(--accent-glow);transform:scale(1.03)}}
+
 /* Tray (Bottom Action Bar) */
 #tray{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;display:flex;gap:10px;align-items:center;padding:8px 12px;z-index:10;max-width:calc(100% - 24px);border-radius:28px;background:var(--card-bg);border:1.5px solid var(--card-border);box-shadow:var(--shadow-lg),0 0 0 1px var(--glass-highlight) inset;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
 .tray-tools{display:flex;gap:8px;align-items:center}
@@ -611,6 +636,11 @@ h3{font-size:18px}
   .icon-btn{width:40px;height:40px}
   .lvl-name{display:none}
   #hint-bar{top:60px;font-size:11px;padding:4px 12px}
+  #tutorial-card{top:60px;padding:10px 12px;border-radius:16px}
+  .tut-ico-wrap{width:30px;height:30px}
+  .tut-ico-wrap svg{width:16px;height:16px}
+  .tut-title{font-size:13px}
+  .tut-desc{font-size:11px}
   
   #tray{bottom:10px;width:calc(100% - 16px);flex-direction:column;padding:8px;gap:6px;border-radius:24px}
   .tray-tools{width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
@@ -637,6 +667,9 @@ h3{font-size:18px}
   .logo{width:46px;height:46px}
   h1{font-size:26px}
   #hint-bar{display:none}
+  #tutorial-card{top:46px;padding:8px 12px;border-radius:14px}
+  .tut-desc{display:none}
+  .tut-action-row{margin-top:4px}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -697,6 +730,28 @@ h3{font-size:18px}
   <span class="hint-dot"></span>
   <span id="hint-text"></span>
 </div>
+
+<aside id="tutorial-card" class="hidden" role="region" aria-label="Tutorial">
+  <div class="tut-header">
+    <div class="tut-steps">
+      <span class="tut-dot active" id="tut-dot-1"></span>
+      <span class="tut-dot" id="tut-dot-2"></span>
+      <span class="tut-dot" id="tut-dot-3"></span>
+    </div>
+    <span class="tut-badge" id="tut-badge">1 / 3</span>
+    <button type="button" class="tut-skip" id="tut-btn-skip" data-i18n="tutSkip">Geç</button>
+  </div>
+  <div class="tut-content">
+    <div class="tut-ico-wrap" id="tut-ico"></div>
+    <div class="tut-text">
+      <h3 class="tut-title" id="tut-title"></h3>
+      <p class="tut-desc" id="tut-desc"></p>
+    </div>
+  </div>
+  <div class="tut-action-row hidden" id="tut-action-row">
+    <button type="button" class="tut-done-btn" id="tut-btn-done" data-i18n="tutGotIt">Anladım</button>
+  </div>
+</aside>
 
 <div id="toasts" aria-live="polite"></div>
 
@@ -1074,7 +1129,7 @@ const TICK = 0.05;   // one simulation tick = 0.05 s of game time (20 ticks per 
 const HU = 0.22;     // world height of one height unit
 const K = 4;         // fine mesh vertices per cell
 const LEVEL_COUNT = LEVELS.length;
-const SAVE_KEY = 'arena.pamukkale.save', SET_KEY = 'arena.pamukkale.settings', BEST_KEY = 'arena.pamukkale.best';
+const SAVE_KEY = 'arena.pamukkale.save', SET_KEY = 'arena.pamukkale.settings', BEST_KEY = 'arena.pamukkale.best', TUTORIAL_KEY = 'arena.pamukkale.tutorial.v1';
 const GAME_URL = 'https://github.com/Furkiozknn';
 const errors = [];
 window.addEventListener('error', e => errors.push(String(e.message || e)));
@@ -1123,7 +1178,13 @@ const S = {
     dailyRes: 'Günün Meydan Okuması {d}: seri {s} gün · en iyi {b}', dailyFail: 'Günün Meydan Okuması {d}: tamamlanınca seri sayılır',
     share: 'Paylaş', another: 'Başka oyun', a11y: 'Erişilebilirlik', a11yOpen: 'Aç',
     shareDaily: 'Günün Meydan Okuması {d} · seri {k}', shareTotal: 'Toplam {s}/{m} ★', shareEnd: '{n}/{m} seviye · {s}/{x} ★',
-    awFirst: 'İlk havuzlar doldu', awPerfect: 'Üç yıldızlı seviye', awAll: '23 seviyenin hepsi'
+    awFirst: 'İlk havuzlar doldu', awPerfect: 'Üç yıldızlı seviye', awAll: '23 seviyenin hepsi',
+    tutSkip: 'Geç', tutGotIt: 'Anladım',
+    tutStep1Title: '1. Taş Yerleştir', tutStep1Desc: 'Suyu havuza yönlendirmek için teras yoluna bir taş koy.',
+    tutStep2Title: '2. Suyu Başlat', tutStep2Desc: 'Akışı başlatmak için "Suyu başlat" düğmesine bas.',
+    tutStep3Title: '3. Kalsiyumu İzle', tutStep3Desc: 'Durgun su havuz kenarında beyaz kalsiyum seti örer.',
+    tutStep3DoneDesc: 'Harika! Kalsiyum seti oluştu ve suyu havuzda tuttu.',
+    tutCompleteToast: 'Öğretici tamamlandı', tutSkipToast: 'Öğretici atlandı'
   },
   en: {
     loading: 'Loading…', subtitle: 'A water-flow puzzle on the white terraces',
@@ -1152,7 +1213,13 @@ const S = {
     dailyRes: 'Daily challenge {d}: streak {s} · best {b}', dailyFail: 'Daily challenge {d}: the streak counts once it is complete',
     share: 'Share', another: 'Another game', a11y: 'Accessibility', a11yOpen: 'Open',
     shareDaily: 'Daily challenge {d} · streak {k}', shareTotal: 'Total {s}/{m} ★', shareEnd: '{n}/{m} levels · {s}/{x} ★',
-    awFirst: 'First pools filled', awPerfect: 'A three-star level', awAll: 'All 23 levels'
+    awFirst: 'First pools filled', awPerfect: 'A three-star level', awAll: 'All 23 levels',
+    tutSkip: 'Skip', tutGotIt: 'Got it',
+    tutStep1Title: '1. Place a Stone', tutStep1Desc: 'Place a stone on the terrace to guide water into the pool.',
+    tutStep2Title: '2. Start the Water', tutStep2Desc: 'Press "Start water" to release the spring flow.',
+    tutStep3Title: '3. Observe Calcium', tutStep3Desc: 'Still water builds white travertine rims around the pool.',
+    tutStep3DoneDesc: 'Great! Calcium rims have formed to hold the water.',
+    tutCompleteToast: 'Tutorial completed', tutSkipToast: 'Tutorial skipped'
   }
 };
 const LV = [
@@ -1936,16 +2003,141 @@ function showHintBar(tag, text, ms = 6500) {
   }, ms);
 }
 
+// ---------- interactive 3-step tutorial (Level 1) ----------
+const tut = { active: false, step: 1, calciumObserved: false };
+
+function isTutorialDone() {
+  try { return localStorage.getItem(TUTORIAL_KEY) === '1'; }
+  catch (e) { return false; }
+}
+
+function setTutorialDone() {
+  try {
+    if (!FLAGS.auto && (!window.Arena || !Arena.quiet)) {
+      localStorage.setItem(TUTORIAL_KEY, '1');
+    }
+  } catch (e) {}
+}
+
+function clearTutPulses() {
+  const ts = document.getElementById('tool-stone');
+  if (ts) ts.classList.remove('tut-pulse');
+  const run = document.getElementById('btn-run');
+  if (run) run.classList.remove('tut-pulse');
+}
+
+function tutUpdateUI(calciumSeen) {
+  if (!tut.active) return;
+  if (calciumSeen) tut.calciumObserved = true;
+  const card = document.getElementById('tutorial-card');
+  if (!card) return;
+  card.classList.remove('hidden');
+
+  for (let k = 1; k <= 3; k++) {
+    const dot = document.getElementById('tut-dot-' + k);
+    if (!dot) continue;
+    dot.className = 'tut-dot' + (k === tut.step ? ' active' : (k < tut.step ? ' done' : ''));
+  }
+  const badge = document.getElementById('tut-badge');
+  if (badge) badge.textContent = `${tut.step} / 3`;
+
+  const title = document.getElementById('tut-title');
+  const desc = document.getElementById('tut-desc');
+  const ico = document.getElementById('tut-ico');
+  const actionRow = document.getElementById('tut-action-row');
+
+  clearTutPulses();
+
+  if (tut.step === 1) {
+    if (title) title.textContent = t('tutStep1Title');
+    if (desc) desc.textContent = t('tutStep1Desc');
+    if (ico) ico.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="14" rx="8.5" ry="4.6"/><ellipse cx="11" cy="12" rx="4.5" ry="2.2" opacity=".5"/></svg>`;
+    if (actionRow) actionRow.classList.add('hidden');
+    const ts = document.getElementById('tool-stone');
+    if (ts) ts.classList.add('tut-pulse');
+  } else if (tut.step === 2) {
+    if (title) title.textContent = t('tutStep2Title');
+    if (desc) desc.textContent = t('tutStep2Desc');
+    if (ico) ico.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5c0 0-6.5 7.2-6.5 12.2a6.5 6.5 0 0 0 13 0c0-5-6.5-12.2-6.5-12.2z"/></svg>`;
+    if (actionRow) actionRow.classList.add('hidden');
+    const run = document.getElementById('btn-run');
+    if (run) run.classList.add('tut-pulse');
+  } else if (tut.step === 3) {
+    if (title) title.textContent = t('tutStep3Title');
+    if (desc) desc.textContent = tut.calciumObserved ? t('tutStep3DoneDesc') : t('tutStep3Desc');
+    if (ico) ico.innerHTML = `<svg viewBox="0 0 24 24" class="s" aria-hidden="true"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6.5 6.5l2.8 2.8M14.7 14.7l2.8 2.8M6.5 17.5l2.8-2.8M14.7 9.3l2.8-2.8"/></svg>`;
+    if (actionRow) actionRow.classList.remove('hidden');
+  }
+}
+
+function setTutStep(s) {
+  if (!tut.active) return;
+  tut.step = s;
+  tutUpdateUI();
+}
+
+function startTutorial() {
+  tut.active = true;
+  tut.step = 1;
+  tut.calciumObserved = false;
+  const hb = document.getElementById('hint-bar');
+  if (hb) hb.classList.add('hidden');
+  tutUpdateUI();
+}
+
+function completeTutorial() {
+  if (!tut.active) return;
+  setTutorialDone();
+  tut.active = false;
+  clearTutPulses();
+  const card = document.getElementById('tutorial-card');
+  if (card) {
+    card.style.opacity = '0';
+    card.style.transform = 'translate(-50%, -8px)';
+    setTimeout(() => {
+      card.classList.add('hidden');
+      card.style.opacity = '';
+      card.style.transform = '';
+    }, 250);
+  }
+  toast(t('tutCompleteToast'), 'good');
+}
+
+function skipTutorial() {
+  setTutorialDone();
+  tut.active = false;
+  clearTutPulses();
+  const card = document.getElementById('tutorial-card');
+  if (card) card.classList.add('hidden');
+  toast(t('tutSkipToast'), 'info');
+  showHintBar(() => levelName(0), () => levelHint(0));
+}
+
+function stopTutorial(clearStorage = false) {
+  tut.active = false;
+  clearTutPulses();
+  const card = document.getElementById('tutorial-card');
+  if (card) card.classList.add('hidden');
+  if (clearStorage) {
+    try { localStorage.removeItem(TUTORIAL_KEY); } catch (e) {}
+  }
+}
+
 function startLevel(i) {
   if (i > progress.unlocked - 1) return toast(t('toastLocked'), 'bad');
   G.daily = null;
   loadLevel(i);
   showScreen('play');
-  const firstGate = LEVELS[i].gates && LEVELS.findIndex(d => d.gates && d.gates.length) === i;
-  if (firstGate) {   // tutorial: the hint bar stays longer and a toast repeats it where the bar is hidden (short landscape screens)
-    showHintBar(() => levelName(i), () => t('gateTutorial'), 14000);
-    if (window.matchMedia && matchMedia('(max-height:520px) and (orientation:landscape)').matches) toast(t('gateTutorial'), 'info');
-  } else showHintBar(() => levelName(i), () => levelHint(i));
+  if (i === 0 && !isTutorialDone() && !FLAGS.auto) {
+    startTutorial();
+  } else {
+    stopTutorial(false);
+    const firstGate = LEVELS[i].gates && LEVELS.findIndex(d => d.gates && d.gates.length) === i;
+    if (firstGate) {   // tutorial: the hint bar stays longer and a toast repeats it where the bar is hidden (short landscape screens)
+      showHintBar(() => levelName(i), () => t('gateTutorial'), 14000);
+      if (window.matchMedia && matchMedia('(max-height:520px) and (orientation:landscape)').matches) toast(t('gateTutorial'), 'info');
+    } else showHintBar(() => levelName(i), () => levelHint(i));
+  }
 }
 
 // opens or closes the sluice gate on cell i; works before and during the flow
@@ -1974,6 +2166,7 @@ function placeAt(i, kind = G.tool) {
   sfxSplash();
   for (let b = 0; b < 6; b++) burst(i);
   renderTray();
+  if (tut.active && tut.step === 1) setTutStep(2);
   return true;
 }
 
@@ -1999,6 +2192,7 @@ function undoLast() {
   G.dirty = true;
   toast(t('toastUndone'), 'info');
   renderTray();
+  if (tut.active && tut.step === 2 && totalUsed() === 0) setTutStep(1);
 }
 
 function setRunning(on) {
@@ -2008,6 +2202,7 @@ function setRunning(on) {
   else if (G.st && G.st.tick > 0) toast(t('toastStop'), 'info');
   setTrickle(on);
   renderTray();
+  if (on && tut.active && tut.step === 2) setTutStep(3);
 }
 function toggleRun() { if (G.screen === 'play') setRunning(!G.running); }
 
@@ -2020,6 +2215,7 @@ function resetLevel() {
   if (G.screen !== 'play' && G.screen !== 'pause') return;
   loadLevel(G.idx);
   showScreen('play');
+  if (tut.active) setTutStep(1);
   toast(t('toastReset'), 'info');
 }
 
@@ -2033,6 +2229,9 @@ function advance() {
   if (st.rimChanged) {
     G.dirty = true;
     if (st.tick - G.calciumTick > 60) { toast(t('toastCalcium'), 'info'); G.calciumTick = st.tick; }
+  }
+  if (tut.active && tut.step === 3 && (st.rimChanged || (st.pools && st.pools.some(p => st.w[p.i] > 0.05)))) {
+    tutUpdateUI(true);
   }
   G.waterDirty = true;
   st.pools.forEach((p, k) => {
@@ -2057,6 +2256,7 @@ function burst(cell) {
 function finish(win) {
   G.running = false;
   setTrickle(false);
+  if (tut.active) completeTutorial();
   const [s1, s2, s3] = starState(win);
   const stars = (s1 ? 1 : 0) + (s2 ? 1 : 0) + (s3 ? 1 : 0);
   G.lastWin = win;
@@ -2141,6 +2341,9 @@ function showScreen(name) {
   document.getElementById('hud').classList.toggle('hidden', !inGame || !G.inLevel);
   document.getElementById('tray').classList.toggle('hidden', !(name === 'play' || name === 'pause'));
   if (name !== 'play' && name !== 'pause') { const hb = document.getElementById('hint-bar'); if (hb) hb.classList.add('hidden'); }
+  const tc = document.getElementById('tutorial-card');
+  if (tc && (name !== 'play' || !tut.active)) tc.classList.add('hidden');
+  else if (tc && name === 'play' && tut.active) tc.classList.remove('hidden');
   if (name === 'areas') renderAreas();
   if (name === 'settings') syncSettingsUI();
   if (name === 'title') renderTitle();
@@ -2244,6 +2447,7 @@ function applyI18n() {
   document.getElementById('btn-sound').innerHTML = svg(settings.musicOn || settings.sfxOn ? 'sound' : 'mute');
   document.getElementById('btn-pause').innerHTML = svg(G.screen === 'play' ? 'pause' : 'play');
   renderHUD(); renderTray(); paintHintBar();
+  if (tut.active) tutUpdateUI();
   renderTitle();
   if (G.screen === 'areas') renderAreas();
   if (G.screen === 'result' && G.res) showResult();
@@ -2488,6 +2692,8 @@ on('btn-run', () => toggleRun());
 on('btn-fast', () => { G.speed = G.speed > 1 ? 1 : 3; renderTray(); });
 on('btn-undo', () => undoLast());
 on('btn-reset', () => resetLevel());
+on('tut-btn-skip', () => skipTutorial());
+on('tut-btn-done', () => completeTutorial());
 document.addEventListener('visibilitychange', () => { if (document.hidden && G.running) setRunning(false); });
 // arena-kit: music and birdsong also stop while the tab is hidden (kit setting "pause when the tab is hidden")
 if (window.Arena) {
@@ -2530,6 +2736,7 @@ function summary() {
     assets: { mode: 'procedural', loaded: [], failed: [], noassets: FLAGS.noassets },
     quality: FLAGS.low ? 'low' : quality, drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles,
     fps: fpsNow, errors: errors.length, bot: bot.state, progress: { unlocked: progress.unlocked },
+    tutorial: { active: tut.active, step: tut.step, done: isTutorialDone() },
     // test hooks: the same functions a click or tap calls
     sol: G.def ? G.def.sol : null, gsol: G.def ? G.def.gsol || null : null,
     gates: G.st ? G.st.gates.map(i => ({ x: i % G.n, y: Math.floor(i / G.n), open: G.st.gate[i] === 2 })) : [],
@@ -2646,6 +2853,11 @@ function boot() {
   if (FLAGS.auto) { bot.phase = 'title'; }
   requestAnimationFrame(t0 => { last = t0; requestAnimationFrame(frame); });
   Object.defineProperty(window, 'pamukkale', { get: summary, configurable: true });
+  window.pamukkaleTutorial = {
+    get state() { return { active: tut.active, step: tut.step, done: isTutorialDone() }; },
+    reset: () => stopTutorial(true),
+    start: () => startTutorial()
+  };
 }
 boot();
 </script>
