@@ -654,6 +654,15 @@ h3{font-size:18px}
   h1{font-size:36px}
   h2{font-size:24px}
 }
+/* narrow phones: the stars were clipped under the buttons (390 px: stars 196-259, pill ends near 244). Two rows:
+   level on the left, pools over the stars on the right */
+@media (max-width:430px){
+  .stats-pill{display:grid;grid-template-columns:auto auto;grid-template-rows:auto auto;align-content:center;justify-content:center;column-gap:10px;row-gap:2px}
+  #hud-level-wrap{grid-column:1;grid-row:1/3;align-self:center}
+  .stats-pill .stat-item:not(.hide-s):not(#hud-level-wrap){grid-column:2;grid-row:1}
+  #hud-stars{grid-column:2;grid-row:2;justify-content:center}
+  .stats-pill .stars svg{width:13px;height:13px}
+}
 @media (max-height:520px) and (orientation:landscape){
   #hud{top:6px}
   .brand-pill,.stats-pill,.actions-pill{height:40px}
@@ -753,7 +762,7 @@ h3{font-size:18px}
   </div>
 </aside>
 
-<div id="toasts" aria-live="polite"></div>
+<div id="toasts" role="status" aria-live="polite"></div>
 
 <nav id="tray" class="hidden" aria-label="Tools">
   <div class="tray-tools">
@@ -1143,6 +1152,8 @@ function readJSON(key, fallback) {
 function writeJSON(key, obj) { try { localStorage.setItem(key, JSON.stringify(obj)); } catch (e) { /* private mode */ } }
 
 const coarse = window.matchMedia && matchMedia('(pointer: coarse)').matches;
+/** arena-kit "reduce motion": no water shimmer, no drifting caustics or clouds, no automatic camera orbit. Read live every frame (visual layer only, the water automaton never reads it). */
+const calm = () => !!(window.Arena && Arena.settings && Arena.settings.reducedMotion);
 const settings = readJSON(SET_KEY, { master: 0.8, music: 0.6, sfx: 0.8, lang: /^tr/i.test(navigator.language || '') ? 'tr' : 'en', quality: coarse ? 'low' : 'high', musicOn: true, sfxOn: true });
 if (Q.get('lang') === 'en' || Q.get('lang') === 'tr') settings.lang = Q.get('lang');
 const progress = readJSON(SAVE_KEY, { unlocked: 1, stars: {}, last: 0 });
@@ -1485,6 +1496,19 @@ for (const k of TOOL_KINDS) {
 const ringMesh = new THREE.InstancedMesh(new THREE.TorusGeometry(0.4, 0.04, 6, 28).rotateX(Math.PI / 2), new THREE.MeshLambertMaterial({ color: 0xffffff }), 12);
 ringMesh.count = 0;
 scene.add(ringMesh);
+// colour-blind second channel next to the ring colour: a check mark floats over every full pool (drawing only)
+const poolMarkMat = (() => {
+  const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d');
+  g.beginPath(); g.arc(32, 32, 27, 0, Math.PI * 2); g.fillStyle = '#0B5F66'; g.fill(); g.lineWidth = 4; g.strokeStyle = '#FFFFFF'; g.stroke();
+  g.lineWidth = 7; g.lineCap = 'round'; g.lineJoin = 'round'; g.beginPath(); g.moveTo(19, 33); g.lineTo(28, 42); g.lineTo(45, 23); g.stroke();
+  const tx = new THREE.CanvasTexture(c); tx.colorSpace = THREE.SRGBColorSpace;
+  return new THREE.SpriteMaterial({ map: tx, depthTest: false, depthWrite: false, fog: false, toneMapped: false });
+})();
+const poolMarks = [];
+function poolMark(k) {
+  if (!poolMarks[k]) { const sp = new THREE.Sprite(poolMarkMat); sp.name = 'poolMark'; sp.scale.set(0.5, 0.5, 1); sp.renderOrder = 6; sp.visible = false; scene.add(sp); poolMarks[k] = sp; }
+  return poolMarks[k];
+}
 // the spring basin is a turned bowl with a rounded rim
 const springBowl = [[0.12, 0], [0.26, 0.04], [0.34, 0.16], [0.33, 0.3], [0.26, 0.37], [0.21, 0.32], [0.19, 0.2]].map(([x, y]) => new THREE.Vector2(x, y));
 const spring = new THREE.Mesh(new THREE.LatheGeometry(springBowl, 20), new THREE.MeshLambertMaterial({ color: 0xF5F3EE }));
@@ -1750,12 +1774,13 @@ function refreshWater() {
 
 // soft shimmer: a slow, per-vertex brightness wave over the turquoise surface
 function shimmer(time) {
-  causticTex.offset.set(time * 0.035, time * 0.02);
+  const still = calm();
+  if (!still) causticTex.offset.set(time * 0.035, time * 0.02);
   if (!board || !board.waterBase) return;
   const col = board.waterGeo.attributes.color, base = board.waterBase, M = board.M, arr = col.array;
   for (let j = 0; j <= M; j++) for (let i = 0; i <= M; i++) {
     const k = (j * (M + 1) + i) * 3;
-    const f = 1 + 0.07 * Math.sin(time * 1.6 + i * 0.5 + j * 0.37) * Math.cos(time * 0.9 - j * 0.45);
+    const f = still ? 1 : 1 + 0.07 * Math.sin(time * 1.6 + i * 0.5 + j * 0.37) * Math.cos(time * 0.9 - j * 0.45);
     arr[k] = base[k] * f; arr[k + 1] = base[k + 1] * f; arr[k + 2] = base[k + 2] * f;
   }
   col.needsUpdate = true;
@@ -1795,8 +1820,10 @@ function refreshTools() {
     ringMesh.setMatrixAt(r, tmpM);
     tmpC.set(full ? 0x2EC4C9 : 0xB9C9C4);
     ringMesh.setColorAt(r, tmpC);
+    const mark = poolMark(r); mark.visible = full; mark.position.set(cellX(p.i, n), (h + p.m) * HU + 0.55, cellZ(p.i, n));
     r++;
   }
+  for (let k = r; k < poolMarks.length; k++) poolMarks[k].visible = false;
   ringMesh.count = r;
   ringMesh.instanceMatrix.needsUpdate = true;
   if (ringMesh.instanceColor) ringMesh.instanceColor.needsUpdate = true;
@@ -1805,9 +1832,29 @@ function refreshTools() {
 // ---------- camera ----------
 const TARGET = new THREE.Vector3(0, 1.4, 0);   // a little above the board, so the blue sky shows at the top of the frame
 const view = { yaw: 0.22, pitch: 0.78, dist: 15 };   // about 45 degrees down onto the terraces
+// Portrait phones: the board did not fit (390 px: the left column and its pool were off-screen; fixed 1.35 x distance).
+// Now the four corners of the cell grid fit between the screen edges at the current orbit angle: first a wider field of
+// view (up to 64 degrees), then as much extra distance as is still needed (distance alone sinks the board into the haze).
+// Pinch still zooms: both are taken against the level's own distance, not against view.dist.
+const PV = { fov: 36, mul: 1.35 };
+function portraitView() {
+  const n = G.n || 7, half = n / 2, base = 9 + n * 0.35, d0 = base * 1.35;
+  const cy = Math.cos(view.yaw), sy = Math.sin(view.yaw), cp = Math.cos(view.pitch);
+  let tanH = 0;
+  const C = [[-half, -half], [half, -half], [-half, half], [half, half]].map(([x, z]) => [Math.abs(x * cy - z * sy), (x * sy + z * cy) * cp]);   // across the view, towards the camera
+  for (const [side, toward] of C) if (d0 - toward > 1) tanH = Math.max(tanH, side / (0.92 * (d0 - toward)));
+  PV.fov = Math.min(64, Math.max(36, Math.atan(tanH / camera.aspect) * 360 / Math.PI));
+  const tH = Math.tan(PV.fov * Math.PI / 360) * camera.aspect;
+  let need = 0;
+  for (const [side, toward] of C) need = Math.max(need, side / (0.92 * tH) + toward);
+  PV.mul = Math.max(1.35, need / base);
+  return PV;
+}
 function updateCamera() {
-  const portrait = camera.aspect < 1;
-  const d = view.dist * (portrait ? 1.35 : 1);
+  const portrait = camera.aspect < 1, pv = portrait ? portraitView() : null;
+  const d = view.dist * (pv ? pv.mul : 1);
+  const fov = pv ? pv.fov : 36;
+  if (Math.abs(camera.fov - fov) > 0.05) { camera.fov = fov; camera.updateProjectionMatrix(); }
   const cp = Math.cos(view.pitch), sp = Math.sin(view.pitch);
   camera.position.set(TARGET.x + d * Math.sin(view.yaw) * cp, TARGET.y + d * sp, TARGET.z + d * Math.cos(view.yaw) * cp);
   camera.lookAt(TARGET);
@@ -2814,9 +2861,10 @@ function frame(now) {
   }
   if (G.screen === 'play' || G.screen === 'pause') updateGhost(); else ghost.visible = false;
 
-  clouds.position.x = Math.sin(now / 12000) * 2;
-  if (G.screen === 'title') view.yaw += dt * 0.07;
-  if (G.screen === 'end') view.yaw += dt * 0.1;
+  const still = calm();   // reduce motion: the clouds and the title / ending camera stand still
+  if (!still) clouds.position.x = Math.sin(now / 12000) * 2;
+  if (!still && G.screen === 'title') view.yaw += dt * 0.07;
+  if (!still && G.screen === 'end') view.yaw += dt * 0.1;
   updateCamera();
   renderer.render(scene, camera);
 
