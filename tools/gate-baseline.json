@@ -1,0 +1,17 @@
+{
+  "game": "pamukkale",
+  "recorded": "2026-11-10T00:04:36.275Z",
+  "commit": "f8b8929",
+  "entrySha": "4ff2325ae200",
+  "run": "() => {\n      const P = () => window.pamukkale, TICK = 0.05;\n      const out = { levels: 0, won: 0, stars: 0, poolsFilled: 0, pools: 0, wasted: 0, ticks: 0 };\n      document.getElementById('btn-play').click();\n      for (let guard = 0; guard < 60; guard++) {\n        const s = P();\n        if (s.screen !== 'play') throw new Error(`gate: level ${s.level} not on the play screen (${s.screen})`);\n        for (const [kind, x, y] of s.sol || []) if (!s.place(x, y, kind)) throw new Error(`gate: level ${s.level} could not place ${kind} at ${x},${y}`);\n        const gsol = s.gsol || [];\n        let r = s;\n        if (!gsol.length) r = window.pamukkaleSim(100000);\n        else for (let k = 0; k < 100000 && r.screen === 'play'; k++) { for (const [x, y, tk] of gsol) if (tk === r.tick) s.toggle(x, y); r = window.pamukkaleSim(TICK); }\n        if (r.screen !== 'result') throw new Error(`gate: level ${r.level} did not finish (${r.screen})`);\n        out.levels++; out.ticks += r.tick; out.wasted += r.wasted; out.pools += r.pools.total; out.poolsFilled += r.pools.filled;\n        const win = r.stars && r.stars[0] !== undefined && r.pools.filled === r.pools.total;\n        out.stars += (r.stars || []).filter(Boolean).length;\n        if (!win) break;\n        out.won++;\n        document.getElementById('btn-next').click();\n        if (P().screen === 'end') break;\n      }\n      out.wasted = Math.round(out.wasted * 10) / 10;\n      window.__gateM = out;\n    }",
+  "metrics": {
+    "levels": 23,
+    "won": 23,
+    "stars": 52,
+    "poolsFilled": 63,
+    "pools": 63,
+    "wasted": 265.1,
+    "ticks": 2249,
+    "gameErrors": 0
+  }
+}
