@@ -535,7 +535,7 @@ html,body{margin:0;height:100%;overflow:hidden}
 body{background:var(--cream);color:var(--ink);font-family:var(--font-ui);-webkit-user-select:none;user-select:none;touch-action:none}
 #stage{position:fixed;inset:0;background:linear-gradient(180deg,var(--sky-top) 0%,var(--sky-bottom) 70%)}
 #stage::after{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 50%,transparent 60%,rgba(10,28,33,0.18) 100%),linear-gradient(180deg,rgba(10,28,33,0.12) 0%,transparent 15%,transparent 84%,rgba(10,28,33,0.2) 100%);z-index:1}
-#c{position:absolute;inset:0;width:100%;height:100%;display:block}
+#c{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
 button{font:inherit;color:inherit;cursor:pointer;min-height:44px;min-width:44px}
 button:focus{outline:none}
 button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--accent-light);outline-offset:2px}
@@ -1377,6 +1377,7 @@ const starSvg = on => `<svg viewBox="0 0 24 24" class="${on ? 'on' : ''}" aria-h
 
 // ---------- three.js scene ----------
 const canvas = document.getElementById('c');
+canvas.style.touchAction = 'none';
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, quality === 'low' ? 1 : 1.5));
 // arena-kit: dynamic pixel ratio for weak GPUs, capped by the game's own quality setting (re-attached in setQuality)
@@ -2668,62 +2669,156 @@ function cellAt(clientX, clientY) {
   return y * n + x;
 }
 
+// Mobile touch control split: 1-finger placement vs 2-finger orbit/pan
 const pointers = new Map();
-let drag = null, pinchStart = 0, pinchDist = 0, longTimer = 0;
+let drag = null, pinchStart = 0, pinchDist = 0, pinchMidX = 0, pinchMidY = 0, longTimer = 0, multiTouch = false;
+
 canvas.addEventListener('pointerdown', e => {
   audioInit();
-  canvas.setPointerCapture(e.pointerId);
+  try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
   pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-  if (pointers.size === 2) {
-    const [a, b] = [...pointers.values()];
-    pinchStart = Math.hypot(a.x - b.x, a.y - b.y); pinchDist = view.dist;
-    drag = null; clearTimeout(longTimer);
+
+  // 2 or more touches: camera mode (orbit / pan / pinch-zoom)
+  if (pointers.size >= 2) {
+    multiTouch = true;
+    drag = null;
+    clearTimeout(longTimer);
+    const pts = [...pointers.values()];
+    pinchStart = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+    pinchDist = view.dist;
+    pinchMidX = (pts[0].x + pts[1].x) / 2;
+    pinchMidY = (pts[0].y + pts[1].y) / 2;
     return;
   }
-  drag = { x: e.clientX, y: e.clientY, moved: false, long: false, button: e.button, touch: e.pointerType !== 'mouse' };
-  if (drag.touch && G.screen === 'play') {
-    longTimer = setTimeout(() => {
-      if (drag && !drag.moved) { const c = cellAt(drag.x, drag.y); if (!(c >= 0 && G.st.gate[c])) { drag.long = true; removeAt(c); } }
-    }, 520);
+
+  // 1-pointer interaction (tap to place/toggle, hold to remove, or mouse drag to orbit)
+  if (!multiTouch) {
+    drag = {
+      startX: e.clientX,
+      startY: e.clientY,
+      x: e.clientX,
+      y: e.clientY,
+      moved: false,
+      long: false,
+      button: e.button,
+      touch: e.pointerType !== 'mouse'
+    };
+    if (drag.touch && G.screen === 'play') {
+      longTimer = setTimeout(() => {
+        if (drag && !drag.moved && !multiTouch && pointers.size === 1) {
+          const c = cellAt(drag.startX, drag.startY);
+          if (c >= 0 && !(G.st && G.st.gate && G.st.gate[c])) {
+            drag.long = true;
+            removeAt(c);
+          }
+        }
+      }, 520);
+    }
   }
 });
+
 canvas.addEventListener('pointermove', e => {
   if (pointers.has(e.pointerId)) pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-  if (pointers.size === 2) {
-    const [a, b] = [...pointers.values()];
-    const d = Math.hypot(a.x - b.x, a.y - b.y);
-    view.dist = Math.min(24, Math.max(8, pinchDist * (pinchStart / Math.max(1, d))));
+
+  // 2-finger touch: orbit/pan (midpoint delta) and pinch-zoom (distance ratio)
+  if (pointers.size >= 2) {
+    const pts = [...pointers.values()];
+    const d = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+    if (pinchStart > 0 && d > 0) {
+      view.dist = Math.min(24, Math.max(8, pinchDist * (pinchStart / d)));
+    }
+    const curMidX = (pts[0].x + pts[1].x) / 2;
+    const curMidY = (pts[0].y + pts[1].y) / 2;
+    const dMidX = curMidX - pinchMidX;
+    const dMidY = curMidY - pinchMidY;
+    if (Math.abs(dMidX) + Math.abs(dMidY) > 1) {
+      view.yaw = Math.max(-0.8, Math.min(0.8, view.yaw - dMidX * 0.006));
+      view.pitch = Math.max(0.12, Math.min(1.15, view.pitch + dMidY * 0.004));
+      pinchMidX = curMidX;
+      pinchMidY = curMidY;
+    }
     return;
   }
-  if (drag) {
-    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
-    if (Math.abs(dx) + Math.abs(dy) > 7) { drag.moved = true; clearTimeout(longTimer); }
-    if (drag.moved) {
-      view.yaw = Math.max(-0.8, Math.min(0.8, view.yaw - dx * 0.006));
-      view.pitch = Math.max(0.12, Math.min(1.15, view.pitch + dy * 0.004));
-      drag.x = e.clientX; drag.y = e.clientY;
+
+  // 1-pointer active
+  if (drag && !multiTouch) {
+    if (drag.touch) {
+      // 1-finger touch: placement only — movement cancels accidental placement, NO camera orbit
+      const dist = Math.hypot(e.clientX - drag.startX, e.clientY - drag.startY);
+      if (dist > 12) {
+        drag.moved = true;
+        clearTimeout(longTimer);
+      }
+    } else {
+      // Desktop mouse: drag with left button orbits camera
+      const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      if (Math.abs(dx) + Math.abs(dy) > 5) {
+        drag.moved = true;
+        clearTimeout(longTimer);
+      }
+      if (drag.moved && drag.button === 0) {
+        view.yaw = Math.max(-0.8, Math.min(0.8, view.yaw - dx * 0.006));
+        view.pitch = Math.max(0.12, Math.min(1.15, view.pitch + dy * 0.004));
+        drag.x = e.clientX;
+        drag.y = e.clientY;
+      }
     }
   } else if (G.screen === 'play' && e.pointerType === 'mouse') {
     G.hover = cellAt(e.clientX, e.clientY);
   }
 });
+
 canvas.addEventListener('pointerup', e => {
+  try { if (canvas.hasPointerCapture(e.pointerId)) canvas.releasePointerCapture(e.pointerId); } catch (err) {}
   pointers.delete(e.pointerId);
   clearTimeout(longTimer);
-  if (drag && !drag.moved && !drag.long && pointers.size === 0 && G.screen === 'play') {
-    const i = cellAt(e.clientX, e.clientY);
-    if (drag.button === 2) removeAt(i);
-    else if (drag.button === 0) { if (G.st.gate[i]) toggleGate(i); else placeAt(i); }
+
+  // 1-finger placement if this was a clean single-touch tap or mouse click
+  if (!multiTouch && drag && !drag.moved && !drag.long && pointers.size === 0 && G.screen === 'play') {
+    let i = cellAt(e.clientX, e.clientY);
+    if (i < 0 && drag) i = cellAt(drag.startX, drag.startY);
+    if (i >= 0) {
+      if (drag.button === 2) {
+        removeAt(i);
+      } else if (drag.button === 0) {
+        if (G.st && G.st.gate && G.st.gate[i]) toggleGate(i);
+        else placeAt(i);
+      }
+    }
   }
-  if (pointers.size === 0) drag = null;
+
+  if (pointers.size < 2) {
+    pinchStart = 0;
+  }
+  if (pointers.size === 0) {
+    drag = null;
+    multiTouch = false;
+  }
 });
-canvas.addEventListener('pointercancel', e => { pointers.delete(e.pointerId); drag = null; clearTimeout(longTimer); });
+
+canvas.addEventListener('pointercancel', e => {
+  try { if (canvas.hasPointerCapture(e.pointerId)) canvas.releasePointerCapture(e.pointerId); } catch (err) {}
+  pointers.delete(e.pointerId);
+  clearTimeout(longTimer);
+  if (pointers.size < 2) pinchStart = 0;
+  if (pointers.size === 0) {
+    drag = null;
+    multiTouch = false;
+  }
+});
+
 canvas.addEventListener('pointerleave', () => { G.hover = -1; });
 canvas.addEventListener('contextmenu', e => e.preventDefault());
 canvas.addEventListener('wheel', e => {
   e.preventDefault();
   view.dist = Math.min(24, Math.max(8, view.dist * (1 + e.deltaY * 0.001)));
 }, { passive: false });
+window.addEventListener('blur', () => {
+  pointers.clear();
+  drag = null;
+  multiTouch = false;
+  clearTimeout(longTimer);
+});
 
 function updateGhost() {
   if (G.screen !== 'play' || G.hover < 0 || !G.st || G.st.tool[G.hover] || G.st.gate[G.hover] || G.hover === G.st.spring || budget(G.tool) <= 0) {
@@ -2858,6 +2953,81 @@ window.pamukkaleSim = function (seconds) {
   return summary();
 };
 
+// ---------- simulated multi-touch test suite ----------
+window.pamukkaleTouchTest = function () {
+  const results = [];
+  function assert(cond, name) {
+    results.push({ name, pass: !!cond });
+    if (!cond) console.warn('[pamukkaleTouchTest fail]', name);
+  }
+
+  // 1. Verify touch-action: none on canvas
+  assert(getComputedStyle(canvas).touchAction === 'none' || canvas.style.touchAction === 'none', 'Canvas has touch-action: none');
+
+  // Save camera & screen state
+  const prevYaw = view.yaw, prevPitch = view.pitch, prevDist = view.dist;
+  const prevScreen = G.screen;
+  if (G.screen !== 'play') startLevel(0);
+
+  // 2. Test 1-finger tap (does not throw, cleans up pointer tracking)
+  const p1Down = new PointerEvent('pointerdown', { pointerId: 401, pointerType: 'touch', clientX: 200, clientY: 200, button: 0 });
+  const p1Up = new PointerEvent('pointerup', { pointerId: 401, pointerType: 'touch', clientX: 201, clientY: 201, button: 0 });
+  canvas.dispatchEvent(p1Down);
+  canvas.dispatchEvent(p1Up);
+  assert(pointers.size === 0 && !multiTouch, '1-finger tap cleans up pointers');
+
+  // 3. Test 1-finger drag (must NOT orbit camera)
+  const yawBefore1F = view.yaw, pitchBefore1F = view.pitch;
+  const pDragDown = new PointerEvent('pointerdown', { pointerId: 402, pointerType: 'touch', clientX: 150, clientY: 150, button: 0 });
+  const pDragMove = new PointerEvent('pointermove', { pointerId: 402, pointerType: 'touch', clientX: 210, clientY: 210, button: 0 });
+  const pDragUp = new PointerEvent('pointerup', { pointerId: 402, pointerType: 'touch', clientX: 210, clientY: 210, button: 0 });
+  canvas.dispatchEvent(pDragDown);
+  canvas.dispatchEvent(pDragMove);
+  assert(view.yaw === yawBefore1F && view.pitch === pitchBefore1F, '1-finger touch movement does not orbit/pan camera');
+  canvas.dispatchEvent(pDragUp);
+  assert(pointers.size === 0, 'Pointer map empty after 1-finger drag');
+
+  // 4. Test 2-finger multi-touch orbit
+  const yawBefore2F = view.yaw;
+  const p2A_down = new PointerEvent('pointerdown', { pointerId: 501, pointerType: 'touch', clientX: 100, clientY: 150, button: 0 });
+  const p2B_down = new PointerEvent('pointerdown', { pointerId: 502, pointerType: 'touch', clientX: 200, clientY: 150, button: 0 });
+  canvas.dispatchEvent(p2A_down);
+  canvas.dispatchEvent(p2B_down);
+  assert(multiTouch === true, 'multiTouch flag active when 2 pointers down');
+
+  // 2-finger swipe right: midpoint moves +40px X
+  const p2A_move = new PointerEvent('pointermove', { pointerId: 501, pointerType: 'touch', clientX: 140, clientY: 150, button: 0 });
+  const p2B_move = new PointerEvent('pointermove', { pointerId: 502, pointerType: 'touch', clientX: 240, clientY: 150, button: 0 });
+  canvas.dispatchEvent(p2A_move);
+  canvas.dispatchEvent(p2B_move);
+  assert(view.yaw !== yawBefore2F, '2-finger swipe orbits camera view.yaw');
+
+  // 5. Test 2-finger pinch zoom
+  const distBeforePinch = view.dist;
+  // Spread fingers further apart (pinch out / zoom in)
+  const p2A_spread = new PointerEvent('pointermove', { pointerId: 501, pointerType: 'touch', clientX: 60, clientY: 150, button: 0 });
+  const p2B_spread = new PointerEvent('pointermove', { pointerId: 502, pointerType: 'touch', clientX: 320, clientY: 150, button: 0 });
+  canvas.dispatchEvent(p2A_spread);
+  canvas.dispatchEvent(p2B_spread);
+  assert(view.dist !== distBeforePinch, '2-finger pinch adjusts camera view.dist');
+
+  // 6. Test lift off safety: lift one finger first, ensure multiTouch remains active until all lifted
+  const p2A_up = new PointerEvent('pointerup', { pointerId: 501, pointerType: 'touch', clientX: 60, clientY: 150, button: 0 });
+  canvas.dispatchEvent(p2A_up);
+  assert(multiTouch === true, 'multiTouch remains active while remaining finger is down');
+
+  const p2B_up = new PointerEvent('pointerup', { pointerId: 502, pointerType: 'touch', clientX: 320, clientY: 150, button: 0 });
+  canvas.dispatchEvent(p2B_up);
+  assert(multiTouch === false && pointers.size === 0, 'multiTouch resets after all fingers lifted');
+
+  // Restore previous state
+  view.yaw = prevYaw; view.pitch = prevPitch; view.dist = prevDist;
+  if (prevScreen !== G.screen) showScreen(prevScreen);
+
+  const allPassed = results.every(r => r.pass);
+  return { ok: allPassed, tests: results };
+};
+
 function summary() {
   const cnt = G.st ? poolCounts() : { filled: 0, total: 0 };
   return {
@@ -2983,6 +3153,10 @@ function boot() {
     showScreen('title');
   }
   if (FLAGS.auto) { bot.phase = 'title'; }
+  if (Q.has('testtouch')) {
+    const res = window.pamukkaleTouchTest();
+    console.log('[TouchTest]', res);
+  }
   requestAnimationFrame(t0 => { last = t0; requestAnimationFrame(frame); });
   Object.defineProperty(window, 'pamukkale', { get: summary, configurable: true });
   window.pamukkaleTutorial = {
