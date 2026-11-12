@@ -2618,7 +2618,7 @@ function renderHUD() {
   const cnt = poolCounts();
   const areaIdx = G.def ? G.def.area : 0;
   const ap = document.getElementById('hud-area-pill');
-  if (ap) ap.textContent = (G.daily ? t('daily') : AREA_NAMES[areaIdx][L()]).toUpperCase();
+  if (ap) ap.textContent = (G.daily ? t('daily') : AREA_NAMES[areaIdx][L()]).toLocaleUpperCase(settings.lang === 'tr' ? 'tr-TR' : 'en-US');
   document.getElementById('hud-level').innerHTML = `<small>${t('levelWord')}</small>${G.idx + 1}/${LEVEL_COUNT}<span class="lvl-name"> · ${levelName(G.idx)}</span>`;
   document.getElementById('hud-pools').textContent = `${cnt.filled}/${cnt.total}`;
   const used = totalUsed();
