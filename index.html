@@ -2500,6 +2500,7 @@ function showScreen(name) {
   if (name === 'title') renderTitle();
   if (name === 'pause') { G.running = false; setTrickle(false); }
   if (name === 'result') { G.running = false; setTrickle(false); }
+  if (name === 'play' && isControl(document.activeElement)) document.activeElement.blur(); // clear lingering button focus when entering play screen
   renderTray();
   if (name === 'play' || name === 'result' || name === 'pause') renderHUD();
 }
@@ -2710,6 +2711,7 @@ let drag = null, pinchStart = 0, pinchDist = 0, pinchMidX = 0, pinchMidY = 0, lo
 
 canvas.addEventListener('pointerdown', e => {
   audioInit();
+  if (isControl(document.activeElement)) document.activeElement.blur(); // clear focused UI button when interacting with the board
   try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
   pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
@@ -2866,6 +2868,7 @@ function updateGhost() {
 
 // ---------- keyboard ----------
 function isControl(el) { return el && (el.tagName === 'BUTTON' || el.tagName === 'INPUT' || el.tagName === 'A'); }
+function isPlayUIButton(el) { return G.screen === 'play' && el && el.tagName === 'BUTTON' && el.closest && !!el.closest('#hud, #tray'); }
 window.addEventListener('keydown', e => {
   audioInit();
   if (e.ctrlKey || e.metaKey || e.altKey) return;
@@ -2879,7 +2882,10 @@ window.addEventListener('keydown', e => {
   if (k === 'm' || k === 'M') { settings.musicOn = !settings.musicOn; writeJSON(SET_KEY, settings); applyVolumes(); toast(`${t('music')}: ${settings.musicOn ? t('onOff')[0] : t('onOff')[1]}`, 'info'); renderHUD(); return; }
   if (k === 'x' || k === 'X') { settings.sfxOn = !settings.sfxOn; writeJSON(SET_KEY, settings); applyVolumes(); toast(`${t('sfx')}: ${settings.sfxOn ? t('onOff')[0] : t('onOff')[1]}`, 'info'); renderHUD(); return; }
   if (k === 'l' || k === 'L') { setLang(settings.lang === 'tr' ? 'en' : 'tr'); return; }
-  if (isControl(e.target) && (k === ' ' || k === 'Enter')) return;   // let focused controls handle their own keys
+  if (isControl(e.target) && (k === ' ' || k === 'Enter')) {
+    if (isPlayUIButton(e.target) && k === ' ') e.preventDefault();   // on play screen, Space is the water shortcut: prevent also clicking a focused HUD/tray button
+    else return;                                                     // let focused controls in menus/overlays handle their own keys
+  }
   if (G.screen !== 'play' && G.screen !== 'pause') return;
   if (k === '1') setTool('stone');
   else if (k === '2') setTool('dam');
@@ -2892,6 +2898,9 @@ window.addEventListener('keydown', e => {
 });
 
 // ---------- buttons ----------
+for (const b of document.querySelectorAll('#hud button, #tray button, #tutorial-card button')) {
+  b.addEventListener('click', e => { if (e.detail > 0) b.blur(); });   // blur game-screen buttons after pointer click so Space/Enter won't re-press them
+}
 const on = (id, fn) => document.getElementById(id).addEventListener('click', fn);
 on('btn-play', () => { audioInit(); startLevel(0); });
 on('btn-continue', () => { audioInit(); startLevel(Math.min(progress.unlocked - 1, Math.max(0, progress.last))); });
