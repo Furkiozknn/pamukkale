@@ -2084,9 +2084,12 @@ function sfxFail() {
   envNote(165, now + 0.22, 0.9, 0.1, 'triangle', AU.sfx);
 }
 function setTrickle(on) {
-  if (!AU.ctx) return;
-  const target = on && settings.sfxOn ? 0.05 * settings.sfx : 0;
-  AU.trickleG.gain.setTargetAtTime(target, AU.ctx.currentTime, 0.25);
+  if (!AU.ctx || !AU.trickleG) return;
+  const target = on && settings.sfxOn ? 0.05 * settings.sfx : 0, g = AU.trickleG.gain, now = AU.ctx.currentTime;
+  // drop any pending ramp so a stop wins over an earlier start; fade out fast, fade in softly
+  g.cancelScheduledValues(now);
+  g.setValueAtTime(g.value, now);
+  g.setTargetAtTime(target, now, on ? 0.25 : 0.06);
 }
 
 // ---------- game state ----------
@@ -2118,6 +2121,7 @@ function loadLevel(i) {
   G.used = { stone: 0, dam: 0, split: 0 };
   G.undo = [];
   G.running = false; G.acc = 0; G.hover = -1; G.poolFull = []; G.calciumTick = -100;
+  setTrickle(false);   // a reset or a new level starts with still water: no trickle until it runs again
   buildBoard(G.n);
   view.dist = 9 + G.n * 0.35;   // closer, so the terraces fill the frame
   G.dirty = true; G.waterDirty = true;
@@ -2498,6 +2502,7 @@ function showScreen(name) {
   if (name === 'areas') renderAreas();
   if (name === 'settings') syncSettingsUI();
   if (name === 'title') renderTitle();
+  if (name !== 'play') setTrickle(false);   // menus, pause and results never keep the water sound going
   if (name === 'pause') { G.running = false; setTrickle(false); }
   if (name === 'result') { G.running = false; setTrickle(false); }
   if (name === 'play' && isControl(document.activeElement)) document.activeElement.blur(); // clear lingering button focus when entering play screen
