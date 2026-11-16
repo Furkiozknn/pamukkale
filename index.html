@@ -1291,7 +1291,7 @@ const S = {
     shareDaily: 'Günün Meydan Okuması {d} · seri {k}', shareTotal: 'Toplam {s}/{m} ★', shareEnd: '{n}/{m} seviye · {s}/{x} ★',
     awFirst: 'İlk havuzlar doldu', awPerfect: 'Üç yıldızlı seviye', awAll: '23 seviyenin hepsi',
     tutSkip: 'Geç', tutGotIt: 'Anladım',
-    tutStep1Title: '1. Taş Yerleştir', tutStep1Desc: 'Suyu havuza yönlendirmek için teras yoluna bir taş koy.',
+    tutStep1Title: '1. Taş Yerleştir', tutStep1Desc: 'Parlayan noktaya bir taş koy: su havuza oradan döner.',
     tutStep2Title: '2. Suyu Başlat', tutStep2Desc: 'Akışı başlatmak için "Suyu başlat" düğmesine bas.',
     tutStep3Title: '3. Kalsiyumu İzle', tutStep3Desc: 'Durgun su havuz kenarında beyaz kalsiyum seti örer.',
     tutStep3DoneDesc: 'Harika! Kalsiyum seti oluştu ve suyu havuzda tuttu.',
@@ -1327,7 +1327,7 @@ const S = {
     shareDaily: 'Daily challenge {d} · streak {k}', shareTotal: 'Total {s}/{m} ★', shareEnd: '{n}/{m} levels · {s}/{x} ★',
     awFirst: 'First pools filled', awPerfect: 'A three-star level', awAll: 'All 23 levels',
     tutSkip: 'Skip', tutGotIt: 'Got it',
-    tutStep1Title: '1. Place a Stone', tutStep1Desc: 'Place a stone on the terrace to guide water into the pool.',
+    tutStep1Title: '1. Place a Stone', tutStep1Desc: 'Place a stone on the glowing spot: that turns the water into the pool.',
     tutStep2Title: '2. Start the Water', tutStep2Desc: 'Press "Start water" to release the spring flow.',
     tutStep3Title: '3. Observe Calcium', tutStep3Desc: 'Still water builds white travertine rims around the pool.',
     tutStep3DoneDesc: 'Great! Calcium rims have formed to hold the water.',
@@ -2165,6 +2165,21 @@ function isTutorialDone() {
   catch (e) { return false; }
 }
 
+// Tutorial step 1: a pulsing ring on the level's solution cell, so the first placement works (most cells do not).
+let tutRing = null;
+function tutRingUpdate(now) {
+  const show = tut.active && tut.step === 1 && G.screen === 'play' && G.def && G.def.sol && G.def.sol.length && G.st;
+  if (!show) { if (tutRing) tutRing.visible = false; return; }
+  if (!tutRing) {
+    tutRing = new THREE.Mesh(new THREE.RingGeometry(0.28, 0.44, 32), new THREE.MeshBasicMaterial({ color: 0xffd25a, transparent: true, opacity: 0.9, side: THREE.DoubleSide, depthWrite: false, depthTest: false }));
+    tutRing.rotation.x = -Math.PI / 2; tutRing.renderOrder = 10; scene.add(tutRing);
+  }
+  const [, x, y] = G.def.sol[0], n = G.n, cell = y * n + x;
+  tutRing.visible = true;
+  tutRing.position.set(cellX(cell, n), PSim.height(G.st, cell) * HU + 0.12, cellZ(cell, n));
+  const k = 1 + 0.18 * Math.sin(now / 220); tutRing.scale.set(k, k, k); tutRing.material.opacity = 0.65 + 0.3 * Math.sin(now / 220);
+}
+
 function setTutorialDone() {
   try {
     if (!FLAGS.auto && (!window.Arena || !Arena.quiet)) {
@@ -2410,7 +2425,7 @@ function burst(cell) {
 function finish(win) {
   G.running = false;
   setTrickle(false);
-  if (tut.active) completeTutorial();
+  if (tut.active && win) completeTutorial(); // a lost first try keeps the tutorial for the retry
   const [s1, s2, s3] = starState(win);
   const stars = (s1 ? 1 : 0) + (s2 ? 1 : 0) + (s3 ? 1 : 0);
   G.lastWin = win;
@@ -2471,7 +2486,7 @@ function showResult() {
   rd.classList.toggle('hidden', !G.daily);
   if (G.daily) rd.textContent = G.dailyRes ? tv('dailyRes', { d: dayText(G.daily.day), s: G.dailyRes.streak, b: G.dailyRes.best }) : tv('dailyFail', { d: dayText(G.daily.day) });
   showScreen('result');
-  if (window.Arena && Arena.complete) Arena.complete({ mount: document.querySelector('#ov-result .stack') });   // arena-kit v1.1: pamukkale/complete + one-tap 👍/👎 (nothing on ?auto)
+  if (G.lastWin && window.Arena && Arena.complete) Arena.complete({ mount: document.querySelector('#ov-result .stack') }); // ask 'did you enjoy it?' only after a win   // arena-kit v1.1: pamukkale/complete + one-tap 👍/👎 (nothing on ?auto)
 }
 
 function showEnd() {
@@ -3183,6 +3198,7 @@ if (FLAGS.debug) dbg.classList.remove('hidden');
 
 function frame(now) {
   requestAnimationFrame(frame);
+  tutRingUpdate(now);
   const dt = Math.min(0.05, (now - last) / 1000);
   last = now;
   if (!document.hidden && G.running && G.st) {
