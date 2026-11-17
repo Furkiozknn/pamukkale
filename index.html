@@ -3588,6 +3588,9 @@ function boot() {
     G.running = true; setTrickle(false);
     window.pamukkaleSim(simSec);
     G.running = true;
+  } else if (!FLAGS.auto && !Q.has('menu') && !isTutorialDone() && progress.unlocked <= 1 && !Object.keys(progress.stars).length) {
+    // Instant start: a first-time player lands in level 1, where the tutorial teaches through play; ?menu forces the title
+    startLevel(0);
   } else {
     loadLevel(0);
     showScreen('title');
