@@ -3394,13 +3394,21 @@ on('btn-restart', () => resetLevel());
 on('btn-main', () => { G.inLevel = false; showScreen('title'); });
 on('btn-res-main', () => { G.inLevel = false; showScreen('title'); });
 on('btn-res-areas', () => showScreen('areas'));
-on('btn-retry', () => { loadLevel(G.idx); showScreen('play'); });
+// Portals (arena-kit v1.3 Arena.portal): an interstitial may play between levels and before a retry, on the result
+// screen where the game already waits. On the game's own site midgame() resolves false at once. One tap = one action.
+let breakBusy = false;
+function afterBreak(f) {
+  if (breakBusy) return; breakBusy = true;
+  const ad = window.Arena && Arena.portal ? Arena.portal.midgame() : Promise.resolve(false);
+  ad.catch(() => false).then(() => { breakBusy = false; f(); });
+}
+on('btn-retry', () => afterBreak(() => { loadLevel(G.idx); showScreen('play'); }));
 on('btn-next', () => {
   if (!G.res || !G.res.win) return;
   if (G.idx === LEVEL_COUNT - 1) return showEnd();
-  startLevel(G.idx + 1);
+  afterBreak(() => startLevel(G.idx + 1));
 });
-on('btn-again', () => startLevel(0));
+on('btn-again', () => afterBreak(() => startLevel(0)));
 on('btn-end-main', () => { G.inLevel = false; showScreen('title'); });
 on('btn-lang-title', () => setLang(settings.lang === 'tr' ? 'en' : 'tr'));
 on('btn-lang', () => setLang(settings.lang === 'tr' ? 'en' : 'tr'));
