@@ -36,6 +36,15 @@
 - **Verified level design & bot replay:** Layouts originate from seeded random hillsides where empty boards fail; `?auto` bot replays stored solutions at 3x speed, verifying **20/20 levels and 46/60 stars** with 0 JavaScript errors (with and without `?noassets`); with the gate levels: 23/23 levels and 52/69 stars, 0 errors (headless Chromium, 2026-11-09, without `?noassets`).
 - **Lean single-file 3D performance:** A single `index.html` running Three.js r170 delivering 21–22 draw calls and 34k triangles in play on Intel UHD 620, complete with procedural geometry and Web Audio synthesis (saz loop, flute, trickling water, splashes, and birdsong).
 
+## What's new in v2.1 (November 2026)
+
+- **Level records:** the fewest tools you won each level with are saved locally (`arena.pamukkale.records`); the result screen shows the record and says when you beat it.
+- **A livelier win:** water sparkles burst out of the pools when a level is complete, plus a short buzz on phones; Reduce motion and the Low quality setting turn it down.
+- **What's new window and version tag:** a **Yenilikler / What's new** button on the main menu, `v2.1 · November 2026` and a link to the other games under it.
+- **Page fixes:** Turkish and English description, share card (title, description, image text), a real icon, canonical link, theme colour and a `404.html`.
+
+Saves from earlier versions keep working: no existing key changed. Full list: [CHANGELOG.md](CHANGELOG.md).
+
 ## How to play
 
 > [!TIP]
@@ -108,7 +117,7 @@
   <tr>
     <td><img src="docs/04-ending.png" alt="Ending screen after the bot run with 20 of 20 levels and 46 of 60 stars"><br><sub>Ending after the <code>?auto</code> run: 20/20 levels, 46/60 stars</sub></td>
     <td><img src="docs/05-phone-500x900.png" alt="Pamukkale on a phone"><br><sub>On a phone</sub></td>
-    <td></td>
+    <td><img src="docs/06-yenilikler-phone.png" alt="The What's new window on a phone"><br><sub>What's new (v2.1)</sub></td>
   </tr>
 </table>
 
@@ -139,7 +148,7 @@ Serve the folder over HTTP (ES modules do not load from `file://`):
 python -m http.server 8000
 ```
 
-Then open <http://localhost:8000/>. Check every level offline with `node tools/solve-levels.mjs`: it prints a solution per level, or FAILED; for gate levels also the toggles `[x, y, tick]`, each toggle's working tick window, and `needsTiming`. `node tools/smoke.mjs chromium firefox webkit` (needs `playwright`) opens the game in real browsers, fails on page errors or a stale SRI hash in the import map, and runs on every pull request (`.github/workflows/smoke.yml`).
+Then open <http://localhost:8000/>. Quick check of the page, one play-through of level 1, an old save and a phone view: `node test/duman.mjs` (needs `playwright` or `playwright-core`; `PW_DIR=<node_modules>` and `PW_CHROMIUM=<browser exe>` point it at an installed copy and browser; nothing is added to the repo). Check every level offline with `node tools/solve-levels.mjs`: it prints a solution per level, or FAILED; for gate levels also the toggles `[x, y, tick]`, each toggle's working tick window, and `needsTiming`. `node tools/smoke.mjs chromium firefox webkit` (needs `playwright`) opens the game in real browsers, fails on page errors or a stale SRI hash in the import map, and runs on every pull request (`.github/workflows/smoke.yml`).
 
 ## Made with Claude Code
 

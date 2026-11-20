@@ -185,7 +185,7 @@ const frames = (page, n, ms = 20000) => page.evaluate(([n, ms]) => new Promise((
   const f = () => (++i >= n || performance.now() > end ? done(i) : requestAnimationFrame(f)); requestAnimationFrame(f);
 }), [n, ms]);
 
-const browser = await chromium.launch({ headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+const browser = await chromium.launch({ headless: true, executablePath: process.env.PW_CHROMIUM || undefined, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
 log(`gate ${GAME.name}: chromium ${browser.version()}, candidate ${candFile === join(root, GAME.entry) ? GAME.entry + ' (working tree)' : candFile} sha ${sha(builds.cand)}`);
 
 function consoleCheck(what, errors) {
