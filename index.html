@@ -5,16 +5,25 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="arena-game" content="pamukkale">
 <title>Pamukkale</title>
-<meta name="description" content="A 3D water-flow puzzle on the white travertine terraces of Pamukkale, redesigned in pastel travertine and turquoise water: guide the spring into the pools with stones, dams and splitters across 23 levels. Plays in the browser.">
+<meta name="description" content="Pamukkale travertenlerinde 3D su akışı bulmacası: taş, set ve ayırıcılarla kaynak suyunu havuzlara ulaştır. 23 seviye, günlük meydan okuma, tarayıcıda ücretsiz. · A 3D water-flow puzzle on the white travertine terraces of Pamukkale: guide the spring into the pools with stones, dams and splitters across 23 levels. Plays free in the browser.">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Pamukkale · Travertine Water Puzzle">
-<meta property="og:description" content="A 3D water-flow puzzle on the white travertine terraces of Pamukkale, redesigned in pastel travertine and turquoise water: guide the spring into the pools with stones, dams and splitters across 23 levels. Plays in the browser.">
+<meta property="og:title" content="Pamukkale · Traverten Su Bulmacası">
+<meta property="og:site_name" content="Pamukkale">
+<meta property="og:locale" content="tr_TR">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:description" content="Pamukkale travertenlerinde 3D su akışı bulmacası: taş, set ve ayırıcılarla kaynak suyunu havuzlara ulaştır. 23 seviye, günlük meydan okuma, tarayıcıda ücretsiz. · A 3D water-flow puzzle on the white travertine terraces of Pamukkale: guide the spring into the pools with stones, dams and splitters across 23 levels. Plays free in the browser.">
 <meta property="og:url" content="https://furkiozknn.github.io/pamukkale/">
 <meta property="og:image" content="https://furkiozknn.github.io/pamukkale/docs/card.jpg">
 <meta property="og:image:width" content="960">
 <meta property="og:image:height" content="540">
+<meta property="og:image:alt" content="Pamukkale: beyaz travertenlerde turkuaz havuzlar ve su akışı bulmacası">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="data:,">
+<meta name="twitter:title" content="Pamukkale · Traverten Su Bulmacası">
+<meta name="twitter:description" content="Pamukkale travertenlerinde 3D su akışı bulmacası: taş, set ve ayırıcılarla kaynak suyunu havuzlara ulaştır. 23 seviye, günlük meydan okuma, tarayıcıda ücretsiz.">
+<meta name="twitter:image" content="https://furkiozknn.github.io/pamukkale/docs/card.jpg">
+<meta name="theme-color" content="#1199A4">
+<link rel="canonical" href="https://furkiozknn.github.io/pamukkale/">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23FAF8F3'/%3E%3Cpath d='M8 44c6-4 12-4 18 0s12 4 18 0 8-3 12-1v10H8z' fill='%231199A4'/%3E%3Cpath d='M32 9s-10 11-10 19a10 10 0 0 0 20 0C42 20 32 9 32 9z' fill='%2308666E'/%3E%3Ccircle cx='29' cy='24' r='2.4' fill='%23fff' opacity='.75'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -1227,6 +1236,17 @@ h3{font-size:18px}
   .stats-pill{padding:0 12px;gap:10px}
   .stats-pill .stat-item.hide-s:not(#hud-time-wrap){display:none}
 }
+/* v2.1 (2026-11): Yenilikler penceresi, sürüm etiketi, seviye rekoru satırı */
+.ver-chip{font-weight:700;opacity:.75;font-size:12px}
+.btn.has-new{position:relative}
+.btn.has-new::after{content:'';position:absolute;top:8px;right:14px;width:10px;height:10px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 2px var(--paper)}
+.news-list{margin:14px 0 6px;padding:0;list-style:none;text-align:left;display:grid;gap:10px}
+.news-list li{padding:10px 14px;border-radius:16px;background:var(--accent-bg);font-size:14px;line-height:1.4;color:var(--ink)}
+.news-list b{display:block;font-size:15px;margin-bottom:2px}
+.rec-line{margin:12px 0 0;font-size:14px;font-weight:700;color:var(--ink-soft);text-align:center}
+.rec-line.new{color:var(--accent)}
+.best:empty{display:none}   /* boş 'en iyi' hapı başlık ekranında küçük bir leke gibi görünüyordu */
+@media (pointer:coarse){.tut-skip{min-height:44px}}   /* dokunmatik hedef 44px */
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 <script data-goatcounter="https://furkiozknn.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
@@ -1403,6 +1423,7 @@ h3{font-size:18px}
       <button class="btn" id="btn-daily"><span data-i18n="daily">Günün Meydan Okuması</span><small id="daily-info" style="font-weight:600;opacity:.75"></small></button>
       <button class="btn" id="btn-areas" data-i18n="areas">Seviyeler</button>
       <button class="btn" id="btn-settings-title" data-i18n="settings">Ayarlar</button>
+      <button class="btn" id="btn-news"><span data-i18n="news">Yenilikler</span><small class="ver-chip" id="ver-chip"></small></button>
     </div>
     <div class="best" id="best-line"></div>
     <div class="row"><button class="btn small" id="btn-lang-title">TR / EN</button></div>
@@ -1438,6 +1459,15 @@ h3{font-size:18px}
         <button class="toggle" id="btn-a11y" data-i18n="a11yOpen" style="grid-column:2">Aç</button></div>
     </div>
     <div class="row"><button class="btn" id="btn-settings-back" data-i18n="back">Geri</button></div>
+  </div>
+</section>
+
+<section id="ov-news" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="news-title">
+  <div class="card">
+    <h2 id="news-title" data-i18n="news">Yenilikler</h2>
+    <p class="sub" id="news-sub"></p>
+    <ul class="news-list" id="news-list"></ul>
+    <div class="row"><button class="btn primary" id="btn-news-back" data-i18n="back">Geri</button></div>
   </div>
 </section>
 
@@ -1691,6 +1721,9 @@ const K = 4;         // fine mesh vertices per cell
 const LEVEL_COUNT = LEVELS.length;
 const SAVE_KEY = 'arena.pamukkale.save', SET_KEY = 'arena.pamukkale.settings', BEST_KEY = 'arena.pamukkale.best', TUTORIAL_KEY = 'arena.pamukkale.tutorial.v1';
 const GAME_URL = 'https://github.com/Furkiozknn';
+const HUB_URL = 'https://furkiozknn.github.io/';
+const VERSION = '2.1', VERSION_DATE = { tr: 'Kasım 2026', en: 'November 2026' };
+const REC_KEY = 'arena.pamukkale.records', SEEN_KEY = 'arena.pamukkale.seenver';
 const errors = [];
 window.addEventListener('error', e => errors.push(String(e.message || e)));
 window.addEventListener('unhandledrejection', e => errors.push('promise: ' + String(e.reason)));
@@ -1709,6 +1742,8 @@ const settings = readJSON(SET_KEY, { master: 0.8, music: 0.6, sfx: 0.8, lang: /^
 if (Q.get('lang') === 'en' || Q.get('lang') === 'tr') settings.lang = Q.get('lang');
 const progress = readJSON(SAVE_KEY, { unlocked: 1, stars: {}, last: 0 });
 const best = readJSON(BEST_KEY, { stars: 0, done: 0 });
+const records = readJSON(REC_KEY, {});   // v2.1: seviye -> kazanılan en az araç sayısı (yerel rekor)
+const seenVer = readJSON(SEEN_KEY, { v: '' });
 let quality = FLAGS.low ? 'low' : settings.quality;
 
 // ---------- text (TR default, EN toggle) ----------
@@ -1742,6 +1777,14 @@ const S = {
     share: 'Paylaş', another: 'Başka oyun', a11y: 'Erişilebilirlik', a11yOpen: 'Aç',
     shareDaily: 'Günün Meydan Okuması {d} · seri {k}', shareTotal: 'Toplam {s}/{m} ★', shareEnd: '{n}/{m} seviye · {s}/{x} ★',
     awFirst: 'İlk havuzlar doldu', awPerfect: 'Üç yıldızlı seviye', awAll: '23 seviyenin hepsi',
+    news: 'Yenilikler', newsSub: 'Sürüm {v} · {d}', another2: 'Diğer oyunlar',
+    newsItems: [
+      ['Seviye rekoru', 'Her seviyede en az araçla kazandığın sonuç kaydedilir. Sonuç ekranında rekorunu görür, kırdığında bildirim alırsın.'],
+      ['Daha coşkulu zafer', 'Seviyeyi bitirince havuzlardan su parçacıkları fışkırır, telefonda kısa bir titreşim gelir. Hareketi azalt ayarı açıksa sakin kalır.'],
+      ['Yenilikler penceresi ve sürüm etiketi', 'Ana menüdeki Yenilikler düğmesinden bu listeye ulaşırsın; sürüm bilgisi menünün altında yazar.'],
+      ['Sayfa düzeltmeleri', 'Paylaşım kartı, simge, açıklama metni ve bulunamayan sayfa için 404 sayfası düzeltildi; menüden diğer oyunlara geçilebilir.']
+    ],
+    recLine: 'Rekor: {n} araç', recNew: 'Yeni rekor: {n} araç (önceki {p})', recTitle: 'rekor {n} araç',
     tutSkip: 'Geç', tutGotIt: 'Anladım',
     tutStep1Title: '1. Taş Yerleştir', tutStep1Desc: 'Parlayan noktaya bir taş koy: su havuza oradan döner.',
     tutStep2Title: '2. Suyu Başlat', tutStep2Desc: 'Akışı başlatmak için "Suyu başlat" düğmesine bas.',
@@ -1778,6 +1821,14 @@ const S = {
     share: 'Share', another: 'Another game', a11y: 'Accessibility', a11yOpen: 'Open',
     shareDaily: 'Daily challenge {d} · streak {k}', shareTotal: 'Total {s}/{m} ★', shareEnd: '{n}/{m} levels · {s}/{x} ★',
     awFirst: 'First pools filled', awPerfect: 'A three-star level', awAll: 'All 23 levels',
+    news: "What's new", newsSub: 'Version {v} · {d}', another2: 'More games',
+    newsItems: [
+      ['Level records', 'The fewest tools you won each level with are saved. The result screen shows your record and tells you when you beat it.'],
+      ['A livelier win', 'Finishing a level sends water sparkles out of the pools, with a short buzz on phones. It stays calm when Reduce motion is on.'],
+      ["What's new window and version tag", 'Open this list from the main menu; the version is shown at the bottom of the menu.'],
+      ['Page fixes', 'Share card, icon, description and a 404 page for missing addresses were fixed; the menu links to the other games.']
+    ],
+    recLine: 'Record: {n} tools', recNew: 'New record: {n} tools (was {p})', recTitle: 'record {n} tools',
     tutSkip: 'Skip', tutGotIt: 'Got it',
     tutStep1Title: '1. Place a Stone', tutStep1Desc: 'Place a stone on the glowing spot: that turns the water into the pool.',
     tutStep2Title: '2. Start the Water', tutStep2Desc: 'Press "Start water" to release the spring flow.',
@@ -2887,6 +2938,7 @@ function finish(win) {
   G.lastWin = win;
   G.res = { win, stars: [s1, s2, s3] };
   G.dailyRes = null;
+  G.rec = null;
   if (win && G.daily) { if (!FLAGS.auto) G.dailyRes = G.daily.complete(stars); sfxChime([523.25, 659.25, 783.99, 1046.5]); }
   else if (win) {
     progress.stars[G.idx] = Math.max(progress.stars[G.idx] || 0, stars);
@@ -2894,16 +2946,33 @@ function finish(win) {
     writeJSON(SAVE_KEY, progress);
     updateBest();
     sfxChime([523.25, 659.25, 783.99, 1046.5]);
+    noteRecord();
   } else {
     sfxFail();
     toast(t('toastTimeUp'), 'bad');
   }
   if (win) {
+    winFx();
     arenaAward('first', 'awFirst');
     if (stars === 3) arenaAward('perfect', 'awPerfect');
     if (LEVELS.every((d, k) => progress.stars[k] > 0)) arenaAward('all', 'awAll');
   }
   showResult();
+}
+
+// v2.1: yerel seviye rekoru (en az araçla kazanma) ve zafer efekti. Yalnız görsel/ses katmanı; su simülasyonu bunları okumaz.
+function noteRecord() {
+  if (FLAGS.auto) return;
+  const used = totalUsed(), prev = records[G.idx];
+  G.rec = { n: used, p: prev === undefined ? null : prev, isNew: prev !== undefined && used < prev };
+  if (prev === undefined || used < prev) { records[G.idx] = used; writeJSON(REC_KEY, records); }
+  else G.rec.n = prev;
+}
+function winFx() {
+  if (FLAGS.auto || !G.st) return;
+  const per = calm() ? 3 : quality === 'low' ? 8 : 18;
+  G.st.pools.forEach(p => { for (let b = 0; b < per; b++) burst(p.i); });
+  try { if (coarse && navigator.vibrate && !(window.Arena && Arena.settings && Arena.settings.vibration === false)) navigator.vibrate(35); } catch (e) { /* no haptics */ }
 }
 
 function updateBest() {
@@ -2930,7 +2999,8 @@ function showResult() {
   const objCards = [[t('star1'), r.stars[0]], [t('star2'), r.stars[1]], [t('star3'), r.stars[2]]].map(([a, on]) =>
     `<div class="res-obj-item ${on ? 'on' : ''}"><div class="obj-badge">${on ? svg('check') : ''}</div><span class="obj-label">${a}</span><span class="obj-star">★</span></div>`
   ).join('');
-  document.getElementById('res-list').innerHTML = `<div class="res-bento">${metricCards}</div><div class="res-objectives">${objCards}</div>`;
+  const recHtml = r.win && G.rec && !G.daily ? `<p class="rec-line${G.rec.isNew ? ' new' : ''}">${G.rec.isNew ? tv('recNew', { n: G.rec.n, p: G.rec.p }) : tv('recLine', { n: G.rec.n })}</p>` : '';
+  document.getElementById('res-list').innerHTML = `<div class="res-bento">${metricCards}</div><div class="res-objectives">${objCards}</div>${recHtml}`;
   const next = document.getElementById('btn-next');
   const last = G.idx === LEVEL_COUNT - 1;
   next.textContent = last ? t('ending') : t('next');
@@ -2958,7 +3028,7 @@ function showEnd() {
 }
 
 // ---------- screens and overlays ----------
-const OVERLAYS = { title: 'ov-title', areas: 'ov-areas', settings: 'ov-settings', pause: 'ov-pause', result: 'ov-result', end: 'ov-end' };
+const OVERLAYS = { title: 'ov-title', areas: 'ov-areas', settings: 'ov-settings', news: 'ov-news', pause: 'ov-pause', result: 'ov-result', end: 'ov-end' };
 function showScreen(name) {
   if (name === 'title' || name === 'areas') G.daily = null;
   G.screen = name;
@@ -2973,6 +3043,7 @@ function showScreen(name) {
   if (name === 'areas') renderAreas();
   if (name === 'settings') syncSettingsUI();
   if (name === 'title') renderTitle();
+  if (name === 'news') renderNews();
   if (name !== 'play') setTrickle(false);   // menus, pause and results never keep the water sound going
   if (name === 'pause') { G.running = false; setTrickle(false); }
   if (name === 'result') { G.running = false; setTrickle(false); }
@@ -2981,7 +3052,15 @@ function showScreen(name) {
   if (name === 'play' || name === 'result' || name === 'pause') renderHUD();
 }
 
+function renderNews() {
+  document.getElementById('news-sub').textContent = tv('newsSub', { v: VERSION, d: VERSION_DATE[settings.lang] || VERSION_DATE.en });
+  document.getElementById('news-list').innerHTML = (t('newsItems') || []).map(([h, p]) => `<li><b>${h}</b>${p}</li>`).join('');
+  if (!FLAGS.auto && seenVer.v !== VERSION) { seenVer.v = VERSION; writeJSON(SEEN_KEY, seenVer); }
+}
+
 function renderTitle() {
+  const nb = document.getElementById('btn-news');
+  if (nb) nb.classList.toggle('has-new', seenVer.v !== VERSION && !FLAGS.auto);
   const cont = document.getElementById('btn-continue');
   const started = progress.unlocked > 1 || Object.keys(progress.stars).length > 0;
   cont.classList.toggle('hidden', !started);
@@ -3040,7 +3119,9 @@ function renderAreas() {
       const locked = i > progress.unlocked - 1;
       b.className = 'lvl' + (i === G.idx && G.inLevel ? ' cur' : '');
       b.disabled = locked;
-      b.setAttribute('aria-label', `${t('levelWord')} ${i + 1} ${levelName(i)}`);
+      const recTxt = records[i] !== undefined && !locked ? ' · ' + tv('recTitle', { n: records[i] }) : '';
+      b.setAttribute('aria-label', `${t('levelWord')} ${i + 1} ${levelName(i)}${recTxt}`);
+      if (recTxt) b.title = recTxt.slice(3);
       b.innerHTML = `<span class="lvl-num">${i + 1}</span><span class="lvl-stars">${locked ? svg('lock') : [1, 2, 3].map(k => `<span class="m-star ${k <= st ? 'on' : ''}">★</span>`).join('')}</span>`;
       b.onclick = () => startLevel(i);
       grid.appendChild(b);
@@ -3069,7 +3150,8 @@ function syncSettingsUI() {
 function applyI18n() {
   document.documentElement.lang = settings.lang; if (window.Arena) Arena.lang(settings.lang); // kit panel in the game's language
   document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
-  document.querySelector('.footer').innerHTML = `<a href="${GAME_URL}" target="_blank" rel="noopener">Claude Game Arena</a> · built by Claude Haiku 5.5`;
+  document.querySelector('.footer').innerHTML = `<a href="${GAME_URL}" target="_blank" rel="noopener">Claude Game Arena</a> · <a href="${HUB_URL}" target="_blank" rel="noopener">${t('another2')}</a> · v${VERSION} · ${VERSION_DATE[settings.lang] || VERSION_DATE.en}`;
+  const vc = document.getElementById('ver-chip'); if (vc) vc.textContent = 'v' + VERSION;
   document.getElementById('btn-lang').textContent = settings.lang.toUpperCase();
   document.getElementById('btn-lang-title').textContent = settings.lang === 'tr' ? 'TR / EN' : 'EN / TR';
   document.getElementById('btn-sound').innerHTML = svg(settings.musicOn || settings.sfxOn ? 'sound' : 'mute');
@@ -3353,6 +3435,7 @@ window.addEventListener('keydown', e => {
     if (G.screen === 'play') { showScreen('pause'); e.preventDefault(); }
     else if (G.screen === 'pause') { showScreen('play'); e.preventDefault(); }
     else if (G.screen === 'settings' && G.returnTo === 'pause') { showScreen('pause'); }
+    else if (G.screen === 'news') { showScreen('title'); e.preventDefault(); }
     return;
   }
   if (k === 'm' || k === 'M') { settings.musicOn = !settings.musicOn; writeJSON(SET_KEY, settings); applyVolumes(); toast(`${t('music')}: ${settings.musicOn ? t('onOff')[0] : t('onOff')[1]}`, 'info'); renderHUD(); return; }
@@ -3387,6 +3470,8 @@ on('btn-res-share', () => shareResult(false));
 on('btn-end-share', () => shareResult(true));
 on('btn-areas-back', () => showScreen('title'));
 on('btn-settings-title', () => { G.returnTo = 'title'; showScreen('settings'); });
+on('btn-news', () => showScreen('news'));
+on('btn-news-back', () => showScreen('title'));
 on('btn-pause-settings', () => { G.returnTo = 'pause'; showScreen('settings'); });
 on('btn-settings-back', () => showScreen(G.returnTo));
 on('btn-resume', () => showScreen('play'));
@@ -3753,6 +3838,8 @@ function boot() {
   if (window.ArenaCore) ArenaCore.kabuk.onceDerle(renderer, scene, camera); // shader warm-up (v2.0.1: synchronous compile, never throws)
   requestAnimationFrame(t0 => { last = t0; requestAnimationFrame(frame); });
   Object.defineProperty(window, 'pamukkale', { get: summary, configurable: true });
+  // test hook: client coordinates of a board cell (used by test/duman.mjs to place a tool with a real click)
+  window.pamukkaleCellXY = (x, y) => { const i = y * G.n + x, v = new THREE.Vector3(cellX(i, G.n), PSim.height(G.st, i) * HU + 0.2, cellZ(i, G.n)).project(camera), r = canvas.getBoundingClientRect(); return { x: r.left + (v.x + 1) / 2 * r.width, y: r.top + (1 - v.y) / 2 * r.height }; };
   window.pamukkaleTutorial = {
     get state() { return { active: tut.active, step: tut.step, done: isTutorialDone() }; },
     reset: () => stopTutorial(true),
