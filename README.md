@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://furkiozknn.github.io/pamukkale/">
-    <img src="docs/card.jpg" width="100%" alt="Pamukkale: a calm 3D water-flow puzzle on white travertine terraces with turquoise pools. Click to play in your browser.">
+    <img src="docs/card-3d.jpg" width="100%" alt="Pamukkale: a calm 3D water-flow puzzle on white travertine terraces with turquoise pools. Click to play in your browser.">
   </a>
 </p>
 
@@ -29,12 +29,21 @@
 
 ## Features
 
+<p align="center">
+  <img src="docs/features.jpg" width="100%" alt="Pamukkale feature overview: two chibi women stand beside a calm turquoise travertine pool at sunset, with five features listed on the water: living terraces, 23 levels in 5 areas, three water tools, sluice gates and a single-file 3D build.">
+</p>
+
+<details>
+<summary><b>Feature details</b></summary>
+
 - **Living terraces & procedural puzzle:** Water that stands still builds calcium: dry cells beside a standing pool rise to the water line, so the board dynamically evolves and changes flow paths while water runs.
 - **23 levels across 5 distinct areas:** Progress through Lower Pools, Middle Shelves, Ancient Pool, Sunset, and Calcium Time, earning up to 3 stars per level (all pools full, no water spilled, and par tool saving).
 - **Calcium Time: sluice gates:** The last three levels add a fixed gate the player opens or closes while the water runs. Timing matters: let a pool fill, then redirect; or shut the gate so still water raises a leaking pool's rim, then open it again. `tools/solve-levels.mjs` checks that no fixed gate setting solves these levels and prints a timed solution with its tick window.
 - **Tactical 3-tool water routing:** Place stones (raises a cell by 1 step so water turns around it), dams (raises by 2 steps to hold water back), and splitters (divides flow among lower neighbours).
 - **Verified level design & bot replay:** Layouts originate from seeded random hillsides where empty boards fail; `?auto` bot replays stored solutions at 3x speed, verifying **20/20 levels and 46/60 stars** with 0 JavaScript errors (with and without `?noassets`); with the gate levels: 23/23 levels and 52/69 stars, 0 errors (headless Chromium, 2026-11-09, without `?noassets`).
 - **Lean single-file 3D performance:** A single `index.html` running Three.js r170 delivering 21–22 draw calls and 34k triangles in play on Intel UHD 620, complete with procedural geometry and Web Audio synthesis (saz loop, flute, trickling water, splashes, and birdsong).
+
+</details>
 
 ## What's new in v2.1 (November 2026)
 
@@ -47,12 +56,21 @@ Saves from earlier versions keep working: no existing key changed. Full list: [C
 
 ## How to play
 
+<p align="center">
+  <img src="docs/how-to-play.jpg" width="100%" alt="How to play Pamukkale: place stones, dams and splitters, start the flow with Space and fill every target pool, with the keyboard and mouse controls listed below the three steps.">
+</p>
+
+<details>
+<summary><b>Goal and steps</b></summary>
+
 > [!TIP]
 > **Goal:** Guide warm spring water down the terraces into every target pool. Block spill paths early: spilled water costs the "no water spilled" star, and every tool kept in reserve counts towards the tool-saving star.
 
 1. **Place your tools:** Select a tool (`1` stone, `2` dam, `3` splitter) and click or tap cells on the hillside grid to place them.
 2. **Start the flow (`Space`):** Release warm water from the steaming spring at the top of the terraces and watch how it channels into target pools.
 3. **Fill every pool mark:** Fill each target pool until its ring turns turquoise. Avoid letting water escape off the bottom edge.
+
+</details>
 
 <details>
 <summary><b>Rules and star objectives</b></summary>
