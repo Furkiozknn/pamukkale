@@ -1248,6 +1248,42 @@ h3{font-size:18px}
 .best:empty{display:none}   /* boş 'en iyi' hapı başlık ekranında küçük bir leke gibi görünüyordu */
 @media (pointer:coarse){.tut-skip{min-height:44px}}   /* dokunmatik hedef 44px */
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* =================================================================================================
+   stil-3d (24.11.2026): the song video's soft 3D chibi world: warm peach-white clay cards, rounder buttons with
+   soft shadows, the tourist and the spring guardian on the cards (assets/3d/ui-*.webp)
+   ================================================================================================= */
+:root[data-theme="light"]{--overlay-bg:rgba(74,42,34,0.44);--card-bg:rgba(255,249,244,0.95);--paper:#FFFBF7;--cream:#FBF1EA;--card-border:rgba(120,70,50,0.13);
+  --shadow-md:0 10px 26px -6px rgba(120,62,40,0.22),0 2px 6px -1px rgba(120,62,40,0.1);
+  --shadow-lg:0 18px 44px -8px rgba(120,62,40,0.3),0 4px 12px -2px rgba(120,62,40,0.12)}
+@media not (prefers-color-scheme: dark){:root:not([data-theme="dark"]){--overlay-bg:rgba(74,42,34,0.44);--card-bg:rgba(255,249,244,0.95);--paper:#FFFBF7;--cream:#FBF1EA;--card-border:rgba(120,70,50,0.13);
+  --shadow-md:0 10px 26px -6px rgba(120,62,40,0.22),0 2px 6px -1px rgba(120,62,40,0.1);
+  --shadow-lg:0 18px 44px -8px rgba(120,62,40,0.3),0 4px 12px -2px rgba(120,62,40,0.12)}}
+.card{border-radius:32px;box-shadow:var(--shadow-lg),inset 0 0 0 3px rgba(255,255,255,0.7),inset 0 -6px 18px rgba(255,190,160,0.14)}
+.btn{box-shadow:inset 0 2px 0 rgba(255,255,255,0.7),inset 0 -3px 0 rgba(120,70,50,0.1),0 4px 10px -3px rgba(120,62,40,0.22)}
+.btn.primary,.act.run{box-shadow:inset 0 2px 0 rgba(255,255,255,0.35),inset 0 -4px 0 rgba(0,60,66,0.28),0 8px 18px -4px rgba(17,153,164,0.5)}
+.tool{border-radius:16px;box-shadow:inset 0 2px 0 rgba(255,255,255,0.7),inset 0 -3px 0 rgba(120,70,50,0.08)}
+.tool img.tool-ico.t3{width:30px;height:26px;object-fit:contain;margin:-2px 0;filter:drop-shadow(0 2px 2px rgba(90,50,30,0.3))}
+.brand-pill img.logo-sm{object-fit:contain}
+.logo3d{display:flex;justify-content:center;align-items:flex-end;height:150px;margin:-8px auto 6px}
+.logo3d img.t3{height:100%;width:auto;object-fit:contain;filter:drop-shadow(0 8px 10px rgba(120,62,40,0.3))}
+.logo3d img.t3.b{height:96%;margin-left:-6px}
+.fighead{display:flex;align-items:center;justify-content:center;gap:10px}
+.fighead h2{margin:0}
+.fighead img.fig3{height:76px;width:auto;flex:none;margin:-10px 0 -6px;filter:drop-shadow(0 5px 6px rgba(120,62,40,0.3))}
+.fighead img.fig3.damla{height:54px}
+.endfig{display:flex;justify-content:center;align-items:flex-end;height:110px;margin:-6px 0 4px}
+.endfig img{height:100%;width:auto;filter:drop-shadow(0 6px 8px rgba(120,62,40,0.35))}
+@media (max-height:800px){
+  .logo3d{height:104px}
+  .fighead img.fig3{height:58px}
+  .fighead img.fig3.damla{height:44px}
+  .endfig{height:84px}
+}
+@media (max-height:520px) and (orientation:landscape){
+  .logo3d{height:52px;margin:0 auto 2px}
+  .fighead img.fig3{height:40px}
+  .endfig{height:48px}
+}
 </style>
 <script data-goatcounter="https://furkiozknn.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </head>
@@ -1257,19 +1293,7 @@ h3{font-size:18px}
 
 <header id="hud" class="hidden">
   <div class="brand-pill">
-    <svg class="logo-sm" viewBox="0 0 36 36" aria-hidden="true">
-      <defs>
-        <linearGradient id="gLogoSm" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#24CBD5"/>
-          <stop offset="100%" stop-color="#08666E"/>
-        </linearGradient>
-      </defs>
-      <circle cx="18" cy="18" r="17" fill="#FAF8F3" stroke="#D6C7AF" stroke-width="1.2"/>
-      <path d="M5 24c3-2 6-2 9 0s6 2 9 0 5-2 8 0v4H5z" fill="url(#gLogoSm)"/>
-      <path d="M7 19c3-1.8 5.5-1.8 8.5 0s5.5 1.8 8.5 0 3.5-1.8 5 0" stroke="#FAF8F3" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-      <path d="M18 6c0 0-5 5.5-5 9.2a5 5 0 0 0 10 0C23 11.5 18 6 18 6z" fill="#1199A4"/>
-      <circle cx="16.5" cy="12.5" r="1.2" fill="#FFFFFF" opacity=".7"/>
-    </svg>
+    <img class="logo-sm" src="assets/3d/ui-damla.webp" alt="" draggable="false">
     <div class="brand-text">
       <span class="brand-title">PAMUKKALE</span>
       <span class="brand-sub" id="hud-area-pill">BÖLGE 1</span>
@@ -1339,30 +1363,19 @@ h3{font-size:18px}
   <div class="tray-tools">
     <button class="tool" data-tool="stone" id="tool-stone" aria-label="Stone (1)">
       <span class="n">1</span>
-      <svg class="tool-ico" viewBox="0 0 24 24" aria-hidden="true">
-        <ellipse cx="12" cy="14" rx="8" ry="4.5" fill="#C5B59E"/>
-        <ellipse cx="11" cy="12.5" rx="5" ry="2.2" fill="#DFD3C0"/>
-        <path d="M7 13.5c1.8-1.4 4.5-1.8 7.5-1.2" stroke="#FAF8F3" stroke-width="1.1" fill="none"/>
-      </svg>
+      <img class="tool-ico t3" src="assets/3d/ui-tas.webp" alt="" draggable="false">
       <span class="c" id="cnt-stone">0</span>
       <span class="lbl" data-i18n="toolStone">Taş</span>
     </button>
     <button class="tool" data-tool="dam" id="tool-dam" aria-label="Dam (2)">
       <span class="n">2</span>
-      <svg class="tool-ico" viewBox="0 0 24 24" aria-hidden="true">
-        <rect x="3" y="10" width="18" height="6.5" rx="2" fill="#BAAA94"/>
-        <path d="M3 12h18" stroke="#1199A4" stroke-width="1.4"/>
-        <path d="M6 10v6.5M12 10v6.5M18 10v6.5" stroke="#FAF8F3" stroke-width=".9" opacity=".6"/>
-      </svg>
+      <img class="tool-ico t3" src="assets/3d/ui-set.webp" alt="" draggable="false">
       <span class="c" id="cnt-dam">0</span>
       <span class="lbl" data-i18n="toolDam">Set</span>
     </button>
     <button class="tool" data-tool="split" id="tool-split" aria-label="Splitter (3)">
       <span class="n">3</span>
-      <svg class="tool-ico" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 4L4 18h16z" fill="#1199A4" opacity=".9"/>
-        <path d="M12 9v7M8.5 15.5L12 9l3.5 6.5" stroke="#FAF8F3" stroke-width="1.3" fill="none"/>
-      </svg>
+      <img class="tool-ico t3" src="assets/3d/ui-ayirici.webp" alt="" draggable="false">
       <span class="c" id="cnt-split">0</span>
       <span class="lbl" data-i18n="toolSplit">Ayırıcı</span>
     </button>
@@ -1392,28 +1405,7 @@ h3{font-size:18px}
 
 <section id="ov-title" class="overlay">
   <div class="card">
-    <svg class="logo" viewBox="0 0 110 110" aria-hidden="true">
-      <defs>
-        <radialGradient id="gLogoBg" cx="50%" cy="40%" r="55%">
-          <stop offset="0%" stop-color="#FFFFFF"/>
-          <stop offset="70%" stop-color="#FAF5EC"/>
-          <stop offset="100%" stop-color="#EBE2D0"/>
-        </radialGradient>
-        <linearGradient id="gWater" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#24CBD5"/>
-          <stop offset="60%" stop-color="#1199A4"/>
-          <stop offset="100%" stop-color="#08666E"/>
-        </linearGradient>
-      </defs>
-      <circle cx="55" cy="55" r="50" fill="url(#gLogoBg)" stroke="#D6C7AF" stroke-width="2.5"/>
-      <circle cx="55" cy="55" r="46" fill="none" stroke="rgba(17,153,164,0.2)" stroke-width="1" stroke-dasharray="3 3"/>
-      <path d="M15 76c12-8 24-8 36 0s24 8 36 0 6-8 8-8v16H15z" fill="url(#gWater)"/>
-      <path d="M12 76c13-8 25-8 38 0s25 8 38 0 8-7 10-7" stroke="#FAF8F3" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <path d="M22 62c10-6 20-6 30 0s20 6 30 0 4-6 6-6" stroke="#FAF8F3" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-      <path d="M55 18c0 0-16 18-16 30a16 16 0 0 0 32 0c0-12-16-30-16-30z" fill="url(#gWater)"/>
-      <path d="M47 38c2-6 8-10 12-11" stroke="#FFFFFF" stroke-width="2" fill="none" stroke-linecap="round" opacity=".8"/>
-      <path d="M42 22c-3-4-2-8 2-11M68 22c3-4 2-8-2-11" stroke="#D6C7AF" stroke-width="1.8" fill="none" stroke-linecap="round" opacity=".6"/>
-    </svg>
+    <div class="logo3d" aria-hidden="true"><img class="t3" src="assets/3d/ui-turist.webp" alt="" draggable="false"><img class="t3 b" src="assets/3d/ui-bekci-el.webp" alt="" draggable="false"></div>
     <h1>PAMUKKALE</h1>
     <p class="sub" data-i18n="subtitle">Travertenlerde su akışı bulmacası</p>
     <p class="sub" style="margin-top:8px;font-size:14px;color:var(--ink-muted)" data-i18n="howto">Kaynaktan akan suyu taş, set ve ayırıcılarla havuzlara yönlendir.</p>
@@ -1433,7 +1425,7 @@ h3{font-size:18px}
 
 <section id="ov-areas" class="overlay hidden">
   <div class="card wide">
-    <h2 data-i18n="areas">Seviyeler</h2>
+    <div class="fighead"><img class="fig3" src="assets/3d/ui-bekci-el.webp" alt="" draggable="false"><h2 data-i18n="areas">Seviyeler</h2></div>
     <div class="areas" id="areas-grid"></div>
     <div class="row"><button class="btn" id="btn-areas-back" data-i18n="back">Geri</button></div>
   </div>
@@ -1473,7 +1465,7 @@ h3{font-size:18px}
 
 <section id="ov-pause" class="overlay hidden">
   <div class="card">
-    <h2 data-i18n="pause">Duraklat</h2>
+    <div class="fighead"><img class="fig3 damla" src="assets/3d/ui-damla.webp" alt="" draggable="false"><h2 data-i18n="pause">Duraklat</h2></div>
     <div class="stack">
       <button class="btn primary" id="btn-resume" data-i18n="resume">Devam</button>
       <button class="btn" id="btn-restart" data-i18n="restart">Baştan</button>
@@ -1485,7 +1477,7 @@ h3{font-size:18px}
 
 <section id="ov-result" class="overlay hidden">
   <div class="card">
-    <h2 id="res-title"></h2>
+    <div class="fighead"><img id="res-fig" class="fig3" src="assets/3d/ui-turist-sevinc.webp" alt="" draggable="false"><h2 id="res-title"></h2></div>
     <p class="sub" id="res-sub"></p>
     <div class="stars" id="res-stars" style="justify-content:center;margin:16px 0 0"></div>
     <div id="res-list"></div>
@@ -1505,6 +1497,7 @@ h3{font-size:18px}
 <section id="ov-end" class="overlay hidden">
   <div class="card">
     <div class="ending">
+      <div class="endfig" aria-hidden="true"><img src="assets/3d/ui-turist-sevinc.webp" alt="" draggable="false"><img src="assets/3d/ui-bekci-sevinc.webp" alt="" draggable="false"></div>
       <h2 data-i18n="endTitle">Gün batımında Pamukkale</h2>
       <p class="sub" style="color:#2A1721" data-i18n="endText">Yamaçtaki tüm havuzlar doldu.</p>
     </div>
@@ -3011,6 +3004,7 @@ function showResult() {
   const rd = document.getElementById('res-daily');
   rd.classList.toggle('hidden', !G.daily);
   if (G.daily) rd.textContent = G.dailyRes ? tv('dailyRes', { d: dayText(G.daily.day), s: G.dailyRes.streak, b: G.dailyRes.best }) : tv('dailyFail', { d: dayText(G.daily.day) });
+  stResFig();
   showScreen('result');
   if (G.lastWin && window.Arena && Arena.complete) Arena.complete({ mount: document.querySelector('#ov-result .stack') }); // ask 'did you enjoy it?' only after a win   // arena-kit v1.1: pamukkale/complete + one-tap 👍/👎 (nothing on ?auto)
 }
@@ -3551,10 +3545,180 @@ const SKIES = [
 function applyAreaSky() {
   const a = SKIES[G.def ? G.def.area : 0];
   const stage = document.getElementById('stage');
-  stage.style.background = `linear-gradient(180deg, ${a.top} 0%, ${a.bottom} 70%)`;
+  // stil-3d: the video's peach sunset over the area's own sky colours
+  stage.style.background = `url(assets/3d/gok.webp) center top / cover no-repeat, linear-gradient(180deg, ${a.top} 0%, ${a.bottom} 70%)`;
   scene.fog.color.setHex(a.fog);
   sun.color.setHex(a.sun);
   sun.intensity = a.sunI;
+}
+
+// ---------- stil-3d (24.11.2026): the song video's soft 3D chibi world ----------
+// The tourist and the spring guardian from the video stand at the board's edge (camera-facing cut-outs, assets/3d/
+// chibi.webp), a water-droplet mascot hops by the spring, the stones, dams, splitters and the spring basin are the
+// video's clay props (nesne.webp), the terraces get a fine travertine relief and the sky is the video's peach sunset.
+// Drawing only: picking still hits the terrain mesh alone, and the water automaton, tools and levels are untouched.
+// three.js draws a UUID from Math.random for every new texture, material and object, so the style layer builds all of
+// its objects once, inside a private random stream (sakin), and never creates any during play.
+let ST_RND = 0x9a11c0de;
+function sakin(fn) {
+  const r = Math.random;
+  Math.random = () => { ST_RND = (ST_RND + 0x6D2B79F5) >>> 0; let t = ST_RND; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  try { return fn(); } finally { Math.random = r; }
+}
+const ST = {
+  ready: false, doku: null, cheer: 0, lastFilled: -1, lastLevel: -1,
+  // [w, h] of each atlas cell's figure as a fraction of the cell (kes.py)
+  meta: {
+    chibi: [[0.738, 0.977], [0.762, 0.977], [0.746, 0.977], [0.488, 0.977], [0.672, 0.977], [0.57, 0.977], [0.926, 0.977], [0.766, 0.977], [0.586, 0.977]],
+    nesne: [[0.969, 0.758], [0.969, 0.766], [0.969, 0.801], [0.969, 0.973], [0.969, 0.746], [0.969, 0.641], [0.961, 0.977], [0.602, 0.977], [0.941, 0.977]]
+  },
+  cell: { tur: 0, turSevinc: 1, turUzgun: 2, bekci: 3, bekciSevinc: 4, bekciGoster: 5, damla: 6, turAyak: 7, bekciEl: 8, tas: 0, set: 1, ayirici: 2, kaynak: 3 }
+};
+// the video's colours: rosy-white travertine, mint-turquoise water (render constants only)
+CREAM.splice(0, 3, 0.985, 0.95, 0.93); WHITE.splice(0, 3, 1, 0.985, 0.975);
+SHALLOW.splice(0, 3, 0.72, 0.97, 0.93); DEEP.splice(0, 3, 0.24, 0.8, 0.79); FOAM.splice(0, 3, 0.98, 1, 0.99);
+// the sky is the video's sunset picture behind the transparent canvas: the drawn sun, clouds and far range step aside
+sunMesh.visible = false; clouds.visible = false; range.visible = false;
+// a cell of a 3x3 atlas as its own texture (shares the image), feet at the sprite's anchor
+function stCell(tex, k) {
+  const t = tex.clone(); t.repeat.set(1 / 3, 1 / 3);
+  t.offset.set((k % 3) / 3, 1 - (Math.floor(k / 3) + 1) / 3); t.needsUpdate = true;
+  return t;
+}
+function stSprite(map, order = 3) {
+  const m = new THREE.SpriteMaterial({ map, transparent: true, alphaTest: 0.35, depthWrite: true, toneMapped: false, fog: true });
+  const s = new THREE.Sprite(m); s.center.set(0.5, 3 / 256); s.renderOrder = order; s.visible = false; scene.add(s);
+  return s;
+}
+sakin(() => {
+  const load = p => new Promise(res => new THREE.TextureLoader().load('assets/3d/' + p, t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; res(t); }, undefined, () => res(null)));
+  Promise.all(['chibi.webp', 'nesne.webp', 'doku.webp'].map(load)).then(tx => sakin(() => {
+    if (tx.some(t => !t)) return;   // a missing file keeps the old meshes
+    const [chibi, nesne, doku] = tx;
+    doku.colorSpace = THREE.NoColorSpace; doku.wrapS = doku.wrapT = THREE.RepeatWrapping; ST.doku = doku;
+    // figures: one texture per figure, its offset switches the pose
+    ST.fig = {};
+    for (const [k, c] of [['tur', ST.cell.tur], ['bekci', ST.cell.bekci], ['damla', ST.cell.damla]]) {
+      const s = stSprite(stCell(chibi, c), 4); s.userData.cell = c; ST.fig[k] = s;
+    }
+    // soft contact shadows under the figures and the props
+    const sc = document.createElement('canvas'); sc.width = sc.height = 64;
+    const x = sc.getContext('2d'), gr = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gr.addColorStop(0, 'rgba(90,60,50,0.42)'); gr.addColorStop(0.6, 'rgba(90,60,50,0.18)'); gr.addColorStop(1, 'rgba(90,60,50,0)');
+    x.fillStyle = gr; x.fillRect(0, 0, 64, 64);
+    const shTex = new THREE.CanvasTexture(sc);
+    ST.shadow = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: shTex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }), 64);
+    ST.shadow.frustumCulled = false; ST.shadow.count = 0; ST.shadow.renderOrder = 3; scene.add(ST.shadow);
+    // props: a pool of sprites per tool kind (the board holds at most 16 of each), and the spring basin
+    ST.tool = {};
+    for (const kind of TOOL_KINDS) {
+      const map = stCell(nesne, ST.cell[kind === 'stone' ? 'tas' : kind === 'dam' ? 'set' : 'ayirici']);
+      ST.tool[kind] = [];
+      for (let k = 0; k < 16; k++) { const s = stSprite(map, 3); s.material = k ? ST.tool[kind][0].material : s.material; ST.tool[kind].push(s); }
+    }
+    ST.kaynak = stSprite(stCell(nesne, ST.cell.kaynak), 3);
+    ST.ready = true;
+    if (board) stZemin();
+    G.dirty = true;
+  }));
+});
+// fine travertine relief on the terraces (needs uvs: added here, render only)
+function stZemin() {
+  if (!ST.doku || !board) return;
+  const g = board.terrainGeo;
+  if (!g.attributes.uv) {
+    const p = g.attributes.position, uv = new Float32Array(p.count * 2);
+    for (let k = 0; k < p.count; k++) { uv[k * 2] = p.getX(k) * 0.7; uv[k * 2 + 1] = p.getZ(k) * 0.7; }
+    g.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+  }
+  const m = board.terrain.material;
+  if (m.map !== ST.doku) { m.map = ST.doku; m.needsUpdate = true; }
+}
+const _stP = new THREE.Vector3();
+let stShadowN = 0;
+function stShadow(x, y, z, w, d) {
+  if (stShadowN >= 64) return;
+  tmpM.compose(_stP.set(x, y + 0.03, z), tmpQ.identity(), tmpS.set(w, 1, d));
+  ST.shadow.setMatrixAt(stShadowN++, tmpM);
+}
+function stPose(s, cell) {
+  if (s.userData.cell === cell) return;
+  s.userData.cell = cell;
+  s.material.map.offset.set((cell % 3) / 3, 1 - (Math.floor(cell / 3) + 1) / 3);
+}
+function stPut(s, x, y, z, size, cell, atlas, sway = 0) {
+  const [w, h] = ST.meta[atlas][cell];
+  // the sprite is a full atlas cell; scale by the figure's height so `size` is the figure's world height
+  const k = size / h;
+  s.scale.set(k, k, 1); s.position.set(x, y, z); s.material.rotation = sway; s.visible = true;
+  stShadow(x, y, z, k * w * 0.8, k * w * 0.45);
+}
+// a spot just outside the board on the left or right side, level with cell i but kept off the top rows (the HUD sits
+// there on a wide screen) and off the front row; the front and the back edges stay clear
+function stEdge(i, n, side) {
+  const cx = i % n;
+  if (!side) side = cx < n / 2 ? 'left' : 'right';
+  const zc = Math.min(n - 2, Math.max(2, Math.floor(i / n)));
+  const edgeCell = zc * n + (side === 'left' ? 0 : n - 1);
+  const out = n / 2 + 0.42;
+  return { x: side === 'left' ? -out : out, z: cellZ(edgeCell, n), y: PSim.height(G.st, edgeCell) * HU, side };
+}
+function stFrame(now, dt) {
+  if (!ST.ready) return;
+  const st = G.st, show = !!(st && board && G.screen !== 'end');
+  stShadowN = 0;
+  for (const kind of TOOL_KINDS) for (const s of ST.tool[kind]) s.visible = false;
+  for (const k in ST.fig) ST.fig[k].visible = false;
+  ST.kaynak.visible = false;
+  if (!st || !board) { ST.shadow.count = 0; return; }
+  stZemin();
+  const n = G.n, t = now / 1000, still = calm();
+  const phone = camera.aspect < 1, big = phone ? 1.65 : 1;
+  // the old meshes give way to the clay props
+  for (const kind of TOOL_KINDS) toolMesh[kind].visible = false;
+  spring.visible = false;
+  const cnt = { stone: 0, dam: 0, split: 0 };
+  for (let i = 0; i < n * n; i++) {
+    const kind = st.tool[i];
+    if (!kind) continue;
+    const s = ST.tool[kind][cnt[kind]++];
+    if (!s) continue;
+    const size = kind === 'stone' ? 0.5 : kind === 'dam' ? 0.52 : 0.5;
+    stPut(s, cellX(i, n), PSim.height(st, i) * HU - 0.04, cellZ(i, n), size, ST.cell[kind === 'stone' ? 'tas' : kind === 'dam' ? 'set' : 'ayirici'], 'nesne');
+  }
+  // spring basin
+  const sx = cellX(st.spring, n), sz = cellZ(st.spring, n), sy = PSim.height(st, st.spring) * HU - 0.06;
+  stPut(ST.kaynak, sx, sy, sz, 0.62, ST.cell.kaynak, 'nesne');
+  // reactions: a pool that just filled makes the tourist cheer; the result card decides the last pose
+  const filled = poolCounts().filled;
+  if (G.idx !== ST.lastLevel) { ST.lastLevel = G.idx; ST.lastFilled = filled; ST.cheer = 0; }
+  if (filled > ST.lastFilled) ST.cheer = 2.4;
+  ST.lastFilled = filled;
+  ST.cheer = Math.max(0, ST.cheer - dt);
+  const res = G.screen === 'result' && G.res;
+  const tPose = res ? (G.res.win ? ST.cell.turSevinc : ST.cell.turUzgun) : ST.cheer > 0 ? ST.cell.turSevinc : G.running ? ST.cell.turAyak : ST.cell.tur;
+  const bPose = res ? (G.res.win ? ST.cell.bekciSevinc : ST.cell.bekci) : G.screen === 'title' ? ST.cell.bekciEl : G.running ? ST.cell.bekci : ST.cell.bekciGoster;
+  if (show) {
+    // guardian beside the spring, tourist beside the first pool (other side when both meet)
+    const bk = stEdge(st.spring, n);
+    const pool = st.pools.length ? st.pools[0].i : n * n - 1;
+    const tu = stEdge(pool, n, bk.side === 'right' ? 'left' : 'right');
+    const happy = tPose === ST.cell.turSevinc, hop = still ? 0 : (happy ? Math.abs(Math.sin(t * 7)) * 0.12 : Math.abs(Math.sin(t * 2.2)) * 0.025);
+    stPose(ST.fig.tur, tPose);
+    stPut(ST.fig.tur, tu.x, tu.y + hop, tu.z, 1.25 * big, tPose, 'chibi', still ? 0 : Math.sin(t * 2.2) * 0.04);
+    const bh = still ? 0 : (bPose === ST.cell.bekciSevinc ? Math.abs(Math.sin(t * 7 + 1)) * 0.12 : 0);
+    stPose(ST.fig.bekci, bPose);
+    stPut(ST.fig.bekci, bk.x, bk.y + bh, bk.z, 1.3 * big, bPose, 'chibi', still ? 0 : Math.sin(t * 1.8 + 2) * 0.03);
+    // the droplet hops on the spring's rim
+    const dh = still ? 0 : Math.abs(Math.sin(t * (G.running ? 5 : 2.6))) * 0.22;
+    stPut(ST.fig.damla, sx + 0.28, sy + 0.12 + dh, sz + 0.18, 0.42 * big, ST.cell.damla, 'chibi', still ? 0 : Math.sin(t * 3) * 0.08);
+  }
+  ST.shadow.count = stShadowN; ST.shadow.instanceMatrix.needsUpdate = true;
+}
+// menu and card figures (assets/3d/ui-*.webp)
+function stResFig() {
+  const f = document.getElementById('res-fig');
+  if (f && G.res) f.src = 'assets/3d/ui-' + (G.res.win ? 'turist-sevinc' : 'turist-uzgun') + '.webp';
 }
 
 // ---------- hooks: fast-forward for tests ----------
@@ -3776,6 +3940,7 @@ function frame(now) {
   if (G.dirty && G.st) { refreshTerrain(); refreshTools(); G.dirty = false; G.waterDirty = true; }
   if (G.waterDirty && G.st) { refreshWater(); G.waterDirty = false; }
   if (G.st && board) shimmer(now / 1000);
+  stFrame(now, dt);
   if (gates.length) placeGates(false, dt);
   hudClock += dt;
   if (hudClock > 0.25) {   // keep the HUD counters in step with the simulation
