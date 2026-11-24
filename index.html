@@ -643,6 +643,45 @@
   };
 })(typeof window !== 'undefined' ? window : globalThis);
 /*ARENA-KIT:END*/</script>
+<script>
+/* GL-GUARD: WebGL unavailable / three.js CDN unreachable -> clear TR+EN message instead of a stuck loading screen */
+(function () {
+  var T = {
+    gl: ['WebGL kullanılamıyor. Tarayıcında donanım hızlandırmayı aç ya da başka bir tarayıcı dene.', 'WebGL is unavailable. Enable hardware acceleration in your browser or try another browser.'],
+    net: ['Three.js yüklenemedi. İnternet bağlantını kontrol edip sayfayı yenile.', 'Three.js could not be loaded. Check your connection and reload the page.']
+  };
+  var st = document.createElement('style');
+  st.textContent = '.glfail{margin:10px 0;padding:10px 12px;border-radius:12px;border:1px solid rgba(214,84,60,.65);background:rgba(214,84,60,.16);color:inherit;font-size:13px;line-height:1.4;text-align:left}.glfail p{margin:0 0 4px}.glfail p+p{margin:0;font-size:12px;opacity:.82}.glfail-fixed{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:9999;width:min(92vw,420px);background:#2a1410;color:#f7e9e2;box-shadow:0 8px 30px rgba(0,0,0,.5)}';
+  document.head.appendChild(st);
+  var box = null, kind = '';
+  function show(k) {
+    if (kind === 'gl' && k !== 'gl') return;
+    kind = k; if (k === 'gl') window.__glFailed = true;
+    var pb = document.querySelector('#btn-play'); if (pb) pb.disabled = true;
+    var tr = /^tr/i.test(navigator.language || ''), m = T[k];
+    if (!box) {
+      box = document.createElement('div'); box.className = 'glfail'; box.setAttribute('role', 'alert');
+      var host = document.querySelector('#btn-play');
+      if (host && host.getClientRects().length) { if (host.childElementCount) host.parentNode.insertBefore(box, host); else { host.textContent = ''; host.parentNode.insertBefore(box, host.nextSibling); } }
+      else { box.className += ' glfail-fixed'; document.body.appendChild(box); }
+    }
+    box.textContent = '';
+    [tr ? m[0] : m[1], tr ? m[1] : m[0]].forEach(function (s) { var p = document.createElement('p'); p.textContent = s; box.appendChild(p); });
+  }
+  window.__glFatal = show;
+  window.__glClear = function () { if (box && kind === 'net') { box.remove(); box = null; kind = ''; } };
+  // inert stand-in for the renderer when WebGL cannot start, so the menu code below still runs
+  window.__glStub = function (canvas) {
+    var p = new Proxy(function () {}, {
+      get: function (t, k) { return k === 'domElement' ? canvas : k === Symbol.toPrimitive ? function () { return 0; } : k === 'then' ? undefined : p; },
+      set: function () { return true; }, apply: function () { return p; }, construct: function () { return p; }
+    });
+    return p;
+  };
+  setTimeout(function () { if (!window.__three) show('net'); }, 15000);
+})();
+</script>
+
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"},"integrity":{"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js":"sha384-GY5FqjttLCFRt/McQbyaVdCk2O1IQtOeX8Py6NfD89BIAsIyJFRl4UgSXrk2vXAk"}}
 </script>
@@ -1702,8 +1741,9 @@ var LEVELS = [
 /* LEVELS-END */
 </script>
 
-<script type="module">
+<script type="module" onerror="window.__glFatal&&__glFatal('net')">
 import * as THREE from 'three';
+window.__three = true; if (window.__glClear) window.__glClear();
 
 // ---------- constants and flags ----------
 const Q = new URLSearchParams(location.search);
@@ -1892,7 +1932,9 @@ const starSvg = on => `<svg viewBox="0 0 24 24" class="${on ? 'on' : ''}" aria-h
 // ---------- three.js scene ----------
 const canvas = document.getElementById('c');
 canvas.style.touchAction = 'none';
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+let glFail = false, renderer;
+try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' }); }
+catch (e) { glFail = true; renderer = window.__glStub(canvas); window.__glFatal('gl'); }
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, quality === 'low' ? 1 : 1.5));
 // arena-kit: dynamic pixel ratio for weak GPUs, capped by the game's own quality setting (re-attached in setQuality)
 const perfCap = () => Math.min(window.devicePixelRatio || 1, quality === 'low' ? 1 : 1.5);
@@ -1916,7 +1958,7 @@ sun.shadow.normalBias = 0.06;
 scene.add(hemi, sun, sun.target);
 // arena-core v2 render preset: the canvas is transparent over the CSS backdrop, so no composer: neutral tone mapping,
 // CSS vignette + grain, and a grade that lifts the flat pastel look (no room light: the import map has no three/addons/ entry)
-const FX = window.ArenaCore ? ArenaCore.render.setup(renderer, scene, camera, { tonlama: 'neutral', pozlama: 1.08, ortam: 0, saydam: true, vinyet: 0.24, grain: 0.035, renk: { doygunluk: 1.1, kontrast: 1.08 } }) : null;
+const FX = window.ArenaCore && !glFail ? ArenaCore.render.setup(renderer, scene, camera, { tonlama: 'neutral', pozlama: 1.08, ortam: 0, saydam: true, vinyet: 0.24, grain: 0.035, renk: { doygunluk: 1.1, kontrast: 1.08 } }) : null;
 
 // seeded random so the decor is the same on every load
 let seed = 7741;
@@ -2793,6 +2835,7 @@ function stopTutorial(clearStorage = false) {
 }
 
 function startLevel(i) {
+  if (glFail) return;
   if (i > progress.unlocked - 1) return toast(t('toastLocked'), 'bad');
   G.daily = null;
   loadLevel(i);
@@ -3072,6 +3115,7 @@ const ARENA_URL = 'https://furkiozknn.github.io/pamukkale/';
 function dailyInfo() { if (!window.Arena) return null; const d = Arena.daily(); d.idx = d.seed % LEVEL_COUNT; return d; }
 const dayText = d => String(d).replace(/^(\d{4})(\d{2})(\d{2})$/, '$1-$2-$3');
 function startDaily() {
+  if (glFail) return;
   const d = dailyInfo(); if (!d) return;
   G.daily = d;
   loadLevel(d.idx);
@@ -3976,18 +4020,19 @@ function boot() {
   window.pamukkale = {};
   document.getElementById('loading').classList.add('hidden');
   const simSec = Number(Q.get('sim') || 0);
-  if (simSec > 0) {
+  if (simSec > 0 && !glFail) {
     G.inLevel = false;
     startLevel(Math.min(progress.last, progress.unlocked - 1));
     G.running = true; setTrickle(false);
     window.pamukkaleSim(simSec);
     G.running = true;
-  } else if (!FLAGS.auto && !Q.has('menu') && !isTutorialDone() && progress.unlocked <= 1 && !Object.keys(progress.stars).length) {
+  } else if (!FLAGS.auto && !Q.has('menu') && !isTutorialDone() && progress.unlocked <= 1 && !Object.keys(progress.stars).length && !glFail) {
     // Instant start: a first-time player lands in level 1, where the tutorial teaches through play; ?menu forces the title
     startLevel(0);
   } else {
     loadLevel(0);
     showScreen('title');
+    if (glFail) for (const id of ['btn-play', 'btn-continue', 'btn-daily', 'btn-areas']) document.getElementById(id).disabled = true; // no WebGL: menu stays readable, Play stays off
   }
   if (FLAGS.auto) { bot.phase = 'title'; }
   if (Q.has('testtouch')) {
